@@ -342,7 +342,7 @@
     </section>
   </div>
 
-  <div id="view-stretches" class="hidden">
+  <div id="view-stretches" class="hidden section">
     <div id="stretchesContent"></div>
   </div>
 
@@ -364,6 +364,37 @@ const STORAGE_KEYS = { current: 'gymlog_current', history: 'gymlog_history', pro
 let state = { exercises: [], timerStart: null, timerElapsed: 0, timerRunning: false, history: [] };
 let profile = { height: 180, weight: 80 };
 let chartInstance = null;
+
+const stretchLibrary = {
+  "Chest": [
+    { name: "Doorway Chest Stretch", duration: "45s", instructions: "Place forearms on doorway frames and lean forward." },
+    { name: "Pec Minor Floor Stretch", duration: "30s/side", instructions: "Lying on stomach, extend one arm out at 90° and roll away from it." }
+  ],
+  "Back": [
+    { name: "Cat-Cow Stretch", duration: "10 reps", instructions: "On all fours, alternate between arching and rounding your spine." },
+    { name: "Child’s Pose", duration: "1m", instructions: "Sit on heels, arms extended forward on the floor." }
+  ],
+  "Shoulders": [
+    { name: "Cross-Body Shoulder Stretch", duration: "30s/side", instructions: "Pull one arm across your chest using the other arm." },
+    { name: "Sleeper Stretch", duration: "30s/side", instructions: "Lying on your side, gently press your forearm toward the floor." }
+  ],
+  "Arms": [
+    { name: "Overhead Tricep Stretch", duration: "30s/side", instructions: "Reach one hand down your spine and pull the elbow with the other hand." },
+    { name: "Wrist Extensor Stretch", duration: "30s/side", instructions: "Extend arm, palm down, and gently pull fingers toward you." }
+  ],
+  "Legs": [
+    { name: "Pigeon Pose", duration: "1m/side", instructions: "Bring one knee forward and rotate it outward; sink hips toward the floor." },
+    { name: "Couch Stretch", duration: "1m/side", instructions: "Back knee on ground, foot against a wall; stay upright to stretch quads/hip flexors." }
+  ],
+  "Core": [
+    { name: "Cobra Stretch", duration: "45s", instructions: "Lying on stomach, press up with hands to stretch the abdominals." },
+    { name: "Sphinx Pose", duration: "1m", instructions: "Prop yourself up on your forearms to gently extend the spine." }
+  ],
+  "Full Body": [
+    { name: "World's Greatest Stretch", duration: "5 reps/side", instructions: "Lunge forward, elbow to instep, then rotate arm to the sky." },
+    { name: "Deep Squat Hold", duration: "1m", instructions: "Sit in a deep squat, using elbows to push knees out." }
+  ]
+};
 
 const BODY_SVG = `
 <svg viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
@@ -457,7 +488,6 @@ function updateAvatarProportions() {
     const scaler = document.getElementById('bodyScaler');
     if (!scaler) return;
 
-    // Normalizing scales: 180cm = 1.0h, 80kg = 1.0w
     const hScale = h / 180;
     const wScale = w / 80;
 
@@ -545,6 +575,37 @@ function renderTodayList() {
   `).join('');
 }
 
+function renderStretches() {
+  const container = document.getElementById('stretchesContent');
+  const workedParts = [...new Set(state.exercises.map(ex => ex.bodyPart))];
+  
+  let html = `<h2 class="section-title">Recovery Plan</h2>`;
+  
+  if (workedParts.length === 0) {
+    html += `<p style="color:var(--text-muted); margin-bottom:15px;">Log a workout to see targeted stretches. Here is a general mobility routine:</p>`;
+    workedParts.push("Full Body");
+  } else {
+    html += `<p style="color:var(--accent); font-family:var(--mono); font-size:10px; text-transform:uppercase; margin-bottom:15px;">Targeting: ${workedParts.join(' + ')}</p>`;
+  }
+
+  workedParts.forEach(part => {
+    const stretches = stretchLibrary[part] || stretchLibrary["Full Body"];
+    stretches.forEach(s => {
+      html += `
+        <div class="history-item" style="border-left: 2px solid var(--accent); margin-bottom: 12px;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline;">
+            <div style="font-weight:700; color:var(--text);">${s.name}</div>
+            <div style="font-family:var(--mono); font-size:11px; color:var(--accent);">${s.duration}</div>
+          </div>
+          <div style="font-size:12px; color:var(--text-muted); margin-top:4px; line-height:1.4;">${s.instructions}</div>
+        </div>
+      `;
+    });
+  });
+
+  container.innerHTML = html;
+}
+
 function renderHistory() {
   const list = document.getElementById('historyList');
   list.innerHTML = state.history.map(s => `
@@ -568,7 +629,7 @@ function renderBody() {
     if (worked.has("Full Body")) m.classList.add('active');
   });
   document.getElementById('workedSummary').innerHTML = Array.from(worked).map(p => `<span class="worked-tag">${p}</span>`).join(' ');
-  updateAvatarProportions(); // Recalculate dimensions on render
+  updateAvatarProportions();
 }
 
 /* ============== TIMER UTILS ============== */
@@ -589,9 +650,12 @@ document.querySelectorAll('.tab').forEach(btn => {
   btn.onclick = () => {
     document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    document.getElementById('view-today').classList.toggle('hidden', btn.dataset.tab !== 'today');
-    document.getElementById('view-history').classList.toggle('hidden', btn.dataset.tab !== 'history');
-    if (btn.dataset.tab === 'history') renderHistory();
+    const target = btn.dataset.tab;
+    document.getElementById('view-today').classList.toggle('hidden', target !== 'today');
+    document.getElementById('view-history').classList.toggle('hidden', target !== 'history');
+    document.getElementById('view-stretches').classList.toggle('hidden', target !== 'stretches');
+    if (target === 'history') renderHistory();
+    if (target === 'stretches') renderStretches();
   };
 });
 
