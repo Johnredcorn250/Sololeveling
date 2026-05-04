@@ -6,255 +6,602 @@
 <meta name="theme-color" content="#0a0a0a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GYMLOG">
 <title>GYMLOG | Solo Leveling</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<!-- Added Chart.js for Muscle Balance -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
   :root {
-    --bg: #0a0a0a; --surface: #141414; --surface-2: #1c1c1c; --border: #262626;
-    --text: #f5f1ea; --text-muted: #888; --accent: #ff4d1f; --accent-dim: rgba(255, 77, 31, 0.15);
-    --display: 'Anton', sans-serif; --body: 'Manrope', sans-serif; --mono: 'JetBrains Mono', monospace;
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-2: #1c1c1c;
+    --border: #262626;
+    --text: #f5f1ea;
+    --text-muted: #888;
+    --text-faint: #555;
+    --accent: #ff4d1f;
+    --accent-dim: rgba(255, 77, 31, 0.15);
+    --success: #5fc97e;
+    --display: 'Anton', sans-serif;
+    --body: 'Manrope', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+    --rank-s: #00f2ff; /* S-Rank Neon Blue */
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body { background: var(--bg); color: var(--text); font-family: var(--body); min-height: 100vh; padding: 20px; background-attachment: fixed; background-image: radial-gradient(circle at 20% 0%, rgba(255, 77, 31, 0.08) 0%, transparent 40%); }
-  .app { max-width: 500px; margin: 0 auto; padding-bottom: 50px; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.5;
+    overflow-x: hidden;
+    min-height: 100vh;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  body {
+    background-image: 
+      radial-gradient(circle at 20% 0%, rgba(255, 77, 31, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 80% 100%, rgba(255, 77, 31, 0.04) 0%, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  .app { max-width: 540px; margin: 0 auto; padding: 0 20px 100px; padding-top: env(safe-area-inset-top); }
 
   /* HEADER */
-  .header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
-  .logo { font-family: var(--display); font-size: 32px; letter-spacing: 1px; }
-  .logo span { color: var(--accent); }
+  .header {
+    padding: 28px 0 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .logo {
+    font-family: var(--display);
+    font-size: 38px;
+    letter-spacing: 0.02em;
+    line-height: 0.85;
+  }
+  .logo .accent { color: var(--accent); }
+  .date {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-align: right;
+  }
 
   /* TABS */
-  .tabs { display: flex; gap: 5px; margin: 20px 0; background: var(--surface); padding: 5px; border-radius: 50px; border: 1px solid var(--border); }
-  .tab { flex: 1; padding: 10px; border: none; background: none; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 11px; border-radius: 50px; cursor: pointer; }
-  .tab.active { background: var(--text); color: var(--bg); }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-top: 16px;
+    padding: 4px;
+    background: var(--surface);
+    border-radius: 999px;
+    border: 1px solid var(--border);
+  }
+  .tab {
+    flex: 1;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: var(--body);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .tab.active {
+    background: var(--text);
+    color: var(--bg);
+  }
 
-  /* AVATAR SYSTEM */
-  .body-section { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; gap: 20px; align-items: center; margin-top: 20px; }
-  .body-figure { width: 120px; display: flex; justify-content: center; overflow: visible; }
-  .muscle { fill: #2a2a2a; stroke: #1a1a1a; stroke-width: 0.5; transition: all 0.5s ease; }
-  .muscle.active { fill: var(--accent); filter: drop-shadow(0 0 5px var(--accent)); }
+  /* ANALYTICS CARD */
+  .analytics-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 24px;
+  }
+
+  /* PR BADGE STYLE */
+  .pr-badge {
+    font-family: var(--display);
+    background: var(--accent);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-left: 8px;
+    animation: rankGlow 2s infinite alternate;
+  }
+
+  @keyframes rankGlow {
+    from { box-shadow: 0 0 5px var(--accent); }
+    to { box-shadow: 0 0 15px var(--accent); }
+  }
+
+  /* TIMER CARD */
+  .timer-card {
+    margin-top: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .timer-card.running {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 8px 32px rgba(255, 77, 31, 0.12);
+  }
+  .timer-card.running::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+  .timer-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .timer-display {
+    font-family: var(--mono);
+    font-size: 48px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    line-height: 1;
+  }
+  .timer-display.running { color: var(--accent); }
+  .timer-actions { display: flex; gap: 8px; margin-top: 16px; }
+
+  /* BODY SILHOUETTE & PROFILE */
+  .body-section {
+    margin-top: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+  .body-figure { width: 130px; flex-shrink: 0; display: flex; justify-content: center; }
+  .body-figure svg { width: 100%; height: auto; overflow: visible; }
+  .muscle { fill: #2a2a2a; stroke: #1a1a1a; stroke-width: 0.5; transition: fill 0.5s ease; }
+  .muscle.active { fill: var(--accent); }
+  .body-summary { flex: 1; }
+  .body-summary h3 {
+    font-family: var(--display);
+    font-size: 22px;
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+  }
+  .worked-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .worked-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border-radius: 999px;
+  }
+
+  /* PHYSICAL STATS INPUTS */
+  .stats-inputs { display: flex; gap: 8px; margin-bottom: 12px; }
+  .stat-field { flex: 1; }
+  .stat-field input { 
+    width: 100%; 
+    background: var(--surface-2); 
+    border: 1px solid var(--border); 
+    color: var(--text); 
+    padding: 6px 10px; 
+    border-radius: 8px; 
+    font-family: var(--mono); 
+    font-size: 11px;
+  }
+
+  /* FORM & LISTS */
+  .section { margin-top: 32px; }
+  .section-title {
+    font-family: var(--display);
+    font-size: 24px;
+    letter-spacing: 0.02em;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+  .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .field label { font-family: var(--mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; display: block; }
+  .field input, .field select { width: 100%; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 12px 14px; border-radius: 10px; font-family: var(--body); }
   
-  /* STATS FORM */
-  .stats-row { display: flex; gap: 10px; margin-top: 15px; }
-  .stat-input { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 8px; width: 100%; font-family: var(--mono); font-size: 12px; }
+  .btn { background: var(--text); color: var(--bg); border: none; padding: 14px 20px; border-radius: 10px; font-weight: 700; text-transform: uppercase; cursor: pointer; width: 100%; }
+  .btn-accent { background: var(--accent); color: var(--text); }
+  .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  .hidden { display: none !important; }
 
-  /* CARDS */
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-top: 20px; }
-  .field label { display: block; font-family: var(--mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; }
-  input, select { width: 100%; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 12px; border-radius: 10px; margin-bottom: 10px; }
-  .btn { width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
-  .btn-accent { background: var(--accent); color: white; }
-  
-  .exercise-item { background: var(--surface-2); padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; border-left: 3px solid var(--border); }
-  .pr-badge { background: var(--accent); font-size: 10px; padding: 2px 6px; border-radius: 4px; font-family: var(--display); }
-  .rank-text { color: var(--accent); font-family: var(--display); font-size: 24px; }
+  /* HISTORY LIST */
+  .history-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 10px; }
+  .history-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+  .history-date { font-family: var(--display); font-size: 18px; }
 
-  .hidden { display: none; }
-  #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 10px 20px; border-radius: 50px; font-weight: 700; opacity: 0; transition: 0.3s; z-index: 999; }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--text); color: var(--bg); padding: 10px 20px; border-radius: 999px; font-weight: 600; transition: transform 0.3s; z-index: 100; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* CHART STYLES */
+  #muscleChart { max-height: 250px; margin-top: 15px; }
+
 </style>
 </head>
 <body>
-
 <div class="app">
+
   <header class="header">
-    <div class="logo">GYM<span>LOG</span></div>
-    <div id="todayDate" style="font-family: var(--mono); font-size: 10px; color: var(--text-muted);"></div>
+    <div class="logo">GYM<span class="accent">LOG</span></div>
+    <div class="date" id="todayDate"></div>
   </header>
 
   <div class="tabs">
     <button class="tab active" data-tab="today">Today</button>
+    <button class="tab" data-tab="stretches">Stretches</button>
     <button class="tab" data-tab="history">History</button>
   </div>
 
   <div id="view-today">
-    <!-- PERSONALIZED AVATAR -->
+    <div class="timer-card" id="timerCard">
+      <div class="timer-label" id="timerLabel">Workout Duration</div>
+      <div class="timer-display" id="timerDisplay">00:00:00</div>
+      <div class="timer-actions">
+        <button class="btn btn-accent" id="timerStart">Start Workout</button>
+        <button class="btn btn-ghost hidden" id="timerPause" style="flex:1">Pause</button>
+        <button class="btn btn-ghost hidden" id="timerEnd" style="flex:1">End</button>
+      </div>
+    </div>
+
     <div class="body-section">
-      <div class="body-figure" id="bodyContainer">
-        <!-- SVG injected by JS -->
-      </div>
-      <div style="flex:1">
-        <h3 style="font-family: var(--display); font-size: 20px;">PLAYER PROPORTIONS</h3>
-        <div class="stats-row">
-          <div class="field">
-            <label>Height (cm)</label>
-            <input type="number" id="userHeight" class="stat-input" placeholder="180" oninput="updateAvatarProportions()">
-          </div>
-          <div class="field">
-            <label>Weight (kg)</label>
-            <input type="number" id="userWeight" class="stat-input" placeholder="80" oninput="updateAvatarProportions()">
-          </div>
+      <div class="body-figure" id="bodyFigure"></div>
+      <div class="body-summary">
+        <h3>My Profile</h3>
+        <div class="stats-inputs">
+            <div class="stat-field">
+                <input type="number" id="userHeight" placeholder="H (cm)" oninput="updateAvatarProportions()">
+            </div>
+            <div class="stat-field">
+                <input type="number" id="userWeight" placeholder="W (kg)" oninput="updateAvatarProportions()">
+            </div>
         </div>
-        <div id="workedSummary" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 5px;"></div>
+        <div id="workedSummary" class="empty">No exercises logged yet.</div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="field">
-        <label>Exercise Name</label>
-        <input type="text" id="exName" placeholder="Squats..." oninput="checkPRSuggestion()">
-        <p id="prHint" style="font-size: 10px; color: var(--accent); margin-bottom: 10px; display: none;"></p>
-      </div>
-      <div style="display: flex; gap: 10px;">
-        <div class="field" style="flex:1">
-          <label>Weight (kg)</label>
-          <input type="number" id="exWeight">
+    <section class="section">
+      <h2 class="section-title">Log Exercise</h2>
+      <div class="form-card">
+        <div class="form-row">
+          <div class="field" style="flex: 2">
+            <label>Exercise</label>
+            <input type="text" id="exName" placeholder="Bench press" oninput="checkPRSuggestion()">
+            <div id="prHint" style="font-size: 10px; color: var(--accent); margin-top: 4px; display: none;"></div>
+          </div>
+          <div class="field">
+            <label>Body Part</label>
+            <select id="exBodyPart">
+              <option value="Chest">Chest</option>
+              <option value="Back">Back</option>
+              <option value="Shoulders">Shoulders</option>
+              <option value="Arms">Arms</option>
+              <option value="Legs">Legs</option>
+              <option value="Core">Core</option>
+              <option value="Full Body">Full Body</option>
+            </select>
+          </div>
         </div>
-        <div class="field" style="flex:1">
-          <label>Target Part</label>
-          <select id="exBodyPart">
-            <option value="Chest">Chest</option>
-            <option value="Back">Back</option>
-            <option value="Shoulders">Shoulders</option>
-            <option value="Arms">Arms</option>
-            <option value="Legs">Legs</option>
-            <option value="Core">Core</option>
-          </select>
+        <div class="form-row">
+          <div class="field"><label>Weight (kg)</label><input type="number" id="exWeight" step="0.5"></div>
+          <div class="field"><label>Sets</label><input type="number" id="exSets"></div>
+          <div class="field"><label>Reps</label><input type="number" id="exReps"></div>
         </div>
+        <button class="btn" id="addExercise">+ Add Exercise</button>
       </div>
-      <button class="btn btn-accent" onclick="addExercise()">+ Log Activity</button>
-    </div>
+    </section>
 
-    <div id="todayList" style="margin-top: 20px;"></div>
-    <button class="btn" style="margin-top: 10px; background: var(--surface); color: var(--text);" onclick="endWorkout()">Finish Session</button>
+    <section class="section">
+      <h2 class="section-title">Logged <span class="meta" id="loggedMeta">0 exercises</span></h2>
+      <div class="exercise-list" id="todayList"></div>
+    </section>
+  </div>
+
+  <div id="view-stretches" class="hidden">
+    <div id="stretchesContent"></div>
   </div>
 
   <div id="view-history" class="hidden">
-    <div class="card"><canvas id="muscleChart"></canvas></div>
+    <div class="analytics-card">
+      <h3 style="font-family: var(--display); letter-spacing: 0.05em;">MUSCLE BALANCE</h3>
+      <canvas id="muscleChart"></canvas>
+    </div>
     <div id="historyList"></div>
   </div>
+
 </div>
 
-<div id="toast">SAVED</div>
+<div class="toast" id="toast">Saved</div>
 
 <script>
-let state = { exercises: [], history: [], userHeight: 175, userWeight: 75 };
-const SVG_TEMPLATE = `
-<svg id="avatarSvg" viewBox="0 0 200 400" width="100%" height="100%">
+/* ============== STATE & CONSTANTS ============== */
+const STORAGE_KEYS = { current: 'gymlog_current', history: 'gymlog_history', profile: 'gymlog_profile' };
+let state = { exercises: [], timerStart: null, timerElapsed: 0, timerRunning: false, history: [] };
+let profile = { height: 180, weight: 80 };
+let chartInstance = null;
+
+const BODY_SVG = `
+<svg viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
   <g id="bodyScaler" transform-origin="center bottom">
-    <circle cx="100" cy="40" r="18" class="muscle" /> <!-- Head -->
-    <path d="M 60 80 Q 100 70 140 80 L 145 100 Q 100 90 55 100 Z" class="muscle" data-zone="Shoulders" id="path-shoulders"/>
-    <path d="M 65 100 Q 100 95 135 100 L 132 140 Q 100 145 68 140 Z" class="muscle" data-zone="Chest" id="path-chest"/>
-    <path d="M 75 140 Q 100 145 125 140 L 122 210 Q 100 215 78 210 Z" class="muscle" data-zone="Core" id="path-core"/>
-    <path d="M 55 100 L 40 170 L 55 175 Z" class="muscle" data-zone="Arms" id="path-larm"/>
-    <path d="M 145 100 L 160 170 L 145 175 Z" class="muscle" data-zone="Arms" id="path-rarm"/>
-    <path d="M 78 210 L 70 320 L 98 320 L 100 215 Z" class="muscle" data-zone="Legs" id="path-lleg"/>
-    <path d="M 122 210 L 130 320 L 102 320 L 100 215 Z" class="muscle" data-zone="Legs" id="path-rleg"/>
+    <circle cx="100" cy="35" r="20" class="muscle"/>
+    <rect x="93" y="54" width="14" height="14" class="muscle"/>
+    <path d="M 58 78 Q 100 68 142 78 L 148 96 Q 100 86 52 96 Z" class="muscle" data-zone="Shoulders"/>
+    <path d="M 64 96 Q 100 92 136 96 L 134 132 Q 100 138 66 132 Z" class="muscle" data-zone="Chest"/>
+    <path d="M 76 132 Q 100 136 124 132 L 121 200 Q 100 204 79 200 Z" class="muscle" data-zone="Core"/>
+    <path d="M 52 96 L 42 102 L 36 162 L 50 166 L 60 104 Z" class="muscle" data-zone="Arms"/>
+    <path d="M 148 96 L 158 102 L 164 162 L 150 166 L 140 104 Z" class="muscle" data-zone="Arms"/>
+    <path d="M 36 162 L 30 226 L 44 230 L 50 166 Z" class="muscle"/>
+    <path d="M 164 162 L 170 226 L 156 230 L 150 166 Z" class="muscle"/>
+    <path d="M 79 200 L 71 296 L 95 296 L 97 204 Z" class="muscle" data-zone="Legs"/>
+    <path d="M 121 200 L 129 296 L 105 296 L 103 204 Z" class="muscle" data-zone="Legs"/>
+    <path d="M 73 296 L 70 376 L 92 376 L 95 296 Z" class="muscle" data-zone="Legs"/>
+    <path d="M 127 296 L 130 376 L 108 376 L 105 296 Z" class="muscle" data-zone="Legs"/>
   </g>
 </svg>`;
 
-function updateAvatarProportions() {
-  const h = document.getElementById('userHeight').value || 175;
-  const w = document.getElementById('userWeight').value || 75;
-  state.userHeight = h; state.userWeight = w;
-  save();
-
-  const scaler = document.getElementById('bodyScaler');
-  if (!scaler) return;
-
-  // Logic: Base height 175cm = scale 1. Base weight 75kg = scale 1.
-  const hScale = h / 175;
-  const wScale = w / 75;
-
-  // Apply non-uniform scaling
-  scaler.setAttribute('transform', `scale(${wScale.toFixed(2)}, ${hScale.toFixed(2)})`);
-}
-
-function addExercise() {
-  const name = document.getElementById('exName').value;
-  const weight = parseFloat(document.getElementById('exWeight').value) || 0;
-  const part = document.getElementById('exBodyPart').value;
-
-  const pr = getPR(name);
-  const isPR = weight > pr && pr > 0;
-
-  state.exercises.push({
-    name, weight, part, isPR, 
-    rank: weight > 100 ? 'S' : weight > 80 ? 'A' : weight > 60 ? 'B' : 'E'
+/* ============== ANALYTICS & PR LOGIC ============== */
+function getPRForExercise(name) {
+  let maxWeight = 0;
+  state.history.forEach(session => {
+    session.exercises.forEach(ex => {
+      if (ex.name.toLowerCase() === name.toLowerCase()) {
+        maxWeight = Math.max(maxWeight, ex.weight || 0);
+      }
+    });
   });
-
-  if (isPR) showToast("RANK UP!");
-  renderAll();
-  save();
-}
-
-function renderAll() {
-  const list = document.getElementById('todayList');
-  list.innerHTML = state.exercises.slice().reverse().map(ex => `
-    <div class="exercise-item">
-      <div>
-        <div style="font-weight:700">${ex.name} ${ex.isPR ? '<span class="pr-badge">PR</span>' : ''}</div>
-        <div style="font-size:11px; color:var(--text-muted)">${ex.part} · ${ex.weight}kg</div>
-      </div>
-      <div class="rank-text">${ex.rank}</div>
-    </div>
-  `).join('');
-
-  const summary = document.getElementById('workedSummary');
-  const parts = [...new Set(state.exercises.map(e => e.part))];
-  summary.innerHTML = parts.map(p => `<span style="background:var(--accent-dim); color:var(--accent); padding:2px 8px; border-radius:20px; font-size:10px; font-weight:700">${p.toUpperCase()}</span>`).join('');
-
-  // Update muscles
-  document.querySelectorAll('.muscle').forEach(m => {
-    m.classList.toggle('active', parts.includes(m.dataset.zone));
-  });
-}
-
-function getPR(name) {
-  let max = 0;
-  state.history.forEach(s => s.exercises.forEach(e => {
-    if (e.name.toLowerCase() === name.toLowerCase()) max = Math.max(max, e.weight);
-  }));
-  return max;
+  return maxWeight;
 }
 
 function checkPRSuggestion() {
-  const name = document.getElementById('exName').value;
-  const pr = getPR(name);
+  const name = document.getElementById('exName').value.trim();
   const hint = document.getElementById('prHint');
-  if (pr > 0) { hint.innerText = `Current PR: ${pr}kg. Aim for ${pr + 2.5}kg?`; hint.style.display = 'block'; }
-  else hint.style.display = 'none';
+  if (name.length < 3) { hint.style.display = 'none'; return; }
+  const pr = getPRForExercise(name);
+  if (pr > 0) {
+    hint.textContent = `Current Max: ${pr}kg. Level up to ${pr + 2.5}kg?`;
+    hint.style.display = 'block';
+  } else { hint.style.display = 'none'; }
+}
+
+function getRank(weight) {
+  if (weight >= 140) return 'S';
+  if (weight >= 100) return 'A';
+  if (weight >= 80) return 'B';
+  if (weight >= 60) return 'C';
+  if (weight >= 40) return 'D';
+  return 'E';
+}
+
+function renderMuscleChart() {
+  const ctx = document.getElementById('muscleChart').getContext('2d');
+  const counts = { Chest: 0, Back: 0, Shoulders: 0, Arms: 0, Legs: 0, Core: 0 };
+  
+  state.history.forEach(s => {
+    s.exercises.forEach(e => {
+      if (counts[e.bodyPart] !== undefined) counts[e.bodyPart] += (e.weight * (e.sets || 1) * (e.reps || 1));
+    });
+  });
+
+  if (chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: Object.keys(counts),
+      datasets: [{
+        label: 'Volume Distribution',
+        data: Object.values(counts),
+        backgroundColor: 'rgba(255, 77, 31, 0.2)',
+        borderColor: '#ff4d1f',
+        pointBackgroundColor: '#ff4d1f'
+      }]
+    },
+    options: {
+      scales: { r: { grid: { color: '#262626' }, angleLines: { color: '#262626' }, ticks: { display: false } } },
+      plugins: { legend: { display: false } }
+    }
+  });
+}
+
+/* ============== PHYSICAL MODEL LOGIC ============== */
+function updateAvatarProportions() {
+    const h = parseFloat(document.getElementById('userHeight').value) || 180;
+    const w = parseFloat(document.getElementById('userWeight').value) || 80;
+    profile = { height: h, weight: w };
+    localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(profile));
+
+    const scaler = document.getElementById('bodyScaler');
+    if (!scaler) return;
+
+    // Normalizing scales: 180cm = 1.0h, 80kg = 1.0w
+    const hScale = h / 180;
+    const wScale = w / 80;
+
+    scaler.setAttribute('transform', `scale(${wScale.toFixed(2)}, ${hScale.toFixed(2)})`);
+}
+
+/* ============== CORE LOGIC ============== */
+function saveState() {
+  localStorage.setItem(STORAGE_KEYS.current, JSON.stringify(state));
+  localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(state.history));
+}
+
+function loadState() {
+  const cur = localStorage.getItem(STORAGE_KEYS.current);
+  if (cur) Object.assign(state, JSON.parse(cur));
+  const hist = localStorage.getItem(STORAGE_KEYS.history);
+  if (hist) state.history = JSON.parse(hist);
+  const prof = localStorage.getItem(STORAGE_KEYS.profile);
+  if (prof) {
+      profile = JSON.parse(prof);
+      document.getElementById('userHeight').value = profile.height;
+      document.getElementById('userWeight').value = profile.weight;
+  }
+}
+
+function addExercise() {
+  const name = document.getElementById('exName').value.trim();
+  const weight = parseFloat(document.getElementById('exWeight').value);
+  if (!name) return;
+
+  const currentPR = getPRForExercise(name);
+  const isPR = weight > currentPR && currentPR > 0;
+
+  state.exercises.push({
+    id: Date.now(),
+    name,
+    bodyPart: document.getElementById('exBodyPart').value,
+    weight,
+    sets: parseInt(document.getElementById('exSets').value),
+    reps: parseInt(document.getElementById('exReps').value),
+    isPR: isPR,
+    rank: getRank(weight)
+  });
+
+  if (isPR) toast("🚨 RANK UP! NEW PR 🚨");
+  else toast("Logged");
+
+  if (!state.timerRunning && state.timerElapsed === 0) startTimer();
+  document.getElementById('exName').value = '';
+  saveState();
+  renderAll();
 }
 
 function endWorkout() {
   if (state.exercises.length === 0) return;
-  state.history.unshift({ date: new Date().toISOString(), exercises: [...state.exercises] });
+  if (!confirm('Save workout to history?')) return;
+  
+  const session = {
+    id: Date.now(),
+    date: new Date().toISOString(),
+    duration: state.timerElapsed + (state.timerRunning ? Date.now() - state.timerStart : 0),
+    exercises: [...state.exercises]
+  };
+  
+  state.history.unshift(session);
   state.exercises = [];
-  save(); renderAll(); showToast("SESSION COMPLETE");
+  state.timerRunning = false;
+  state.timerElapsed = 0;
+  saveState();
+  renderAll();
 }
 
-function save() { 
-  localStorage.setItem('gymlog_v2', JSON.stringify(state)); 
+/* ============== UI RENDERING ============== */
+function renderTodayList() {
+  const list = document.getElementById('todayList');
+  document.getElementById('loggedMeta').textContent = `${state.exercises.length} items`;
+  list.innerHTML = state.exercises.slice().reverse().map(ex => `
+    <div class="exercise-item" style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+      <div style="flex:1">
+        <div class="exercise-name" style="font-weight: 700; color: var(--text);">${ex.name} ${ex.isPR ? '<span class="pr-badge">PR</span>' : ''}</div>
+        <div class="exercise-meta" style="font-size: 12px; color: var(--text-muted);">${ex.bodyPart} · ${ex.weight}kg · ${ex.sets}x${ex.reps}</div>
+      </div>
+      <div style="font-family: var(--display); color: var(--accent); font-size: 20px;">${ex.rank}</div>
+    </div>
+  `).join('');
 }
 
-function load() {
-  const data = localStorage.getItem('gymlog_v2');
-  if (data) state = JSON.parse(data);
-  document.getElementById('userHeight').value = state.userHeight;
-  document.getElementById('userWeight').value = state.userWeight;
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  list.innerHTML = state.history.map(s => `
+    <div class="history-item">
+      <div class="history-header">
+        <div class="history-date">${new Date(s.date).toLocaleDateString().toUpperCase()}</div>
+        <div style="color: var(--text-muted); font-size: 12px;">${Math.round(s.duration/60000)}m</div>
+      </div>
+      ${s.exercises.map(e => `<div style="font-size: 13px; display:flex; justify-content:space-between"><span>${e.name}</span><span>${e.weight}kg</span></div>`).join('')}
+    </div>
+  `).join('');
+  renderMuscleChart();
 }
 
-function showToast(m) { 
-  const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = 1; 
-  setTimeout(() => t.style.opacity = 0, 2000); 
+function renderBody() {
+  const fig = document.getElementById('bodyFigure');
+  fig.innerHTML = BODY_SVG;
+  const worked = new Set(state.exercises.map(e => e.bodyPart));
+  fig.querySelectorAll('.muscle').forEach(m => {
+    if (worked.has(m.dataset.zone)) m.classList.add('active');
+    if (worked.has("Full Body")) m.classList.add('active');
+  });
+  document.getElementById('workedSummary').innerHTML = Array.from(worked).map(p => `<span class="worked-tag">${p}</span>`).join(' ');
+  updateAvatarProportions(); // Recalculate dimensions on render
 }
 
-// Tabs
-document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
-  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-  t.classList.add('active');
-  document.getElementById('view-today').classList.toggle('hidden', t.dataset.tab !== 'today');
-  document.getElementById('view-history').classList.toggle('hidden', t.dataset.tab !== 'history');
+/* ============== TIMER UTILS ============== */
+function startTimer() { state.timerStart = Date.now(); state.timerRunning = true; setInterval(updateTimer, 1000); renderTimerUI(); }
+function updateTimer() { if (!state.timerRunning) return; const ms = state.timerElapsed + (Date.now() - state.timerStart); document.getElementById('timerDisplay').textContent = new Date(ms).toISOString().substr(11, 8); }
+function renderTimerUI() {
+  const isRun = state.timerRunning;
+  document.getElementById('timerStart').classList.toggle('hidden', isRun || state.timerElapsed > 0);
+  document.getElementById('timerPause').classList.toggle('hidden', !isRun);
+  document.getElementById('timerEnd').classList.toggle('hidden', !isRun && state.timerElapsed === 0);
+}
+
+/* ============== INIT ============== */
+function renderAll() { renderTodayList(); renderBody(); renderTimerUI(); }
+function toast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
+
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('view-today').classList.toggle('hidden', btn.dataset.tab !== 'today');
+    document.getElementById('view-history').classList.toggle('hidden', btn.dataset.tab !== 'history');
+    if (btn.dataset.tab === 'history') renderHistory();
+  };
 });
 
-// Init
-document.getElementById('bodyContainer').innerHTML = SVG_TEMPLATE;
-document.getElementById('todayDate').innerText = new Date().toDateString().toUpperCase();
-load();
+document.getElementById('addExercise').onclick = addExercise;
+document.getElementById('timerStart').onclick = startTimer;
+document.getElementById('timerEnd').onclick = endWorkout;
+document.getElementById('todayDate').textContent = new Date().toDateString().toUpperCase();
+
+loadState();
 renderAll();
-updateAvatarProportions();
 </script>
 </body>
 </html>
