@@ -11,6 +11,33 @@ body { background:#0a0a0a; color:white; font-family:sans-serif; max-width:500px;
 input, select, button { margin:5px 0; padding:10px; width:100%; }
 button { cursor:pointer; }
 .hidden { display:none; }
+
+/* 🔥 RANK BADGE */
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 77, 31, 0.1);
+  border: 1px solid rgba(255, 77, 31, 0.4);
+  color: #ff4d1f;
+  margin-bottom: 10px;
+}
+
+.rank-letter {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Glow tiers */
+.rank-S { box-shadow: 0 0 10px rgba(0,242,255,0.7); color:#00f2ff; }
+.rank-A { box-shadow: 0 0 8px rgba(255,77,31,0.6); }
+
 </style>
 </head>
 
@@ -50,7 +77,10 @@ button { cursor:pointer; }
 <hr>
 
 <h3>History</h3>
+
+<div id="userRank"></div>
 <div id="totalVolume"></div>
+
 <canvas id="muscleChart"></canvas>
 <div id="historyList"></div>
 
@@ -70,6 +100,33 @@ let state = {
 
 let timerInterval = null;
 let lastExercise = null;
+
+/* ================= RANK SYSTEM ================= */
+
+function getUserRank() {
+  const count = state.history.length;
+
+  if (count >= 40) return "S";
+  if (count >= 21) return "A";
+  if (count >= 11) return "B";
+  if (count >= 6) return "C";
+  if (count >= 3) return "D";
+  return "E";
+}
+
+function renderRank() {
+  const rank = getUserRank();
+  const count = state.history.length;
+
+  const el = document.getElementById('userRank');
+
+  el.className = "rank-badge rank-" + rank;
+  el.innerHTML = `
+    <span>Rank</span>
+    <span class="rank-letter">${rank}</span>
+    <span>· ${count} sessions</span>
+  `;
+}
 
 /* ================= TIMER ================= */
 
@@ -139,7 +196,6 @@ function addExercise() {
   state.exercises.push({ name, weight, sets, reps, bodyPart });
 
   lastExercise = { name, bodyPart };
-
   autofillLastExercise();
 
   if (!state.timerRunning && state.timerElapsed === 0) startTimer();
@@ -221,6 +277,7 @@ function renderHistory() {
   document.getElementById('totalVolume').textContent =
     "Total Volume: " + getTotalVolume().toLocaleString() + " kg";
 
+  renderRank();
   renderChart();
 }
 
@@ -245,9 +302,7 @@ function renderChart() {
     type: 'radar',
     data: {
       labels: Object.keys(counts),
-      datasets: [{
-        data: Object.values(counts)
-      }]
+      datasets: [{ data: Object.values(counts) }]
     }
   });
 }
