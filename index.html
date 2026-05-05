@@ -2,580 +2,113 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0a0a0a">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="GYMLOG">
-<title>GYMLOG | Solo Leveling</title>
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/svg+xml" href="icon.svg">
-<link rel="apple-touch-icon" href="icon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GYMLOG</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-  :root {
-    --bg: #0a0a0a;
-    --surface: #141414;
-    --surface-2: #1c1c1c;
-    --border: #262626;
-    --text: #f5f1ea;
-    --text-muted: #888;
-    --text-faint: #555;
-    --accent: #ff4d1f;
-    --accent-light: #ff8a5b;
-    --accent-dim: rgba(255, 77, 31, 0.15);
-    --success: #5fc97e;
-    --display: 'Anton', sans-serif;
-    --body: 'Manrope', sans-serif;
-    --mono: 'JetBrains Mono', monospace;
-    --rank-s: #00f2ff;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-  html, body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--body);
-    font-size: 15px;
-    line-height: 1.5;
-    overflow-x: hidden;
-    min-height: 100vh;
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-
-  body {
-    background-image:
-      radial-gradient(circle at 20% 0%, rgba(255, 77, 31, 0.08) 0%, transparent 40%),
-      radial-gradient(circle at 80% 100%, rgba(255, 77, 31, 0.04) 0%, transparent 50%);
-    background-attachment: fixed;
-  }
-
-  .app { max-width: 540px; margin: 0 auto; padding: 0 20px 100px; padding-top: env(safe-area-inset-top); }
-
-  /* HEADER */
-  .header {
-    padding: 28px 0 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-  }
-  .logo { font-family: var(--display); font-size: 38px; letter-spacing: 0.02em; line-height: 0.85; }
-  .logo .accent { color: var(--accent); }
-  .date {
-    font-family: var(--mono); font-size: 11px; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 0.08em; text-align: right;
-  }
-
-  /* TABS */
-  .tabs {
-    display: flex; gap: 4px; margin-top: 16px; padding: 4px;
-    background: var(--surface); border-radius: 999px; border: 1px solid var(--border);
-  }
-  .tab {
-    flex: 1; padding: 10px 12px; background: transparent; border: none;
-    color: var(--text-muted); font-family: var(--body); font-size: 12px;
-    font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
-    border-radius: 999px; cursor: pointer; transition: all 0.25s;
-  }
-  .tab.active { background: var(--text); color: var(--bg); }
-
-  /* ANALYTICS CARD */
-  .analytics-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 20px; margin-top: 24px;
-  }
-
-  /* PR BADGE */
-  .pr-badge {
-    font-family: var(--display); background: var(--accent); color: white;
-    padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px;
-    animation: rankGlow 2s infinite alternate;
-  }
-  @keyframes rankGlow {
-    from { box-shadow: 0 0 5px var(--accent); }
-    to { box-shadow: 0 0 15px var(--accent); }
-  }
-
-  /* TIMER CARD */
-  .timer-card {
-    margin-top: 24px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 24px; position: relative; overflow: hidden;
-  }
-  .timer-card.running {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 1px var(--accent), 0 8px 32px rgba(255, 77, 31, 0.12);
-  }
-  .timer-card.running::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0;
-    height: 2px; background: var(--accent); animation: pulse 1.5s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 0.4; }
-    50% { opacity: 1; }
-  }
-  .timer-label {
-    font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em;
-    text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;
-  }
-  .timer-display {
-    font-family: var(--mono); font-size: 48px; font-weight: 600;
-    letter-spacing: -0.02em; color: var(--text); line-height: 1;
-  }
-  .timer-display.running { color: var(--accent); }
-  .timer-actions { display: flex; gap: 8px; margin-top: 16px; }
-
-  /* BODY SILHOUETTE & PROFILE */
-  .body-section {
-    margin-top: 24px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 24px; display: flex; gap: 20px; align-items: center;
-    position: relative; overflow: hidden;
-  }
-  /* subtle grid backdrop behind avatar — system UI feel */
-  .body-section::before {
-    content: ''; position: absolute; top: 0; left: 0; width: 170px; height: 100%;
-    background-image:
-      linear-gradient(rgba(255,77,31,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,77,31,0.04) 1px, transparent 1px);
-    background-size: 20px 20px;
-    mask-image: radial-gradient(ellipse 80px 200px at 65px 50%, black 30%, transparent 70%);
-    pointer-events: none;
-  }
-  .body-figure { width: 140px; flex-shrink: 0; display: flex; justify-content: center; position: relative; z-index: 1; }
-  .body-figure svg { width: 100%; height: auto; overflow: visible; display: block; }
-
-  /* MUSCLE STYLING — gradient depth + glow on activation */
-  .muscle {
-    fill: url(#muscleSheen);
-    stroke: #0a0a0a;
-    stroke-width: 0.6;
-    transition: fill 0.6s ease, filter 0.6s ease;
-  }
-  .muscle.active {
-    fill: url(#activeSheen);
-    filter: drop-shadow(0 0 3px rgba(255, 77, 31, 0.7));
-  }
-  /* thin separator lines layered on top — non-interactive */
-  .muscle-line {
-    fill: none;
-    stroke: #0a0a0a;
-    stroke-width: 0.5;
-    stroke-linecap: round;
-    pointer-events: none;
-    opacity: 0.6;
-  }
-  .body-summary { flex: 1; position: relative; z-index: 1; }
-  .body-summary h3 {
-    font-family: var(--display); font-size: 22px;
-    letter-spacing: 0.02em; margin-bottom: 8px;
-  }
-  .worked-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-  .worked-tag {
-    font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
-    text-transform: uppercase; padding: 4px 10px;
-    background: var(--accent-dim); color: var(--accent); border-radius: 999px;
-  }
-
-  /* PHYSICAL STATS INPUTS */
-  .stats-inputs { display: flex; gap: 8px; margin-bottom: 12px; }
-  .stat-field { flex: 1; }
-  .stat-field input {
-    width: 100%; background: var(--surface-2); border: 1px solid var(--border);
-    color: var(--text); padding: 6px 10px; border-radius: 8px;
-    font-family: var(--mono); font-size: 11px;
-  }
-  .stat-field input:focus { outline: none; border-color: var(--accent); }
-
-  /* BMI READOUT */
-  .bmi-readout {
-    font-family: var(--mono); font-size: 10px; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
-  }
-  .bmi-readout strong { color: var(--text); font-weight: 600; }
-
-  /* FORM & LISTS */
-  .section { margin-top: 32px; }
-  .section-title {
-    font-family: var(--display); font-size: 24px; letter-spacing: 0.02em;
-    margin-bottom: 12px; display: flex; align-items: baseline; justify-content: space-between;
-  }
-  .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
-  .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
-  .field label { font-family: var(--mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; display: block; }
-  .field input, .field select {
-    width: 100%; background: var(--surface-2); border: 1px solid var(--border);
-    color: var(--text); padding: 12px 14px; border-radius: 10px; font-family: var(--body);
-  }
-
-  .btn { background: var(--text); color: var(--bg); border: none; padding: 14px 20px; border-radius: 10px; font-weight: 700; text-transform: uppercase; cursor: pointer; width: 100%; }
-  .btn-accent { background: var(--accent); color: var(--text); }
-  .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
-  .hidden { display: none !important; }
-
-  /* HISTORY LIST */
-  .history-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 10px; }
-  .history-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
-  .history-date { font-family: var(--display); font-size: 18px; }
-
-  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--text); color: var(--bg); padding: 10px 20px; border-radius: 999px; font-weight: 600; transition: transform 0.3s; z-index: 100; }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-
-  #muscleChart { max-height: 250px; margin-top: 15px; }
+body { background:#0a0a0a; color:white; font-family:sans-serif; max-width:500px; margin:auto; }
+input, select, button { margin:5px 0; padding:10px; width:100%; }
+button { cursor:pointer; }
+.hidden { display:none; }
 </style>
 </head>
+
 <body>
-<div class="app">
 
-  <header class="header">
-    <div class="logo">GYM<span class="accent">LOG</span></div>
-    <div class="date" id="todayDate"></div>
-  </header>
+<h2>GYMLOG</h2>
+<div id="timerDisplay">00:00:00</div>
 
-  <div class="tabs">
-    <button class="tab active" data-tab="today">Today</button>
-    <button class="tab" data-tab="stretches">Stretches</button>
-    <button class="tab" data-tab="history">History</button>
-  </div>
+<button id="timerStart">Start</button>
+<button id="timerPause" class="hidden">Pause</button>
+<button id="timerEnd" class="hidden">End</button>
 
-  <div id="view-today">
-    <div class="timer-card" id="timerCard">
-      <div class="timer-label" id="timerLabel">Workout Duration</div>
-      <div class="timer-display" id="timerDisplay">00:00:00</div>
-      <div class="timer-actions">
-        <button class="btn btn-accent" id="timerStart">Start Workout</button>
-        <button class="btn btn-ghost hidden" id="timerPause" style="flex:1">Pause</button>
-        <button class="btn btn-ghost hidden" id="timerEnd" style="flex:1">End</button>
-      </div>
-    </div>
+<hr>
 
-    <div class="body-section">
-      <div class="body-figure" id="bodyFigure"></div>
-      <div class="body-summary">
-        <h3>My Profile</h3>
-        <div class="stats-inputs">
-            <div class="stat-field">
-                <input type="number" id="userHeight" placeholder="H (cm)" oninput="updateAvatarProportions()">
-            </div>
-            <div class="stat-field">
-                <input type="number" id="userWeight" placeholder="W (kg)" oninput="updateAvatarProportions()">
-            </div>
-        </div>
-        <div class="bmi-readout" id="bmiReadout"></div>
-        <div id="workedSummary" class="empty">No exercises logged yet.</div>
-      </div>
-    </div>
+<h3>Log Exercise</h3>
+<input id="exName" placeholder="Exercise">
+<select id="exBodyPart">
+<option>Chest</option>
+<option>Back</option>
+<option>Shoulders</option>
+<option>Arms</option>
+<option>Legs</option>
+<option>Core</option>
+</select>
+<input id="exWeight" type="number" placeholder="Weight">
+<input id="exSets" type="number" placeholder="Sets">
+<input id="exReps" type="number" placeholder="Reps">
 
-    <section class="section">
-      <h2 class="section-title">Log Exercise</h2>
-      <div class="form-card">
-        <div class="form-row">
-          <div class="field" style="flex: 2">
-            <label>Exercise</label>
-            <input type="text" id="exName" placeholder="Bench press" oninput="checkPRSuggestion()">
-            <div id="prHint" style="font-size: 10px; color: var(--accent); margin-top: 4px; display: none;"></div>
-          </div>
-          <div class="field">
-            <label>Body Part</label>
-            <select id="exBodyPart">
-              <option value="Chest">Chest</option>
-              <option value="Back">Back</option>
-              <option value="Shoulders">Shoulders</option>
-              <option value="Arms">Arms</option>
-              <option value="Legs">Legs</option>
-              <option value="Core">Core</option>
-              <option value="Full Body">Full Body</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="field"><label>Weight (kg)</label><input type="number" id="exWeight" step="0.5"></div>
-          <div class="field"><label>Sets</label><input type="number" id="exSets"></div>
-          <div class="field"><label>Reps</label><input type="number" id="exReps"></div>
-        </div>
-        <button class="btn" id="addExercise">+ Add Exercise</button>
-      </div>
-    </section>
+<button id="addExercise">Add Exercise</button>
+<button onclick="clearToday()">Clear Today</button>
 
-    <section class="section">
-      <h2 class="section-title">Logged <span class="meta" id="loggedMeta">0 exercises</span></h2>
-      <div class="exercise-list" id="todayList"></div>
-    </section>
-  </div>
+<hr>
 
-  <div id="view-stretches" class="hidden section">
-    <div id="stretchesContent"></div>
-  </div>
+<h3>Today</h3>
+<div id="todayList"></div>
 
-  <div id="view-history" class="hidden">
-    <div class="analytics-card">
-      <h3 style="font-family: var(--display); letter-spacing: 0.05em;">MUSCLE BALANCE</h3>
-      <canvas id="muscleChart"></canvas>
-    </div>
-    <div id="historyList"></div>
-  </div>
+<hr>
 
-</div>
-
-<div class="toast" id="toast">Saved</div>
+<h3>History</h3>
+<div id="totalVolume"></div>
+<canvas id="muscleChart"></canvas>
+<div id="historyList"></div>
 
 <script>
-/* ============== STATE & CONSTANTS ============== */
-const STORAGE_KEYS = { current: 'gymlog_current', history: 'gymlog_history', profile: 'gymlog_profile' };
-let state = { exercises: [], timerStart: null, timerElapsed: 0, timerRunning: false, history: [] };
-let profile = { height: 180, weight: 80 };
-let chartInstance = null;
-
-const stretchLibrary = {
-  "Chest": [
-    { name: "Doorway Chest Stretch", duration: "45s", instructions: "Place forearms on doorway frames and lean forward." },
-    { name: "Pec Minor Floor Stretch", duration: "30s/side", instructions: "Lying on stomach, extend one arm out at 90° and roll away from it." }
-  ],
-  "Back": [
-    { name: "Cat-Cow Stretch", duration: "10 reps", instructions: "On all fours, alternate between arching and rounding your spine." },
-    { name: "Child's Pose", duration: "1m", instructions: "Sit on heels, arms extended forward on the floor." }
-  ],
-  "Shoulders": [
-    { name: "Cross-Body Shoulder Stretch", duration: "30s/side", instructions: "Pull one arm across your chest using the other arm." },
-    { name: "Sleeper Stretch", duration: "30s/side", instructions: "Lying on your side, gently press your forearm toward the floor." }
-  ],
-  "Arms": [
-    { name: "Overhead Tricep Stretch", duration: "30s/side", instructions: "Reach one hand down your spine and pull the elbow with the other hand." },
-    { name: "Wrist Extensor Stretch", duration: "30s/side", instructions: "Extend arm, palm down, and gently pull fingers toward you." }
-  ],
-  "Legs": [
-    { name: "Pigeon Pose", duration: "1m/side", instructions: "Bring one knee forward and rotate it outward; sink hips toward the floor." },
-    { name: "Couch Stretch", duration: "1m/side", instructions: "Back knee on ground, foot against a wall; stay upright to stretch quads/hip flexors." }
-  ],
-  "Core": [
-    { name: "Cobra Stretch", duration: "45s", instructions: "Lying on stomach, press up with hands to stretch the abdominals." },
-    { name: "Sphinx Pose", duration: "1m", instructions: "Prop yourself up on your forearms to gently extend the spine." }
-  ],
-  "Full Body": [
-    { name: "World's Greatest Stretch", duration: "5 reps/side", instructions: "Lunge forward, elbow to instep, then rotate arm to the sky." },
-    { name: "Deep Squat Hold", duration: "1m", instructions: "Sit in a deep squat, using elbows to push knees out." }
-  ]
+const STORAGE_KEYS = {
+  current: 'gymlog_current',
+  history: 'gymlog_history'
 };
 
-/* ============== UPGRADED ANATOMICAL MANNEQUIN ==============
-   Front view, viewBox 200x440. Each muscle group is a separate path
-   with a data-zone attribute matching the body-part categories.
-   Separator lines (.muscle-line) sit on top for definition. */
-const BODY_SVG = `
-<svg viewBox="0 0 200 440" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="muscleSheen" x1="50%" y1="0%" x2="50%" y2="100%">
-      <stop offset="0%" stop-color="#3a3a3a"/>
-      <stop offset="50%" stop-color="#2a2a2a"/>
-      <stop offset="100%" stop-color="#1a1a1a"/>
-    </linearGradient>
-    <linearGradient id="activeSheen" x1="50%" y1="0%" x2="50%" y2="100%">
-      <stop offset="0%" stop-color="#ff8a5b"/>
-      <stop offset="50%" stop-color="#ff4d1f"/>
-      <stop offset="100%" stop-color="#c93a14"/>
-    </linearGradient>
-  </defs>
+let state = {
+  exercises: [],
+  history: [],
+  timerStart: null,
+  timerElapsed: 0,
+  timerRunning: false
+};
 
-  <g id="bodyScaler" transform-origin="100 430">
+let timerInterval = null;
+let lastExercise = null;
 
-    <!-- HEAD -->
-    <ellipse cx="100" cy="34" rx="19" ry="23" class="muscle"/>
-    <!-- jaw line -->
-    <path d="M 86 48 Q 100 60 114 48" class="muscle-line"/>
+/* ================= TIMER ================= */
 
-    <!-- NECK -->
-    <path d="M 91 54 Q 92 66 90 72 L 110 72 Q 108 66 109 54 Z" class="muscle"/>
+function startTimer() {
+  if (timerInterval) clearInterval(timerInterval);
 
-    <!-- TRAPEZIUS (visible from front, between neck & shoulders) -->
-    <path d="M 90 70 Q 76 74 64 84 Q 78 82 100 80 Q 122 82 136 84 Q 124 74 110 70 Z" class="muscle" data-zone="Back"/>
+  state.timerStart = Date.now();
+  state.timerRunning = true;
 
-    <!-- LEFT DELTOID -->
-    <path d="M 64 84 Q 48 90 46 110 Q 50 122 68 118 Q 78 104 82 92 Q 76 84 64 84 Z" class="muscle" data-zone="Shoulders"/>
-    <!-- RIGHT DELTOID -->
-    <path d="M 136 84 Q 152 90 154 110 Q 150 122 132 118 Q 122 104 118 92 Q 124 84 136 84 Z" class="muscle" data-zone="Shoulders"/>
-
-    <!-- LEFT PECTORAL -->
-    <path d="M 82 90 Q 70 98 68 132 Q 76 148 98 148 L 99 104 Q 96 92 82 90 Z" class="muscle" data-zone="Chest"/>
-    <!-- RIGHT PECTORAL -->
-    <path d="M 118 90 Q 130 98 132 132 Q 124 148 102 148 L 101 104 Q 104 92 118 90 Z" class="muscle" data-zone="Chest"/>
-    <!-- sternum line -->
-    <path d="M 100 100 L 100 148" class="muscle-line"/>
-    <!-- pec lower fold -->
-    <path d="M 72 142 Q 86 150 98 148" class="muscle-line"/>
-    <path d="M 128 142 Q 114 150 102 148" class="muscle-line"/>
-
-    <!-- LATS (peeking from sides — categorized as Back) -->
-    <path d="M 68 130 Q 64 152 70 178 Q 76 182 80 178 Q 78 158 78 138 Q 72 132 68 130 Z" class="muscle" data-zone="Back"/>
-    <path d="M 132 130 Q 136 152 130 178 Q 124 182 120 178 Q 122 158 122 138 Q 128 132 132 130 Z" class="muscle" data-zone="Back"/>
-
-    <!-- LEFT BICEP -->
-    <path d="M 46 110 Q 38 132 40 168 Q 50 174 60 170 Q 64 146 64 116 Q 56 110 46 110 Z" class="muscle" data-zone="Arms"/>
-    <!-- RIGHT BICEP -->
-    <path d="M 154 110 Q 162 132 160 168 Q 150 174 140 170 Q 136 146 136 116 Q 144 110 154 110 Z" class="muscle" data-zone="Arms"/>
-
-    <!-- ELBOW joints -->
-    <ellipse cx="50" cy="174" rx="9" ry="5" class="muscle"/>
-    <ellipse cx="150" cy="174" rx="9" ry="5" class="muscle"/>
-
-    <!-- LEFT FOREARM -->
-    <path d="M 42 178 Q 36 200 40 232 Q 50 238 58 234 Q 60 204 60 180 Q 50 176 42 178 Z" class="muscle" data-zone="Arms"/>
-    <!-- RIGHT FOREARM -->
-    <path d="M 158 178 Q 164 200 160 232 Q 150 238 142 234 Q 140 204 140 180 Q 150 176 158 178 Z" class="muscle" data-zone="Arms"/>
-
-    <!-- HANDS -->
-    <ellipse cx="48" cy="244" rx="9" ry="11" class="muscle"/>
-    <ellipse cx="152" cy="244" rx="9" ry="11" class="muscle"/>
-
-    <!-- 6-PACK ABS — three rows -->
-    <!-- upper row -->
-    <path d="M 84 150 Q 84 166 88 170 L 99 170 L 99 150 Z" class="muscle" data-zone="Core"/>
-    <path d="M 116 150 Q 116 166 112 170 L 101 170 L 101 150 Z" class="muscle" data-zone="Core"/>
-    <!-- mid row -->
-    <path d="M 86 172 L 99 172 L 99 192 L 88 192 Z" class="muscle" data-zone="Core"/>
-    <path d="M 114 172 L 101 172 L 101 192 L 112 192 Z" class="muscle" data-zone="Core"/>
-    <!-- lower row -->
-    <path d="M 88 194 L 99 194 L 99 216 L 92 216 Z" class="muscle" data-zone="Core"/>
-    <path d="M 112 194 L 101 194 L 101 216 L 108 216 Z" class="muscle" data-zone="Core"/>
-
-    <!-- OBLIQUES -->
-    <path d="M 78 178 Q 76 200 84 220 Q 88 222 90 218 Q 88 198 86 180 Z" class="muscle" data-zone="Core"/>
-    <path d="M 122 178 Q 124 200 116 220 Q 112 222 110 218 Q 112 198 114 180 Z" class="muscle" data-zone="Core"/>
-
-    <!-- HIP / V-line / pelvis -->
-    <path d="M 84 218 Q 80 238 90 252 L 110 252 Q 120 238 116 218 L 110 230 L 100 234 L 90 230 Z" class="muscle"/>
-
-    <!-- LEFT QUAD -->
-    <path d="M 86 248 Q 76 290 78 332 L 82 342 Q 96 346 99 342 L 99 320 Q 100 280 99 250 Z" class="muscle" data-zone="Legs"/>
-    <!-- RIGHT QUAD -->
-    <path d="M 114 248 Q 124 290 122 332 L 118 342 Q 104 346 101 342 L 101 320 Q 100 280 101 250 Z" class="muscle" data-zone="Legs"/>
-    <!-- rectus femoris central lines (definition) -->
-    <path d="M 90 260 Q 89 295 88 330" class="muscle-line"/>
-    <path d="M 110 260 Q 111 295 112 330" class="muscle-line"/>
-
-    <!-- KNEES -->
-    <ellipse cx="89" cy="346" rx="10" ry="6" class="muscle"/>
-    <ellipse cx="111" cy="346" rx="10" ry="6" class="muscle"/>
-
-    <!-- LEFT CALF / SHIN -->
-    <path d="M 82 354 Q 78 388 84 422 L 96 422 L 97 388 L 96 354 Z" class="muscle" data-zone="Legs"/>
-    <!-- RIGHT CALF / SHIN -->
-    <path d="M 118 354 Q 122 388 116 422 L 104 422 L 103 388 L 104 354 Z" class="muscle" data-zone="Legs"/>
-    <!-- calf inner curve hint -->
-    <path d="M 84 366 Q 82 388 86 410" class="muscle-line"/>
-    <path d="M 116 366 Q 118 388 114 410" class="muscle-line"/>
-
-    <!-- FEET -->
-    <ellipse cx="90" cy="428" rx="10" ry="6" class="muscle"/>
-    <ellipse cx="110" cy="428" rx="10" ry="6" class="muscle"/>
-
-  </g>
-</svg>`;
-
-/* ============== ANALYTICS & PR LOGIC ============== */
-function getPRForExercise(name) {
-  let maxWeight = 0;
-  state.history.forEach(session => {
-    session.exercises.forEach(ex => {
-      if (ex.name.toLowerCase() === name.toLowerCase()) {
-        maxWeight = Math.max(maxWeight, ex.weight || 0);
-      }
-    });
-  });
-  return maxWeight;
+  timerInterval = setInterval(updateTimer, 1000);
+  renderTimerUI();
 }
 
-function checkPRSuggestion() {
-  const name = document.getElementById('exName').value.trim();
-  const hint = document.getElementById('prHint');
-  if (name.length < 3) { hint.style.display = 'none'; return; }
-  const pr = getPRForExercise(name);
-  if (pr > 0) {
-    hint.textContent = `Current Max: ${pr}kg. Level up to ${pr + 2.5}kg?`;
-    hint.style.display = 'block';
-  } else { hint.style.display = 'none'; }
+function pauseTimer() {
+  if (!state.timerRunning) return;
+
+  state.timerElapsed += Date.now() - state.timerStart;
+  state.timerRunning = false;
+
+  clearInterval(timerInterval);
+  renderTimerUI();
 }
 
-function getRank(weight) {
-  if (weight >= 140) return 'S';
-  if (weight >= 100) return 'A';
-  if (weight >= 80) return 'B';
-  if (weight >= 60) return 'C';
-  if (weight >= 40) return 'D';
-  return 'E';
+function updateTimer() {
+  if (!state.timerRunning) return;
+
+  const ms = state.timerElapsed + (Date.now() - state.timerStart);
+  document.getElementById('timerDisplay').textContent =
+    new Date(ms).toISOString().substr(11, 8);
 }
 
-function renderMuscleChart() {
-  const ctx = document.getElementById('muscleChart').getContext('2d');
-  const counts = { Chest: 0, Back: 0, Shoulders: 0, Arms: 0, Legs: 0, Core: 0 };
-
-  state.history.forEach(s => {
-    s.exercises.forEach(e => {
-      if (counts[e.bodyPart] !== undefined) counts[e.bodyPart] += (e.weight * (e.sets || 1) * (e.reps || 1));
-    });
-  });
-
-  if (chartInstance) chartInstance.destroy();
-  chartInstance = new Chart(ctx, {
-    type: 'radar',
-    data: {
-      labels: Object.keys(counts),
-      datasets: [{
-        label: 'Volume Distribution',
-        data: Object.values(counts),
-        backgroundColor: 'rgba(255, 77, 31, 0.2)',
-        borderColor: '#ff4d1f',
-        pointBackgroundColor: '#ff4d1f'
-      }]
-    },
-    options: {
-      scales: { r: { grid: { color: '#262626' }, angleLines: { color: '#262626' }, ticks: { display: false } } },
-      plugins: { legend: { display: false } }
-    }
-  });
+function renderTimerUI() {
+  document.getElementById('timerStart').classList.toggle('hidden', state.timerRunning || state.timerElapsed > 0);
+  document.getElementById('timerPause').classList.toggle('hidden', !state.timerRunning);
+  document.getElementById('timerEnd').classList.toggle('hidden', !state.timerRunning && state.timerElapsed === 0);
 }
 
-/* ============== SMARTER BODY PROPORTION SCALING ==============
-   Old logic scaled width linearly with weight (60kg → 0.75x, 120kg → 1.5x — too extreme).
-   New logic: height scales vertically (clamped); width is driven by BMI ratio with a
-   square-root softener so changes feel natural rather than cartoonish. */
-function updateAvatarProportions() {
-    const h = parseFloat(document.getElementById('userHeight').value) || 180;
-    const w = parseFloat(document.getElementById('userWeight').value) || 80;
-    profile = { height: h, weight: w };
-    localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(profile));
+/* ================= DATA ================= */
 
-    const scaler = document.getElementById('bodyScaler');
-    if (!scaler) return;
-
-    // Reference body: 180cm / 80kg → BMI 24.7
-    const refBMI = 80 / Math.pow(1.80, 2);
-    const userBMI = w / Math.pow(h / 100, 2);
-
-    // Vertical scale: gentle, clamped so figure never breaks the card
-    const hScale = Math.max(0.88, Math.min(1.12, h / 180));
-
-    // Horizontal scale: BMI-driven, square-root softens extremes
-    const bmiRatio = userBMI / refBMI;
-    const wScale = Math.max(0.85, Math.min(1.25, Math.pow(bmiRatio, 0.55)));
-
-    scaler.setAttribute('transform', `scale(${wScale.toFixed(3)}, ${hScale.toFixed(3)})`);
-
-    // BMI readout for the user
-    const readout = document.getElementById('bmiReadout');
-    if (readout) {
-      let category = 'Normal';
-      if (userBMI < 18.5) category = 'Underweight';
-      else if (userBMI >= 25 && userBMI < 30) category = 'Overweight';
-      else if (userBMI >= 30) category = 'Obese';
-      readout.innerHTML = `BMI <strong>${userBMI.toFixed(1)}</strong> · ${category}`;
-    }
-}
-
-/* ============== CORE LOGIC ============== */
 function saveState() {
   localStorage.setItem(STORAGE_KEYS.current, JSON.stringify(state));
   localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(state.history));
@@ -584,169 +117,158 @@ function saveState() {
 function loadState() {
   const cur = localStorage.getItem(STORAGE_KEYS.current);
   if (cur) Object.assign(state, JSON.parse(cur));
+
   const hist = localStorage.getItem(STORAGE_KEYS.history);
   if (hist) state.history = JSON.parse(hist);
-  const prof = localStorage.getItem(STORAGE_KEYS.profile);
-  if (prof) {
-      profile = JSON.parse(prof);
-      document.getElementById('userHeight').value = profile.height;
-      document.getElementById('userWeight').value = profile.weight;
-  }
 }
+
+/* ================= EXERCISE ================= */
 
 function addExercise() {
   const name = document.getElementById('exName').value.trim();
   const weight = parseFloat(document.getElementById('exWeight').value);
-  if (!name) return;
+  const sets = parseInt(document.getElementById('exSets').value);
+  const reps = parseInt(document.getElementById('exReps').value);
+  const bodyPart = document.getElementById('exBodyPart').value;
 
-  const currentPR = getPRForExercise(name);
-  const isPR = weight > currentPR && currentPR > 0;
+  if (!name || !weight || !sets || !reps) {
+    alert("Fill all fields");
+    return;
+  }
 
-  state.exercises.push({
-    id: Date.now(),
-    name,
-    bodyPart: document.getElementById('exBodyPart').value,
-    weight,
-    sets: parseInt(document.getElementById('exSets').value),
-    reps: parseInt(document.getElementById('exReps').value),
-    isPR: isPR,
-    rank: getRank(weight)
-  });
+  state.exercises.push({ name, weight, sets, reps, bodyPart });
 
-  if (isPR) toast("🚨 RANK UP! NEW PR 🚨");
-  else toast("Logged");
+  lastExercise = { name, bodyPart };
+
+  autofillLastExercise();
 
   if (!state.timerRunning && state.timerElapsed === 0) startTimer();
-  document.getElementById('exName').value = '';
+
   saveState();
   renderAll();
 }
 
+function autofillLastExercise() {
+  if (!lastExercise) return;
+
+  document.getElementById('exName').value = lastExercise.name;
+  document.getElementById('exBodyPart').value = lastExercise.bodyPart;
+}
+
+/* ================= CLEAR ================= */
+
+function clearToday() {
+  if (!confirm("Clear today's workout?")) return;
+
+  state.exercises = [];
+  state.timerRunning = false;
+  state.timerElapsed = 0;
+
+  if (timerInterval) clearInterval(timerInterval);
+
+  saveState();
+  renderAll();
+}
+
+/* ================= HISTORY ================= */
+
 function endWorkout() {
   if (state.exercises.length === 0) return;
-  if (!confirm('Save workout to history?')) return;
 
   const session = {
-    id: Date.now(),
     date: new Date().toISOString(),
-    duration: state.timerElapsed + (state.timerRunning ? Date.now() - state.timerStart : 0),
+    duration: state.timerElapsed,
     exercises: [...state.exercises]
   };
 
   state.history.unshift(session);
+
   state.exercises = [];
   state.timerRunning = false;
   state.timerElapsed = 0;
+
   saveState();
   renderAll();
 }
 
-/* ============== UI RENDERING ============== */
-function renderTodayList() {
-  const list = document.getElementById('todayList');
-  document.getElementById('loggedMeta').textContent = `${state.exercises.length} items`;
-  list.innerHTML = state.exercises.slice().reverse().map(ex => `
-    <div class="exercise-item" style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-      <div style="flex:1">
-        <div class="exercise-name" style="font-weight: 700; color: var(--text);">${ex.name} ${ex.isPR ? '<span class="pr-badge">PR</span>' : ''}</div>
-        <div class="exercise-meta" style="font-size: 12px; color: var(--text-muted);">${ex.bodyPart} · ${ex.weight}kg · ${ex.sets}x${ex.reps}</div>
-      </div>
-      <div style="font-family: var(--display); color: var(--accent); font-size: 20px;">${ex.rank}</div>
-    </div>
-  `).join('');
-}
+function getTotalVolume() {
+  let total = 0;
 
-function renderStretches() {
-  const container = document.getElementById('stretchesContent');
-  const workedParts = [...new Set(state.exercises.map(ex => ex.bodyPart))];
-
-  let html = `<h2 class="section-title">Recovery Plan</h2>`;
-
-  if (workedParts.length === 0) {
-    html += `<p style="color:var(--text-muted); margin-bottom:15px;">Pick a stretching routine. Always gotta stretch gang</p>`;
-    workedParts.push("Full Body");
-  } else {
-    html += `<p style="color:var(--accent); font-family:var(--mono); font-size:10px; text-transform:uppercase; margin-bottom:15px;">Targeting: ${workedParts.join(' + ')}</p>`;
-  }
-
-  workedParts.forEach(part => {
-    const stretches = stretchLibrary[part] || stretchLibrary["Full Body"];
-    stretches.forEach(s => {
-      html += `
-        <div class="history-item" style="border-left: 2px solid var(--accent); margin-bottom: 12px;">
-          <div style="display:flex; justify-content:space-between; align-items:baseline;">
-            <div style="font-weight:700; color:var(--text);">${s.name}</div>
-            <div style="font-family:var(--mono); font-size:11px; color:var(--accent);">${s.duration}</div>
-          </div>
-          <div style="font-size:12px; color:var(--text-muted); margin-top:4px; line-height:1.4;">${s.instructions}</div>
-        </div>
-      `;
+  state.history.forEach(s => {
+    s.exercises.forEach(e => {
+      total += e.weight * e.sets * e.reps;
     });
   });
 
-  container.innerHTML = html;
+  return total;
+}
+
+/* ================= RENDER ================= */
+
+function renderToday() {
+  document.getElementById('todayList').innerHTML =
+    state.exercises.map(e =>
+      `<div>${e.name} - ${e.weight}kg (${e.sets}x${e.reps})</div>`
+    ).join('');
 }
 
 function renderHistory() {
-  const list = document.getElementById('historyList');
-  list.innerHTML = state.history.map(s => `
-    <div class="history-item">
-      <div class="history-header">
-        <div class="history-date">${new Date(s.date).toLocaleDateString().toUpperCase()}</div>
-        <div style="color: var(--text-muted); font-size: 12px;">${Math.round(s.duration/60000)}m</div>
-      </div>
-      ${s.exercises.map(e => `<div style="font-size: 13px; display:flex; justify-content:space-between"><span>${e.name}</span><span>${e.weight}kg</span></div>`).join('')}
-    </div>
-  `).join('');
-  renderMuscleChart();
+  document.getElementById('historyList').innerHTML =
+    state.history.map(s =>
+      `<div>${new Date(s.date).toLocaleDateString()} (${Math.round(s.duration/60000)} min)</div>`
+    ).join('');
+
+  document.getElementById('totalVolume').textContent =
+    "Total Volume: " + getTotalVolume().toLocaleString() + " kg";
+
+  renderChart();
 }
 
-function renderBody() {
-  const fig = document.getElementById('bodyFigure');
-  fig.innerHTML = BODY_SVG;
-  const worked = new Set(state.exercises.map(e => e.bodyPart));
-  fig.querySelectorAll('.muscle').forEach(m => {
-    if (worked.has(m.dataset.zone)) m.classList.add('active');
-    if (worked.has("Full Body")) m.classList.add('active');
+/* ================= CHART ================= */
+
+let chart;
+
+function renderChart() {
+  const ctx = document.getElementById('muscleChart');
+
+  const counts = { Chest:0, Back:0, Shoulders:0, Arms:0, Legs:0, Core:0 };
+
+  state.history.forEach(s => {
+    s.exercises.forEach(e => {
+      counts[e.bodyPart] += e.weight * e.sets * e.reps;
+    });
   });
-  document.getElementById('workedSummary').innerHTML = Array.from(worked).map(p => `<span class="worked-tag">${p}</span>`).join(' ');
-  updateAvatarProportions();
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: Object.keys(counts),
+      datasets: [{
+        data: Object.values(counts)
+      }]
+    }
+  });
 }
 
-/* ============== TIMER UTILS ============== */
-function startTimer() { state.timerStart = Date.now(); state.timerRunning = true; setInterval(updateTimer, 1000); renderTimerUI(); }
-function updateTimer() { if (!state.timerRunning) return; const ms = state.timerElapsed + (Date.now() - state.timerStart); document.getElementById('timerDisplay').textContent = new Date(ms).toISOString().substr(11, 8); }
-function renderTimerUI() {
-  const isRun = state.timerRunning;
-  document.getElementById('timerStart').classList.toggle('hidden', isRun || state.timerElapsed > 0);
-  document.getElementById('timerPause').classList.toggle('hidden', !isRun);
-  document.getElementById('timerEnd').classList.toggle('hidden', !isRun && state.timerElapsed === 0);
+function renderAll() {
+  renderToday();
+  renderHistory();
+  renderTimerUI();
 }
 
-/* ============== INIT ============== */
-function renderAll() { renderTodayList(); renderBody(); renderTimerUI(); }
-function toast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
-
-document.querySelectorAll('.tab').forEach(btn => {
-  btn.onclick = () => {
-    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const target = btn.dataset.tab;
-    document.getElementById('view-today').classList.toggle('hidden', target !== 'today');
-    document.getElementById('view-history').classList.toggle('hidden', target !== 'history');
-    document.getElementById('view-stretches').classList.toggle('hidden', target !== 'stretches');
-    if (target === 'history') renderHistory();
-    if (target === 'stretches') renderStretches();
-  };
-});
+/* ================= INIT ================= */
 
 document.getElementById('addExercise').onclick = addExercise;
 document.getElementById('timerStart').onclick = startTimer;
+document.getElementById('timerPause').onclick = pauseTimer;
 document.getElementById('timerEnd').onclick = endWorkout;
-document.getElementById('todayDate').textContent = new Date().toDateString().toUpperCase();
 
 loadState();
 renderAll();
+
 </script>
+
 </body>
 </html>
