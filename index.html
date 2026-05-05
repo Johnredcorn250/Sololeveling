@@ -3,326 +3,65 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GYMLOG</title>
+<title>GYMLOG Updated</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <style>
-body { background:#0a0a0a; color:white; font-family:sans-serif; max-width:500px; margin:auto; }
-input, select, button { margin:5px 0; padding:10px; width:100%; }
-button { cursor:pointer; }
-.hidden { display:none; }
-
-/* 🔥 RANK BADGE */
-.rank-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: monospace;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(255, 77, 31, 0.1);
-  border: 1px solid rgba(255, 77, 31, 0.4);
-  color: #ff4d1f;
-  margin-bottom: 10px;
-}
-
-.rank-letter {
-  font-size: 16px;
-  font-weight: bold;
-}
-
-/* Glow tiers */
-.rank-S { box-shadow: 0 0 10px rgba(0,242,255,0.7); color:#00f2ff; }
-.rank-A { box-shadow: 0 0 8px rgba(255,77,31,0.6); }
-
+body { font-family: Arial; background:#0a0a0a; color:#fff; }
+.analytics-card { background:#141414; padding:15px; margin:10px 0; border-radius:10px; }
 </style>
 </head>
-
 <body>
 
 <h2>GYMLOG</h2>
-<div id="timerDisplay">00:00:00</div>
 
-<button id="timerStart">Start</button>
-<button id="timerPause" class="hidden">Pause</button>
-<button id="timerEnd" class="hidden">End</button>
+<div id="view-history">
+  <div class="analytics-card" id="rankCard" style="display:flex; justify-content:space-between;">
+    <div>
+      <div style="font-size:10px; color:#888;">CURRENT RANK</div>
+      <div id="userRank" style="font-size:28px;">E</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:10px; color:#888;">WORKOUTS</div>
+      <div id="workoutCount" style="font-size:20px;">0</div>
+    </div>
+  </div>
 
-<hr>
+  <div class="analytics-card">
+    <canvas id="muscleChart"></canvas>
+  </div>
 
-<h3>Log Exercise</h3>
-<input id="exName" placeholder="Exercise">
-<select id="exBodyPart">
-<option>Chest</option>
-<option>Back</option>
-<option>Shoulders</option>
-<option>Arms</option>
-<option>Legs</option>
-<option>Core</option>
-</select>
-<input id="exWeight" type="number" placeholder="Weight">
-<input id="exSets" type="number" placeholder="Sets">
-<input id="exReps" type="number" placeholder="Reps">
-
-<button id="addExercise">Add Exercise</button>
-<button onclick="clearToday()">Clear Today</button>
-
-<hr>
-
-<h3>Today</h3>
-<div id="todayList"></div>
-
-<hr>
-
-<h3>History</h3>
-
-<div id="userRank"></div>
-<div id="totalVolume"></div>
-
-<canvas id="muscleChart"></canvas>
-<div id="historyList"></div>
+  <div id="historyList"></div>
+</div>
 
 <script>
-const STORAGE_KEYS = {
-  current: 'gymlog_current',
-  history: 'gymlog_history'
-};
-
-let state = {
-  exercises: [],
-  history: [],
-  timerStart: null,
-  timerElapsed: 0,
-  timerRunning: false
-};
-
-let timerInterval = null;
-let lastExercise = null;
-
-/* ================= RANK SYSTEM ================= */
+let state = { history: [] };
 
 function getUserRank() {
   const count = state.history.length;
-
-  if (count >= 40) return "S";
-  if (count >= 21) return "A";
-  if (count >= 11) return "B";
-  if (count >= 6) return "C";
-  if (count >= 3) return "D";
-  return "E";
-}
-
-function renderRank() {
-  const rank = getUserRank();
-  const count = state.history.length;
-
-  const el = document.getElementById('userRank');
-
-  el.className = "rank-badge rank-" + rank;
-  el.innerHTML = `
-    <span>Rank</span>
-    <span class="rank-letter">${rank}</span>
-    <span>· ${count} sessions</span>
-  `;
-}
-
-/* ================= TIMER ================= */
-
-function startTimer() {
-  if (timerInterval) clearInterval(timerInterval);
-
-  state.timerStart = Date.now();
-  state.timerRunning = true;
-
-  timerInterval = setInterval(updateTimer, 1000);
-  renderTimerUI();
-}
-
-function pauseTimer() {
-  if (!state.timerRunning) return;
-
-  state.timerElapsed += Date.now() - state.timerStart;
-  state.timerRunning = false;
-
-  clearInterval(timerInterval);
-  renderTimerUI();
-}
-
-function updateTimer() {
-  if (!state.timerRunning) return;
-
-  const ms = state.timerElapsed + (Date.now() - state.timerStart);
-  document.getElementById('timerDisplay').textContent =
-    new Date(ms).toISOString().substr(11, 8);
-}
-
-function renderTimerUI() {
-  document.getElementById('timerStart').classList.toggle('hidden', state.timerRunning || state.timerElapsed > 0);
-  document.getElementById('timerPause').classList.toggle('hidden', !state.timerRunning);
-  document.getElementById('timerEnd').classList.toggle('hidden', !state.timerRunning && state.timerElapsed === 0);
-}
-
-/* ================= DATA ================= */
-
-function saveState() {
-  localStorage.setItem(STORAGE_KEYS.current, JSON.stringify(state));
-  localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(state.history));
-}
-
-function loadState() {
-  const cur = localStorage.getItem(STORAGE_KEYS.current);
-  if (cur) Object.assign(state, JSON.parse(cur));
-
-  const hist = localStorage.getItem(STORAGE_KEYS.history);
-  if (hist) state.history = JSON.parse(hist);
-}
-
-/* ================= EXERCISE ================= */
-
-function addExercise() {
-  const name = document.getElementById('exName').value.trim();
-  const weight = parseFloat(document.getElementById('exWeight').value);
-  const sets = parseInt(document.getElementById('exSets').value);
-  const reps = parseInt(document.getElementById('exReps').value);
-  const bodyPart = document.getElementById('exBodyPart').value;
-
-  if (!name || !weight || !sets || !reps) {
-    alert("Fill all fields");
-    return;
-  }
-
-  state.exercises.push({ name, weight, sets, reps, bodyPart });
-
-  lastExercise = { name, bodyPart };
-  autofillLastExercise();
-
-  if (!state.timerRunning && state.timerElapsed === 0) startTimer();
-
-  saveState();
-  renderAll();
-}
-
-function autofillLastExercise() {
-  if (!lastExercise) return;
-
-  document.getElementById('exName').value = lastExercise.name;
-  document.getElementById('exBodyPart').value = lastExercise.bodyPart;
-}
-
-/* ================= CLEAR ================= */
-
-function clearToday() {
-  if (!confirm("Clear today's workout?")) return;
-
-  state.exercises = [];
-  state.timerRunning = false;
-  state.timerElapsed = 0;
-
-  if (timerInterval) clearInterval(timerInterval);
-
-  saveState();
-  renderAll();
-}
-
-/* ================= HISTORY ================= */
-
-function endWorkout() {
-  if (state.exercises.length === 0) return;
-
-  const session = {
-    date: new Date().toISOString(),
-    duration: state.timerElapsed,
-    exercises: [...state.exercises]
-  };
-
-  state.history.unshift(session);
-
-  state.exercises = [];
-  state.timerRunning = false;
-  state.timerElapsed = 0;
-
-  saveState();
-  renderAll();
-}
-
-function getTotalVolume() {
-  let total = 0;
-
-  state.history.forEach(s => {
-    s.exercises.forEach(e => {
-      total += e.weight * e.sets * e.reps;
-    });
-  });
-
-  return total;
-}
-
-/* ================= RENDER ================= */
-
-function renderToday() {
-  document.getElementById('todayList').innerHTML =
-    state.exercises.map(e =>
-      `<div>${e.name} - ${e.weight}kg (${e.sets}x${e.reps})</div>`
-    ).join('');
+  if (count >= 80) return 'S';
+  if (count >= 40) return 'A';
+  if (count >= 20) return 'B';
+  if (count >= 10) return 'C';
+  if (count >= 5) return 'D';
+  return 'E';
 }
 
 function renderHistory() {
-  document.getElementById('historyList').innerHTML =
-    state.history.map(s =>
-      `<div>${new Date(s.date).toLocaleDateString()} (${Math.round(s.duration/60000)} min)</div>`
-    ).join('');
+  const list = document.getElementById('historyList');
 
-  document.getElementById('totalVolume').textContent =
-    "Total Volume: " + getTotalVolume().toLocaleString() + " kg";
+  const rank = getUserRank();
+  document.getElementById('userRank').textContent = rank;
+  document.getElementById('workoutCount').textContent = state.history.length;
 
-  renderRank();
-  renderChart();
+  list.innerHTML = state.history.map(s => `
+    <div class="analytics-card">
+      <div>${new Date(s.date).toLocaleDateString()}</div>
+      ${s.exercises.map(e => `<div>${e.name} - ${e.weight}kg</div>`).join('')}
+    </div>
+  `).join('');
 }
 
-/* ================= CHART ================= */
-
-let chart;
-
-function renderChart() {
-  const ctx = document.getElementById('muscleChart');
-
-  const counts = { Chest:0, Back:0, Shoulders:0, Arms:0, Legs:0, Core:0 };
-
-  state.history.forEach(s => {
-    s.exercises.forEach(e => {
-      counts[e.bodyPart] += e.weight * e.sets * e.reps;
-    });
-  });
-
-  if (chart) chart.destroy();
-
-  chart = new Chart(ctx, {
-    type: 'radar',
-    data: {
-      labels: Object.keys(counts),
-      datasets: [{ data: Object.values(counts) }]
-    }
-  });
-}
-
-function renderAll() {
-  renderToday();
-  renderHistory();
-  renderTimerUI();
-}
-
-/* ================= INIT ================= */
-
-document.getElementById('addExercise').onclick = addExercise;
-document.getElementById('timerStart').onclick = startTimer;
-document.getElementById('timerPause').onclick = pauseTimer;
-document.getElementById('timerEnd').onclick = endWorkout;
-
-loadState();
-renderAll();
-
+renderHistory();
 </script>
 
 </body>
