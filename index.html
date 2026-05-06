@@ -32,7 +32,14 @@
     --display: 'Anton', sans-serif;
     --body: 'Manrope', sans-serif;
     --mono: 'JetBrains Mono', monospace;
+    
+    /* Rank Colors */
     --rank-s: #00f2ff;
+    --rank-a: #ff0055;
+    --rank-b: #ae00ff;
+    --rank-c: #00ff88;
+    --rank-d: #ffbb00;
+    --rank-e: #888888;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -85,11 +92,27 @@
   }
   .tab.active { background: var(--text); color: var(--bg); }
 
-  /* ANALYTICS CARD */
+  /* ANALYTICS & RANK CARD */
   .analytics-card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 16px; padding: 20px; margin-top: 24px;
   }
+
+  /* RANK STYLING */
+  .rank-display {
+    font-family: var(--display);
+    font-size: 72px;
+    line-height: 1;
+    margin: 10px 0;
+    transition: all 0.5s ease;
+  }
+
+  .rank-s { color: var(--rank-s); text-shadow: 0 0 20px rgba(0, 242, 255, 0.6); }
+  .rank-a { color: var(--rank-a); text-shadow: 0 0 20px rgba(255, 0, 85, 0.5); }
+  .rank-b { color: var(--rank-b); text-shadow: 0 0 20px rgba(174, 0, 255, 0.5); }
+  .rank-c { color: var(--rank-c); text-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
+  .rank-d { color: var(--rank-d); text-shadow: 0 0 20px rgba(255, 187, 0, 0.5); }
+  .rank-e { color: var(--rank-e); text-shadow: none; }
 
   /* PR BADGE */
   .pr-badge {
@@ -130,13 +153,12 @@
   .timer-display.running { color: var(--accent); }
   .timer-actions { display: flex; gap: 8px; margin-top: 16px; }
 
-  /* BODY SILHOUETTE & PROFILE */
+  /* BODY SILHOUETTE */
   .body-section {
     margin-top: 24px; background: var(--surface); border: 1px solid var(--border);
     border-radius: 16px; padding: 24px; display: flex; gap: 20px; align-items: center;
     position: relative; overflow: hidden;
   }
-  /* subtle grid backdrop behind avatar — system UI feel */
   .body-section::before {
     content: ''; position: absolute; top: 0; left: 0; width: 170px; height: 100%;
     background-image:
@@ -149,31 +171,11 @@
   .body-figure { width: 140px; flex-shrink: 0; display: flex; justify-content: center; position: relative; z-index: 1; }
   .body-figure svg { width: 100%; height: auto; overflow: visible; display: block; }
 
-  /* MUSCLE STYLING — gradient depth + glow on activation */
-  .muscle {
-    fill: url(#muscleSheen);
-    stroke: #0a0a0a;
-    stroke-width: 0.6;
-    transition: fill 0.6s ease, filter 0.6s ease;
-  }
-  .muscle.active {
-    fill: url(#activeSheen);
-    filter: drop-shadow(0 0 3px rgba(255, 77, 31, 0.7));
-  }
-  /* thin separator lines layered on top — non-interactive */
-  .muscle-line {
-    fill: none;
-    stroke: #0a0a0a;
-    stroke-width: 0.5;
-    stroke-linecap: round;
-    pointer-events: none;
-    opacity: 0.6;
-  }
+  .muscle { fill: url(#muscleSheen); stroke: #0a0a0a; stroke-width: 0.6; transition: fill 0.6s ease, filter 0.6s ease; }
+  .muscle.active { fill: url(#activeSheen); filter: drop-shadow(0 0 3px rgba(255, 77, 31, 0.7)); }
+  .muscle-line { fill: none; stroke: #0a0a0a; stroke-width: 0.5; stroke-linecap: round; pointer-events: none; opacity: 0.6; }
   .body-summary { flex: 1; position: relative; z-index: 1; }
-  .body-summary h3 {
-    font-family: var(--display); font-size: 22px;
-    letter-spacing: 0.02em; margin-bottom: 8px;
-  }
+  .body-summary h3 { font-family: var(--display); font-size: 22px; letter-spacing: 0.02em; margin-bottom: 8px; }
   .worked-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
   .worked-tag {
     font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
@@ -181,7 +183,6 @@
     background: var(--accent-dim); color: var(--accent); border-radius: 999px;
   }
 
-  /* PHYSICAL STATS INPUTS */
   .stats-inputs { display: flex; gap: 8px; margin-bottom: 12px; }
   .stat-field { flex: 1; }
   .stat-field input {
@@ -191,7 +192,6 @@
   }
   .stat-field input:focus { outline: none; border-color: var(--accent); }
 
-  /* BMI READOUT */
   .bmi-readout {
     font-family: var(--mono); font-size: 10px; color: var(--text-muted);
     text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
@@ -242,6 +242,7 @@
     <button class="tab" data-tab="history">History</button>
   </div>
 
+  <!-- TODAY VIEW -->
   <div id="view-today">
     <div class="timer-card" id="timerCard">
       <div class="timer-label" id="timerLabel">Workout Duration</div>
@@ -307,11 +308,20 @@
     </section>
   </div>
 
+  <!-- STRETCHES VIEW -->
   <div id="view-stretches" class="hidden section">
     <div id="stretchesContent"></div>
   </div>
 
+  <!-- HISTORY VIEW -->
   <div id="view-history" class="hidden">
+    <!-- GLOBAL RANK BADGE -->
+    <div class="analytics-card" style="text-align: center; margin-bottom: 12px; border-color: rgba(255,255,255,0.1);">
+      <div class="timer-label">Global Hunter Rank</div>
+      <div id="globalRank" class="rank-display rank-e">E</div>
+      <div id="rankSubtitle" style="font-family: var(--mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Awaiting Awakening</div>
+    </div>
+
     <div class="analytics-card">
       <h3 style="font-family: var(--display); letter-spacing: 0.05em;">MUSCLE BALANCE</h3>
       <canvas id="muscleChart"></canvas>
@@ -361,10 +371,6 @@ const stretchLibrary = {
   ]
 };
 
-/* ============== UPGRADED ANATOMICAL MANNEQUIN ==============
-   Front view, viewBox 200x440. Each muscle group is a separate path
-   with a data-zone attribute matching the body-part categories.
-   Separator lines (.muscle-line) sit on top for definition. */
 const BODY_SVG = `
 <svg viewBox="0 0 200 440" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -379,103 +385,92 @@ const BODY_SVG = `
       <stop offset="100%" stop-color="#c93a14"/>
     </linearGradient>
   </defs>
-
   <g id="bodyScaler" transform-origin="100 430">
-
-    <!-- HEAD -->
     <ellipse cx="100" cy="34" rx="19" ry="23" class="muscle"/>
-    <!-- jaw line -->
     <path d="M 86 48 Q 100 60 114 48" class="muscle-line"/>
-
-    <!-- NECK -->
     <path d="M 91 54 Q 92 66 90 72 L 110 72 Q 108 66 109 54 Z" class="muscle"/>
-
-    <!-- TRAPEZIUS (visible from front, between neck & shoulders) -->
     <path d="M 90 70 Q 76 74 64 84 Q 78 82 100 80 Q 122 82 136 84 Q 124 74 110 70 Z" class="muscle" data-zone="Back"/>
-
-    <!-- LEFT DELTOID -->
     <path d="M 64 84 Q 48 90 46 110 Q 50 122 68 118 Q 78 104 82 92 Q 76 84 64 84 Z" class="muscle" data-zone="Shoulders"/>
-    <!-- RIGHT DELTOID -->
     <path d="M 136 84 Q 152 90 154 110 Q 150 122 132 118 Q 122 104 118 92 Q 124 84 136 84 Z" class="muscle" data-zone="Shoulders"/>
-
-    <!-- LEFT PECTORAL -->
     <path d="M 82 90 Q 70 98 68 132 Q 76 148 98 148 L 99 104 Q 96 92 82 90 Z" class="muscle" data-zone="Chest"/>
-    <!-- RIGHT PECTORAL -->
     <path d="M 118 90 Q 130 98 132 132 Q 124 148 102 148 L 101 104 Q 104 92 118 90 Z" class="muscle" data-zone="Chest"/>
-    <!-- sternum line -->
     <path d="M 100 100 L 100 148" class="muscle-line"/>
-    <!-- pec lower fold -->
     <path d="M 72 142 Q 86 150 98 148" class="muscle-line"/>
     <path d="M 128 142 Q 114 150 102 148" class="muscle-line"/>
-
-    <!-- LATS (peeking from sides — categorized as Back) -->
     <path d="M 68 130 Q 64 152 70 178 Q 76 182 80 178 Q 78 158 78 138 Q 72 132 68 130 Z" class="muscle" data-zone="Back"/>
     <path d="M 132 130 Q 136 152 130 178 Q 124 182 120 178 Q 122 158 122 138 Q 128 132 132 130 Z" class="muscle" data-zone="Back"/>
-
-    <!-- LEFT BICEP -->
     <path d="M 46 110 Q 38 132 40 168 Q 50 174 60 170 Q 64 146 64 116 Q 56 110 46 110 Z" class="muscle" data-zone="Arms"/>
-    <!-- RIGHT BICEP -->
     <path d="M 154 110 Q 162 132 160 168 Q 150 174 140 170 Q 136 146 136 116 Q 144 110 154 110 Z" class="muscle" data-zone="Arms"/>
-
-    <!-- ELBOW joints -->
     <ellipse cx="50" cy="174" rx="9" ry="5" class="muscle"/>
     <ellipse cx="150" cy="174" rx="9" ry="5" class="muscle"/>
-
-    <!-- LEFT FOREARM -->
     <path d="M 42 178 Q 36 200 40 232 Q 50 238 58 234 Q 60 204 60 180 Q 50 176 42 178 Z" class="muscle" data-zone="Arms"/>
-    <!-- RIGHT FOREARM -->
     <path d="M 158 178 Q 164 200 160 232 Q 150 238 142 234 Q 140 204 140 180 Q 150 176 158 178 Z" class="muscle" data-zone="Arms"/>
-
-    <!-- HANDS -->
     <ellipse cx="48" cy="244" rx="9" ry="11" class="muscle"/>
     <ellipse cx="152" cy="244" rx="9" ry="11" class="muscle"/>
-
-    <!-- 6-PACK ABS — three rows -->
-    <!-- upper row -->
     <path d="M 84 150 Q 84 166 88 170 L 99 170 L 99 150 Z" class="muscle" data-zone="Core"/>
     <path d="M 116 150 Q 116 166 112 170 L 101 170 L 101 150 Z" class="muscle" data-zone="Core"/>
-    <!-- mid row -->
     <path d="M 86 172 L 99 172 L 99 192 L 88 192 Z" class="muscle" data-zone="Core"/>
     <path d="M 114 172 L 101 172 L 101 192 L 112 192 Z" class="muscle" data-zone="Core"/>
-    <!-- lower row -->
     <path d="M 88 194 L 99 194 L 99 216 L 92 216 Z" class="muscle" data-zone="Core"/>
     <path d="M 112 194 L 101 194 L 101 216 L 108 216 Z" class="muscle" data-zone="Core"/>
-
-    <!-- OBLIQUES -->
     <path d="M 78 178 Q 76 200 84 220 Q 88 222 90 218 Q 88 198 86 180 Z" class="muscle" data-zone="Core"/>
     <path d="M 122 178 Q 124 200 116 220 Q 112 222 110 218 Q 112 198 114 180 Z" class="muscle" data-zone="Core"/>
-
-    <!-- HIP / V-line / pelvis -->
     <path d="M 84 218 Q 80 238 90 252 L 110 252 Q 120 238 116 218 L 110 230 L 100 234 L 90 230 Z" class="muscle"/>
-
-    <!-- LEFT QUAD -->
     <path d="M 86 248 Q 76 290 78 332 L 82 342 Q 96 346 99 342 L 99 320 Q 100 280 99 250 Z" class="muscle" data-zone="Legs"/>
-    <!-- RIGHT QUAD -->
     <path d="M 114 248 Q 124 290 122 332 L 118 342 Q 104 346 101 342 L 101 320 Q 100 280 101 250 Z" class="muscle" data-zone="Legs"/>
-    <!-- rectus femoris central lines (definition) -->
     <path d="M 90 260 Q 89 295 88 330" class="muscle-line"/>
     <path d="M 110 260 Q 111 295 112 330" class="muscle-line"/>
-
-    <!-- KNEES -->
     <ellipse cx="89" cy="346" rx="10" ry="6" class="muscle"/>
     <ellipse cx="111" cy="346" rx="10" ry="6" class="muscle"/>
-
-    <!-- LEFT CALF / SHIN -->
     <path d="M 82 354 Q 78 388 84 422 L 96 422 L 97 388 L 96 354 Z" class="muscle" data-zone="Legs"/>
-    <!-- RIGHT CALF / SHIN -->
     <path d="M 118 354 Q 122 388 116 422 L 104 422 L 103 388 L 104 354 Z" class="muscle" data-zone="Legs"/>
-    <!-- calf inner curve hint -->
     <path d="M 84 366 Q 82 388 86 410" class="muscle-line"/>
     <path d="M 116 366 Q 118 388 114 410" class="muscle-line"/>
-
-    <!-- FEET -->
     <ellipse cx="90" cy="428" rx="10" ry="6" class="muscle"/>
     <ellipse cx="110" cy="428" rx="10" ry="6" class="muscle"/>
-
   </g>
 </svg>`;
 
-/* ============== ANALYTICS & PR LOGIC ============== */
+/* ============== RANK LOGIC ============== */
+function getRank(weight) {
+  if (weight >= 120) return 'S';
+  if (weight >= 80) return 'A';
+  if (weight >= 60) return 'B';
+  if (weight >= 40) return 'C';
+  if (weight >= 20) return 'D';
+  return 'E';
+}
+
+function updateGlobalRank() {
+  const rankDisplay = document.getElementById('globalRank');
+  const subtitle = document.getElementById('rankSubtitle');
+  
+  let maxWeightEver = 0;
+  state.history.forEach(session => {
+    session.exercises.forEach(ex => {
+      if (ex.weight > maxWeightEver) maxWeightEver = ex.weight;
+    });
+  });
+
+  const rank = getRank(maxWeightEver);
+  
+  // Clean up existing rank classes and apply the correct glowing class
+  rankDisplay.className = 'rank-display rank-' + rank.toLowerCase();
+  rankDisplay.textContent = rank;
+
+  const descriptions = {
+    'S': 'National Level Hunter',
+    'A': 'Elite Raid Leader',
+    'B': 'High-Rank Striker',
+    'C': 'Solid Tanker',
+    'D': 'Active Hunter',
+    'E': 'E-Class Awakened'
+  };
+  
+  subtitle.textContent = `Rank: ${rank}-Class (${descriptions[rank]})`;
+}
+
+/* ============== CORE LOGIC ============== */
 function getPRForExercise(name) {
   let maxWeight = 0;
   state.history.forEach(session => {
@@ -499,25 +494,14 @@ function checkPRSuggestion() {
   } else { hint.style.display = 'none'; }
 }
 
-function getRank(weight) {
-  if (weight >= 120) return 'S';
-  if (weight >= 80) return 'A';
-  if (weight >= 60) return 'B';
-  if (weight >= 40) return 'C';
-  if (weight >= 20) return 'D';
-  return 'E';
-}
-
 function renderMuscleChart() {
   const ctx = document.getElementById('muscleChart').getContext('2d');
   const counts = { Chest: 0, Back: 0, Shoulders: 0, Arms: 0, Legs: 0, Core: 0 };
-
   state.history.forEach(s => {
     s.exercises.forEach(e => {
       if (counts[e.bodyPart] !== undefined) counts[e.bodyPart] += (e.weight * (e.sets || 1) * (e.reps || 1));
     });
   });
-
   if (chartInstance) chartInstance.destroy();
   chartInstance = new Chart(ctx, {
     type: 'radar',
@@ -538,33 +522,19 @@ function renderMuscleChart() {
   });
 }
 
-/* ============== SMARTER BODY PROPORTION SCALING ==============
-   Old logic scaled width linearly with weight (60kg → 0.75x, 120kg → 1.5x — too extreme).
-   New logic: height scales vertically (clamped); width is driven by BMI ratio with a
-   square-root softener so changes feel natural rather than cartoonish. */
 function updateAvatarProportions() {
     const h = parseFloat(document.getElementById('userHeight').value) || 180;
     const w = parseFloat(document.getElementById('userWeight').value) || 80;
     profile = { height: h, weight: w };
     localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(profile));
-
     const scaler = document.getElementById('bodyScaler');
     if (!scaler) return;
-
-    // Reference body: 180cm / 80kg → BMI 24.7
     const refBMI = 80 / Math.pow(1.80, 2);
     const userBMI = w / Math.pow(h / 100, 2);
-
-    // Vertical scale: gentle, clamped so figure never breaks the card
     const hScale = Math.max(0.88, Math.min(1.12, h / 180));
-
-    // Horizontal scale: BMI-driven, square-root softens extremes
     const bmiRatio = userBMI / refBMI;
     const wScale = Math.max(0.85, Math.min(1.25, Math.pow(bmiRatio, 0.55)));
-
     scaler.setAttribute('transform', `scale(${wScale.toFixed(3)}, ${hScale.toFixed(3)})`);
-
-    // BMI readout for the user
     const readout = document.getElementById('bmiReadout');
     if (readout) {
       let category = 'Normal';
@@ -575,7 +545,6 @@ function updateAvatarProportions() {
     }
 }
 
-/* ============== CORE LOGIC ============== */
 function saveState() {
   localStorage.setItem(STORAGE_KEYS.current, JSON.stringify(state));
   localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(state.history));
@@ -598,10 +567,9 @@ function addExercise() {
   const name = document.getElementById('exName').value.trim();
   const weight = parseFloat(document.getElementById('exWeight').value);
   if (!name) return;
-
   const currentPR = getPRForExercise(name);
   const isPR = weight > currentPR && currentPR > 0;
-
+  const rank = getRank(weight);
   state.exercises.push({
     id: Date.now(),
     name,
@@ -610,12 +578,10 @@ function addExercise() {
     sets: parseInt(document.getElementById('exSets').value),
     reps: parseInt(document.getElementById('exReps').value),
     isPR: isPR,
-    rank: getRank(weight)
+    rank: rank
   });
-
   if (isPR) toast("🚨 RANK UP! NEW PR 🚨");
   else toast("Logged");
-
   if (!state.timerRunning && state.timerElapsed === 0) startTimer();
   document.getElementById('exName').value = '';
   saveState();
@@ -625,14 +591,12 @@ function addExercise() {
 function endWorkout() {
   if (state.exercises.length === 0) return;
   if (!confirm('Save workout to history?')) return;
-
   const session = {
     id: Date.now(),
     date: new Date().toISOString(),
     duration: state.timerElapsed + (state.timerRunning ? Date.now() - state.timerStart : 0),
     exercises: [...state.exercises]
   };
-
   state.history.unshift(session);
   state.exercises = [];
   state.timerRunning = false;
@@ -641,7 +605,6 @@ function endWorkout() {
   renderAll();
 }
 
-/* ============== UI RENDERING ============== */
 function renderTodayList() {
   const list = document.getElementById('todayList');
   document.getElementById('loggedMeta').textContent = `${state.exercises.length} items`;
@@ -651,7 +614,7 @@ function renderTodayList() {
         <div class="exercise-name" style="font-weight: 700; color: var(--text);">${ex.name} ${ex.isPR ? '<span class="pr-badge">PR</span>' : ''}</div>
         <div class="exercise-meta" style="font-size: 12px; color: var(--text-muted);">${ex.bodyPart} · ${ex.weight}kg · ${ex.sets}x${ex.reps}</div>
       </div>
-      <div style="font-family: var(--display); color: var(--accent); font-size: 20px;">${ex.rank}</div>
+      <div class="rank-${ex.rank.toLowerCase()}" style="font-family: var(--display); font-size: 24px;">${ex.rank}</div>
     </div>
   `).join('');
 }
@@ -659,16 +622,13 @@ function renderTodayList() {
 function renderStretches() {
   const container = document.getElementById('stretchesContent');
   const workedParts = [...new Set(state.exercises.map(ex => ex.bodyPart))];
-
   let html = `<h2 class="section-title">Recovery Plan</h2>`;
-
   if (workedParts.length === 0) {
     html += `<p style="color:var(--text-muted); margin-bottom:15px;">Pick a stretching routine. Always gotta stretch gang</p>`;
     workedParts.push("Full Body");
   } else {
     html += `<p style="color:var(--accent); font-family:var(--mono); font-size:10px; text-transform:uppercase; margin-bottom:15px;">Targeting: ${workedParts.join(' + ')}</p>`;
   }
-
   workedParts.forEach(part => {
     const stretches = stretchLibrary[part] || stretchLibrary["Full Body"];
     stretches.forEach(s => {
@@ -679,11 +639,9 @@ function renderStretches() {
             <div style="font-family:var(--mono); font-size:11px; color:var(--accent);">${s.duration}</div>
           </div>
           <div style="font-size:12px; color:var(--text-muted); margin-top:4px; line-height:1.4;">${s.instructions}</div>
-        </div>
-      `;
+        </div>`;
     });
   });
-
   container.innerHTML = html;
 }
 
@@ -695,10 +653,11 @@ function renderHistory() {
         <div class="history-date">${new Date(s.date).toLocaleDateString().toUpperCase()}</div>
         <div style="color: var(--text-muted); font-size: 12px;">${Math.round(s.duration/60000)}m</div>
       </div>
-      ${s.exercises.map(e => `<div style="font-size: 13px; display:flex; justify-content:space-between"><span>${e.name}</span><span>${e.weight}kg</span></div>`).join('')}
+      ${s.exercises.map(e => `<div style="font-size: 13px; display:flex; justify-content:space-between"><span>${e.name}</span><span class="rank-${e.rank.toLowerCase()}">${e.weight}kg</span></div>`).join('')}
     </div>
   `).join('');
   renderMuscleChart();
+  updateGlobalRank();
 }
 
 function renderBody() {
@@ -723,7 +682,6 @@ function renderTimerUI() {
   document.getElementById('timerEnd').classList.toggle('hidden', !isRun && state.timerElapsed === 0);
 }
 
-/* ============== INIT ============== */
 function renderAll() { renderTodayList(); renderBody(); renderTimerUI(); }
 function toast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
 
