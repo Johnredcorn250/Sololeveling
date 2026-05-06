@@ -32,7 +32,7 @@
     --display: 'Anton', sans-serif;
     --body: 'Manrope', sans-serif;
     --mono: 'JetBrains Mono', monospace;
-    
+
     /* Rank Colors */
     --rank-s: #00f2ff;
     --rank-a: #ff0055;
@@ -92,21 +92,13 @@
   }
   .tab.active { background: var(--text); color: var(--bg); }
 
-  /* ANALYTICS & RANK CARD */
+  /* ANALYTICS CARD */
   .analytics-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 20px; margin-top: 24px;
+    border-radius: 16px; padding: 20px; margin-top: 16px;
   }
 
-  /* RANK STYLING */
-  .rank-display {
-    font-family: var(--display);
-    font-size: 72px;
-    line-height: 1;
-    margin: 10px 0;
-    transition: all 0.5s ease;
-  }
-
+  /* RANK COLOR CLASSES (used for per-exercise letters & weight readouts) */
   .rank-s { color: var(--rank-s); text-shadow: 0 0 20px rgba(0, 242, 255, 0.6); }
   .rank-a { color: var(--rank-a); text-shadow: 0 0 20px rgba(255, 0, 85, 0.5); }
   .rank-b { color: var(--rank-b); text-shadow: 0 0 20px rgba(174, 0, 255, 0.5); }
@@ -138,6 +130,10 @@
     content: ''; position: absolute; top: 0; left: 0; right: 0;
     height: 2px; background: var(--accent); animation: pulse 1.5s ease-in-out infinite;
   }
+  .timer-card.paused {
+    border-color: var(--rank-d);
+    box-shadow: 0 0 0 1px var(--rank-d);
+  }
   @keyframes pulse {
     0%, 100% { opacity: 0.4; }
     50% { opacity: 1; }
@@ -151,16 +147,17 @@
     letter-spacing: -0.02em; color: var(--text); line-height: 1;
   }
   .timer-display.running { color: var(--accent); }
+  .timer-display.paused { color: var(--rank-d); }
   .timer-actions { display: flex; gap: 8px; margin-top: 16px; }
 
   /* BODY SILHOUETTE */
   .body-section {
     margin-top: 24px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 24px; display: flex; gap: 20px; align-items: center;
+    border-radius: 16px; padding: 20px; display: flex; gap: 16px; align-items: flex-start;
     position: relative; overflow: hidden;
   }
   .body-section::before {
-    content: ''; position: absolute; top: 0; left: 0; width: 170px; height: 100%;
+    content: ''; position: absolute; top: 0; left: 0; width: 160px; height: 100%;
     background-image:
       linear-gradient(rgba(255,77,31,0.04) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255,77,31,0.04) 1px, transparent 1px);
@@ -168,33 +165,86 @@
     mask-image: radial-gradient(ellipse 80px 200px at 65px 50%, black 30%, transparent 70%);
     pointer-events: none;
   }
-  .body-figure { width: 140px; flex-shrink: 0; display: flex; justify-content: center; position: relative; z-index: 1; }
+  .body-figure { width: 130px; flex-shrink: 0; display: flex; justify-content: center; position: relative; z-index: 1; }
   .body-figure svg { width: 100%; height: auto; overflow: visible; display: block; }
 
-  .muscle { fill: url(#muscleSheen); stroke: #0a0a0a; stroke-width: 0.6; transition: fill 0.6s ease, filter 0.6s ease; }
-  .muscle.active { fill: url(#activeSheen); filter: drop-shadow(0 0 3px rgba(255, 77, 31, 0.7)); }
-  .muscle-line { fill: none; stroke: #0a0a0a; stroke-width: 0.5; stroke-linecap: round; pointer-events: none; opacity: 0.6; }
-  .body-summary { flex: 1; position: relative; z-index: 1; }
-  .body-summary h3 { font-family: var(--display); font-size: 22px; letter-spacing: 0.02em; margin-bottom: 8px; }
-  .worked-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .muscle {
+    fill: url(#muscleSheen);
+    stroke: #0a0a0a;
+    stroke-width: var(--muscle-stroke, 0.6);
+    transition: fill 0.6s ease, filter 0.6s ease, stroke-width 0.4s ease;
+  }
+  .muscle.active {
+    fill: url(#activeSheen);
+    filter: drop-shadow(0 0 3px rgba(255, 77, 31, 0.7));
+  }
+  .muscle-line {
+    fill: none;
+    stroke: #0a0a0a;
+    stroke-width: 0.5;
+    stroke-linecap: round;
+    pointer-events: none;
+    opacity: var(--definition-opacity, 0.6);
+    transition: opacity 0.4s ease;
+  }
+  .body-summary { flex: 1; position: relative; z-index: 1; min-width: 0; }
+  .body-summary h3 { font-family: var(--display); font-size: 22px; letter-spacing: 0.02em; margin-bottom: 12px; }
+  .worked-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
   .worked-tag {
     font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
     text-transform: uppercase; padding: 4px 10px;
     background: var(--accent-dim); color: var(--accent); border-radius: 999px;
   }
 
-  .stats-inputs { display: flex; gap: 8px; margin-bottom: 12px; }
-  .stat-field { flex: 1; }
-  .stat-field input {
-    width: 100%; background: var(--surface-2); border: 1px solid var(--border);
-    color: var(--text); padding: 6px 10px; border-radius: 8px;
-    font-family: var(--mono); font-size: 11px;
+  /* PROFILE INPUTS — sex toggle, age, height, weight */
+  .profile-row { display: flex; gap: 6px; margin-bottom: 10px; align-items: stretch; }
+  .sex-toggle {
+    display: flex; background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 8px; overflow: hidden;
   }
-  .stat-field input:focus { outline: none; border-color: var(--accent); }
+  .sex-btn {
+    background: transparent; border: none; color: var(--text-muted);
+    padding: 0 10px; font-family: var(--mono); font-size: 11px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .sex-btn.active { background: var(--accent); color: var(--text); }
+  .profile-input {
+    flex: 1; min-width: 0; background: var(--surface-2); border: 1px solid var(--border);
+    color: var(--text); padding: 6px 8px; border-radius: 8px;
+    font-family: var(--mono); font-size: 11px; text-align: center;
+  }
+  .profile-input:focus { outline: none; border-color: var(--accent); }
+
+  /* BF SLIDER */
+  .bf-slider-row { margin-bottom: 8px; }
+  .bf-label {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-family: var(--mono); font-size: 9px; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;
+  }
+  .bf-label strong { color: var(--accent); font-size: 11px; font-weight: 600; }
+  .bf-slider {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 4px;
+    background: linear-gradient(90deg,
+      var(--rank-c) 0%, var(--success) 25%,
+      var(--accent) 65%, var(--rank-b) 100%);
+    border-radius: 2px; outline: none; cursor: pointer;
+  }
+  .bf-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 14px; height: 14px;
+    background: var(--text); border-radius: 50%; cursor: pointer;
+    box-shadow: 0 0 8px rgba(255, 77, 31, 0.6);
+  }
+  .bf-slider::-moz-range-thumb {
+    width: 14px; height: 14px; background: var(--text);
+    border-radius: 50%; cursor: pointer; border: none;
+    box-shadow: 0 0 8px rgba(255, 77, 31, 0.6);
+  }
 
   .bmi-readout {
     font-family: var(--mono); font-size: 10px; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
+    text-transform: uppercase; letter-spacing: 0.06em; margin-top: 8px;
   }
   .bmi-readout strong { color: var(--text); font-weight: 600; }
 
@@ -226,6 +276,121 @@
   .toast.show { transform: translateX(-50%) translateY(0); }
 
   #muscleChart { max-height: 250px; margin-top: 15px; }
+
+  /* HUNTER RANK CARD (composite RP) */
+  .rank-card {
+    margin-top: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .rank-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 25% 50%, var(--rank-glow, rgba(136,136,136,0.2)) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .rank-card-header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 16px; position: relative; z-index: 1;
+  }
+  .rank-card-title {
+    font-family: var(--mono); font-size: 10px; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.15em;
+  }
+  .rank-card-rp {
+    font-family: var(--display); font-size: 22px; color: var(--text);
+    letter-spacing: 0.02em;
+  }
+  .rank-card-rp .rp-suffix { font-size: 11px; color: var(--text-muted); margin-left: 4px; letter-spacing: 0.08em; }
+  .rank-card-body {
+    display: flex; gap: 20px; align-items: center;
+    position: relative; z-index: 1;
+  }
+  .rank-letter-big {
+    font-family: var(--display);
+    font-size: 96px;
+    line-height: 0.85;
+    flex-shrink: 0;
+    width: 90px;
+    text-align: center;
+    letter-spacing: -0.05em;
+  }
+  .rank-card-stats { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .rank-stat-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-family: var(--mono); font-size: 11px;
+    border-bottom: 1px dashed var(--border);
+    padding-bottom: 4px;
+  }
+  .rank-stat-row:last-child { border-bottom: none; }
+  .rank-stat-num { color: var(--text); font-weight: 600; font-size: 13px; }
+  .rank-stat-label { color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .rank-subtitle {
+    font-family: var(--mono); font-size: 10px; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.1em;
+    margin-top: 14px; text-align: center; position: relative; z-index: 1;
+  }
+  .rank-progress { margin-top: 14px; position: relative; z-index: 1; }
+  .rank-progress-bar {
+    height: 4px; background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 2px; overflow: hidden; margin-bottom: 6px;
+  }
+  .rank-progress-fill {
+    height: 100%;
+    background: var(--rank-fill, var(--rank-e));
+    box-shadow: 0 0 8px var(--rank-fill, var(--rank-e));
+    transition: width 0.6s ease;
+  }
+  .rank-progress-label {
+    font-family: var(--mono); font-size: 9px; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.1em;
+    display: flex; justify-content: space-between;
+  }
+  .rank-progress-label strong { color: var(--text); }
+
+  /* STRETCH CARDS */
+  .stretch-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 2px solid var(--accent);
+    border-radius: 12px; padding: 14px;
+    margin-bottom: 10px;
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .stretch-illustration {
+    width: 80px; height: 70px; flex-shrink: 0;
+    background: var(--surface-2); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 4px;
+  }
+  .stretch-illustration svg { width: 100%; height: 100%; }
+  .stretch-content { flex: 1; min-width: 0; }
+  .stretch-header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 4px; gap: 8px;
+  }
+  .stretch-name { font-weight: 700; color: var(--text); font-size: 14px; line-height: 1.2; }
+  .stretch-duration {
+    font-family: var(--mono); font-size: 10px; color: var(--accent);
+    flex-shrink: 0; letter-spacing: 0.04em;
+  }
+  .stretch-instruction {
+    font-size: 12px; color: var(--text-muted);
+    line-height: 1.4;
+  }
+  .stretch-targets {
+    margin-top: 6px; display: flex; gap: 4px; flex-wrap: wrap;
+  }
+  .stretch-target-tag {
+    font-family: var(--mono); font-size: 8px; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 2px 6px;
+    background: rgba(255,77,31,0.08); color: var(--text-muted);
+    border-radius: 999px;
+  }
 </style>
 </head>
 <body>
@@ -250,6 +415,7 @@
       <div class="timer-actions">
         <button class="btn btn-accent" id="timerStart">Start Workout</button>
         <button class="btn btn-ghost hidden" id="timerPause" style="flex:1">Pause</button>
+        <button class="btn btn-accent hidden" id="timerResume" style="flex:1">Resume</button>
         <button class="btn btn-ghost hidden" id="timerEnd" style="flex:1">End</button>
       </div>
     </div>
@@ -258,16 +424,21 @@
       <div class="body-figure" id="bodyFigure"></div>
       <div class="body-summary">
         <h3>My Profile</h3>
-        <div class="stats-inputs">
-            <div class="stat-field">
-                <input type="number" id="userHeight" placeholder="H (cm)" oninput="updateAvatarProportions()">
+        <div class="profile-row">
+            <div class="sex-toggle">
+                <button class="sex-btn active" data-sex="male">M</button>
+                <button class="sex-btn" data-sex="female">F</button>
             </div>
-            <div class="stat-field">
-                <input type="number" id="userWeight" placeholder="W (kg)" oninput="updateAvatarProportions()">
-            </div>
+            <input type="number" class="profile-input" id="userAge" placeholder="Age">
+            <input type="number" class="profile-input" id="userHeight" placeholder="H">
+            <input type="number" class="profile-input" id="userWeight" placeholder="W">
+        </div>
+        <div class="bf-slider-row">
+            <div class="bf-label">Body Fat <strong id="bfValue">18%</strong></div>
+            <input type="range" min="5" max="35" value="18" id="userBodyFat" class="bf-slider">
         </div>
         <div class="bmi-readout" id="bmiReadout"></div>
-        <div id="workedSummary" class="empty">No exercises logged yet.</div>
+        <div id="workedSummary" class="worked-list"></div>
       </div>
     </div>
 
@@ -315,13 +486,7 @@
 
   <!-- HISTORY VIEW -->
   <div id="view-history" class="hidden">
-    <!-- GLOBAL RANK BADGE -->
-    <div class="analytics-card" style="text-align: center; margin-bottom: 12px; border-color: rgba(255,255,255,0.1);">
-      <div class="timer-label">Global Hunter Rank</div>
-      <div id="globalRank" class="rank-display rank-e">E</div>
-      <div id="rankSubtitle" style="font-family: var(--mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Awaiting Awakening</div>
-    </div>
-
+    <div id="rankCardContainer"></div>
     <div class="analytics-card">
       <h3 style="font-family: var(--display); letter-spacing: 0.05em;">MUSCLE BALANCE</h3>
       <canvas id="muscleChart"></canvas>
@@ -337,41 +502,254 @@
 /* ============== STATE & CONSTANTS ============== */
 const STORAGE_KEYS = { current: 'gymlog_current', history: 'gymlog_history', profile: 'gymlog_profile' };
 let state = { exercises: [], timerStart: null, timerElapsed: 0, timerRunning: false, history: [] };
-let profile = { height: 180, weight: 80 };
+let profile = { height: 180, weight: 80, sex: 'male', age: 30, bodyFat: 18 };
 let chartInstance = null;
+let timerInterval = null;
 
-const stretchLibrary = {
-  "Chest": [
-    { name: "Doorway Chest Stretch", duration: "45s", instructions: "Place forearms on doorway frames and lean forward." },
-    { name: "Pec Minor Floor Stretch", duration: "30s/side", instructions: "Lying on stomach, extend one arm out at 90° and roll away from it." }
-  ],
-  "Back": [
-    { name: "Cat-Cow Stretch", duration: "10 reps", instructions: "On all fours, alternate between arching and rounding your spine." },
-    { name: "Child's Pose", duration: "1m", instructions: "Sit on heels, arms extended forward on the floor." }
-  ],
-  "Shoulders": [
-    { name: "Cross-Body Shoulder Stretch", duration: "30s/side", instructions: "Pull one arm across your chest using the other arm." },
-    { name: "Sleeper Stretch", duration: "30s/side", instructions: "Lying on your side, gently press your forearm toward the floor." }
-  ],
-  "Arms": [
-    { name: "Overhead Tricep Stretch", duration: "30s/side", instructions: "Reach one hand down your spine and pull the elbow with the other hand." },
-    { name: "Wrist Extensor Stretch", duration: "30s/side", instructions: "Extend arm, palm down, and gently pull fingers toward you." }
-  ],
-  "Legs": [
-    { name: "Pigeon Pose", duration: "1m/side", instructions: "Bring one knee forward and rotate it outward; sink hips toward the floor." },
-    { name: "Couch Stretch", duration: "1m/side", instructions: "Back knee on ground, foot against a wall; stay upright to stretch quads/hip flexors." }
-  ],
-  "Core": [
-    { name: "Cobra Stretch", duration: "45s", instructions: "Lying on stomach, press up with hands to stretch the abdominals." },
-    { name: "Sphinx Pose", duration: "1m", instructions: "Prop yourself up on your forearms to gently extend the spine." }
-  ],
-  "Full Body": [
-    { name: "World's Greatest Stretch", duration: "5 reps/side", instructions: "Lunge forward, elbow to instep, then rotate arm to the sky." },
-    { name: "Deep Squat Hold", duration: "1m", instructions: "Sit in a deep squat, using elbows to push knees out." }
-  ]
-};
+/* ============== STRETCH LIBRARY (with inline SVG illustrations) ==============
+   ~30 stretches commonly prescribed in physiotherapy and mobility work.
+   Each stretch is tagged with one or more body-part targets so the
+   recommendation engine can pick relevant ones for what was just trained. */
+const STRETCH_LIBRARY = [
+  // ===== CHEST =====
+  {
+    id: 'doorway-chest', name: 'Doorway Chest Stretch', duration: '45s',
+    targets: ['Chest', 'Shoulders'],
+    instructions: 'Stand in a doorway, place forearms on the frame at 90°, step one foot forward and lean gently until you feel a stretch across the chest.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="35" y1="8" x2="35" y2="85" stroke="#444" stroke-width="2"/><line x1="85" y1="8" x2="85" y2="85" stroke="#444" stroke-width="2"/><circle cx="60" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="27" x2="60" y2="55" stroke="#888" stroke-width="1.5"/><path d="M 60 35 Q 50 30 38 28" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><path d="M 60 35 Q 70 30 82 28" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><line x1="60" y1="55" x2="52" y2="80" stroke="#888" stroke-width="1.5"/><line x1="60" y1="55" x2="68" y2="80" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'pec-floor', name: 'Pec Minor Floor Stretch', duration: '30s/side',
+    targets: ['Chest'],
+    instructions: 'Lie face down, extend one arm out at 90°, palm flat. Roll your body away from that arm until you feel a deep chest stretch.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="70" x2="110" y2="70" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><ellipse cx="55" cy="60" rx="32" ry="9" fill="none" stroke="#888" stroke-width="1.5"/><circle cx="28" cy="60" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 60 55 L 95 38" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><circle cx="95" cy="38" r="3" fill="#ff4d1f"/><line x1="78" y1="64" x2="92" y2="76" stroke="#888" stroke-width="1.5"/><line x1="78" y1="68" x2="86" y2="78" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'wall-corner', name: 'Wall Corner Stretch', duration: '40s',
+    targets: ['Chest', 'Shoulders'],
+    instructions: 'Face a corner, place forearms on each wall at shoulder height, step in and lean forward gently to open the chest.',
+    illustration: `<svg viewBox="0 0 120 90"><path d="M 30 8 L 60 38 L 90 8" fill="none" stroke="#444" stroke-width="2"/><circle cx="60" cy="48" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="53" x2="60" y2="78" stroke="#888" stroke-width="1.5"/><path d="M 60 58 L 38 32" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><path d="M 60 58 L 82 32" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/></svg>`
+  },
+  {
+    id: 'thoracic-foam', name: 'Foam Roller Thoracic Extension', duration: '8 reps',
+    targets: ['Chest', 'Back'],
+    instructions: 'Place a foam roller under your upper back, hands behind head, and slowly extend backwards over the roller.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><ellipse cx="48" cy="60" rx="6" ry="4" fill="#444" stroke="#666" stroke-width="1"/><path d="M 25 55 Q 40 45 60 55 Q 75 60 90 75" fill="none" stroke="#888" stroke-width="1.8"/><circle cx="22" cy="52" r="5" fill="none" stroke="#ff4d1f" stroke-width="1.8"/><line x1="60" y1="56" x2="68" y2="40" stroke="#888" stroke-width="1.5"/><line x1="68" y1="40" x2="62" y2="32" stroke="#888" stroke-width="1.5"/><line x1="92" y1="74" x2="100" y2="78" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'cobra-chest', name: 'Cobra Chest Opener', duration: '45s',
+    targets: ['Chest', 'Core'],
+    instructions: 'Lie face down, palms by ribs. Press up gently, lifting chest while keeping hips on the floor. Open the collarbones.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 30 78 Q 50 68 65 50 Q 72 38 78 28" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><circle cx="80" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="55" x2="58" y2="78" stroke="#888" stroke-width="1.5"/><line x1="68" y1="55" x2="74" y2="78" stroke="#888" stroke-width="1.5"/><path d="M 30 75 Q 25 75 22 78" fill="none" stroke="#888" stroke-width="1.5"/></svg>`
+  },
 
-const BODY_SVG = `
+  // ===== BACK =====
+  {
+    id: 'cat-cow', name: 'Cat-Cow Stretch', duration: '10 reps',
+    targets: ['Back', 'Core'],
+    instructions: 'On all fours, alternate between rounding the spine upward (cat) and arching it downward (cow). Move with breath.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 30 50 Q 60 30 90 50" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><circle cx="92" cy="48" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="32" y1="52" x2="32" y2="76" stroke="#888" stroke-width="1.5"/><line x1="40" y1="54" x2="40" y2="76" stroke="#888" stroke-width="1.5"/><line x1="80" y1="54" x2="80" y2="76" stroke="#888" stroke-width="1.5"/><line x1="88" y1="54" x2="88" y2="76" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'childs-pose', name: "Child's Pose", duration: '1m',
+    targets: ['Back'],
+    instructions: 'Kneel, sit back on heels. Fold forward, arms extended, forehead toward the floor. Breathe into the back.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 70 78 Q 60 60 45 50 Q 30 45 18 48" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><circle cx="20" cy="52" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 70 78 Q 78 70 80 60" fill="none" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'thread-needle', name: 'Thread the Needle', duration: '30s/side',
+    targets: ['Back', 'Shoulders'],
+    instructions: 'On all fours, slide one arm under the body palm up. Lower shoulder and ear toward the floor.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 28 50 Q 55 38 85 50" fill="none" stroke="#888" stroke-width="1.8"/><circle cx="22" cy="62" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="35" y1="55" x2="60" y2="68" stroke="#ff4d1f" stroke-width="2.2"/><line x1="60" y1="68" x2="80" y2="64" stroke="#ff4d1f" stroke-width="2.2"/><line x1="32" y1="52" x2="32" y2="76" stroke="#888" stroke-width="1.5"/><line x1="80" y1="54" x2="80" y2="76" stroke="#888" stroke-width="1.5"/><line x1="88" y1="54" x2="88" y2="76" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'dead-hang', name: 'Dead Hang', duration: '30s',
+    targets: ['Back', 'Shoulders'],
+    instructions: 'Hang from a pull-up bar with arms straight, shoulders relaxed. Decompresses the spine and stretches the lats.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="20" y1="12" x2="100" y2="12" stroke="#444" stroke-width="2.5"/><line x1="60" y1="12" x2="60" y2="22" stroke="#ff4d1f" stroke-width="2"/><line x1="55" y1="12" x2="55" y2="22" stroke="#ff4d1f" stroke-width="2"/><line x1="65" y1="12" x2="65" y2="22" stroke="#ff4d1f" stroke-width="2"/><circle cx="60" cy="30" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="35" x2="60" y2="68" stroke="#888" stroke-width="1.5"/><line x1="60" y1="68" x2="55" y2="84" stroke="#888" stroke-width="1.5"/><line x1="60" y1="68" x2="65" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'forward-fold', name: 'Standing Forward Fold', duration: '45s',
+    targets: ['Back', 'Legs'],
+    instructions: 'Stand tall, hinge at the hips and let the upper body hang. Keep a slight bend in the knees. Let arms dangle.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="60" cy="55" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 60 60 Q 60 45 60 38" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><line x1="55" y1="55" x2="48" y2="65" stroke="#888" stroke-width="1.5"/><line x1="65" y1="55" x2="72" y2="65" stroke="#888" stroke-width="1.5"/><line x1="58" y1="38" x2="55" y2="80" stroke="#888" stroke-width="1.5"/><line x1="62" y1="38" x2="65" y2="80" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'supine-twist', name: 'Supine Spinal Twist', duration: '45s/side',
+    targets: ['Back', 'Core'],
+    instructions: 'Lie on back, draw one knee across the body to the opposite side. Keep both shoulders pressed to the floor.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="22" cy="55" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="22" y1="62" x2="25" y2="76" stroke="#888" stroke-width="1.5"/><line x1="22" y1="62" x2="20" y2="76" stroke="#888" stroke-width="1.5"/><path d="M 28 65 Q 55 70 80 50" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 80 50 Q 92 38 100 30" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 80 50 L 95 60" fill="none" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+
+  // ===== SHOULDERS =====
+  {
+    id: 'cross-body', name: 'Cross-Body Shoulder Stretch', duration: '30s/side',
+    targets: ['Shoulders'],
+    instructions: 'Bring one arm across the chest, use the other arm to pull it gently toward the body until you feel the stretch in the rear deltoid.',
+    illustration: `<svg viewBox="0 0 120 90"><circle cx="60" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="27" x2="60" y2="65" stroke="#888" stroke-width="1.5"/><path d="M 55 35 Q 38 38 30 32" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><path d="M 60 40 Q 45 38 32 34" fill="none" stroke="#888" stroke-width="1.5"/><line x1="55" y1="65" x2="48" y2="84" stroke="#888" stroke-width="1.5"/><line x1="60" y1="65" x2="68" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'sleeper-stretch', name: 'Sleeper Stretch', duration: '30s/side',
+    targets: ['Shoulders'],
+    instructions: 'Lie on your side, arm bent at 90°. With the top hand, gently press the forearm toward the floor.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><ellipse cx="55" cy="60" rx="32" ry="9" fill="none" stroke="#888" stroke-width="1.5"/><circle cx="28" cy="55" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="33" y1="58" x2="50" y2="48" stroke="#ff4d1f" stroke-width="2.2"/><line x1="50" y1="48" x2="48" y2="68" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 50 48 Q 56 55 50 65" fill="none" stroke="#888" stroke-width="1.3"/></svg>`
+  },
+  {
+    id: 'wall-slides', name: 'Wall Slides', duration: '10 reps',
+    targets: ['Shoulders', 'Back'],
+    instructions: 'Stand against a wall, arms in a goalpost position. Slide arms up and down keeping forearms in contact with the wall.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="20" y1="8" x2="20" y2="85" stroke="#444" stroke-width="2.5"/><circle cx="35" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="35" y1="27" x2="35" y2="62" stroke="#888" stroke-width="1.5"/><path d="M 30 32 L 22 22 L 22 12" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><path d="M 40 32 L 50 22 L 50 12" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><line x1="32" y1="62" x2="28" y2="82" stroke="#888" stroke-width="1.5"/><line x1="38" y1="62" x2="42" y2="82" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'doorway-shoulder', name: 'Doorway Shoulder Stretch', duration: '30s/side',
+    targets: ['Shoulders', 'Chest'],
+    instructions: 'Place one hand on a door frame at shoulder height, step forward and rotate the body away from the arm.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="35" y1="8" x2="35" y2="85" stroke="#444" stroke-width="2"/><circle cx="65" cy="25" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="65" y1="30" x2="65" y2="62" stroke="#888" stroke-width="1.5"/><path d="M 60 35 L 38 30" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><line x1="60" y1="62" x2="55" y2="82" stroke="#888" stroke-width="1.5"/><line x1="65" y1="62" x2="72" y2="82" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'eagle-arms', name: 'Eagle Arms', duration: '30s/side',
+    targets: ['Shoulders'],
+    instructions: 'Cross one arm under the other at the elbows, wrap forearms, palms touching. Lift elbows away from chest.',
+    illustration: `<svg viewBox="0 0 120 90"><circle cx="60" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="27" x2="60" y2="68" stroke="#888" stroke-width="1.5"/><path d="M 50 38 Q 55 45 60 50 Q 65 55 70 50 Q 70 42 65 38" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 65 38 L 65 28" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><line x1="55" y1="68" x2="50" y2="84" stroke="#888" stroke-width="1.5"/><line x1="65" y1="68" x2="70" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+
+  // ===== ARMS =====
+  {
+    id: 'tricep-overhead', name: 'Overhead Tricep Stretch', duration: '30s/side',
+    targets: ['Arms', 'Shoulders'],
+    instructions: 'Reach one hand down your spine, use the other to pull the elbow gently across the head.',
+    illustration: `<svg viewBox="0 0 120 90"><circle cx="60" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="27" x2="60" y2="68" stroke="#888" stroke-width="1.5"/><path d="M 60 32 L 70 12 L 55 32" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><path d="M 60 32 L 50 12 L 65 18" fill="none" stroke="#888" stroke-width="1.5"/><line x1="55" y1="68" x2="48" y2="84" stroke="#888" stroke-width="1.5"/><line x1="65" y1="68" x2="72" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'wrist-extensor', name: 'Wrist Extensor Stretch', duration: '30s/side',
+    targets: ['Arms'],
+    instructions: 'Extend one arm forward, palm facing down. With the other hand, gently pull the fingers down and toward you.',
+    illustration: `<svg viewBox="0 0 120 90"><circle cx="35" cy="32" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="35" y1="37" x2="35" y2="68" stroke="#888" stroke-width="1.5"/><line x1="35" y1="42" x2="80" y2="42" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 80 42 L 82 52 L 78 56" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><path d="M 35 48 Q 60 55 80 50" fill="none" stroke="#888" stroke-width="1.5"/><line x1="32" y1="68" x2="28" y2="84" stroke="#888" stroke-width="1.5"/><line x1="38" y1="68" x2="42" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'wrist-flexor', name: 'Wrist Flexor Stretch', duration: '30s/side',
+    targets: ['Arms'],
+    instructions: 'Extend one arm forward, palm facing up. With the other hand, gently pull the fingers down and back.',
+    illustration: `<svg viewBox="0 0 120 90"><circle cx="35" cy="32" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="35" y1="37" x2="35" y2="68" stroke="#888" stroke-width="1.5"/><line x1="35" y1="42" x2="80" y2="42" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 80 42 L 78 32 L 82 28" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><path d="M 35 50 Q 55 38 78 36" fill="none" stroke="#888" stroke-width="1.5"/><line x1="32" y1="68" x2="28" y2="84" stroke="#888" stroke-width="1.5"/><line x1="38" y1="68" x2="42" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'bicep-wall', name: 'Bicep Wall Stretch', duration: '30s/side',
+    targets: ['Arms', 'Chest'],
+    instructions: 'Place palm on a wall behind you, fingers pointing back. Step forward and rotate the body away from the arm.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="95" y1="8" x2="95" y2="85" stroke="#444" stroke-width="2"/><circle cx="60" cy="25" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="30" x2="60" y2="62" stroke="#888" stroke-width="1.5"/><path d="M 65 35 L 92 38" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><line x1="55" y1="62" x2="50" y2="82" stroke="#888" stroke-width="1.5"/><line x1="65" y1="62" x2="70" y2="82" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'forearm-prayer', name: 'Reverse Prayer Stretch', duration: '30s',
+    targets: ['Arms'],
+    instructions: 'Bring palms together behind the back, fingers pointing up. Press palms together gently to stretch the wrists and forearms.',
+    illustration: `<svg viewBox="0 0 120 90"><circle cx="60" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="27" x2="60" y2="68" stroke="#888" stroke-width="1.5"/><path d="M 50 35 Q 45 50 58 55 L 58 38" fill="none" stroke="#ff4d1f" stroke-width="2"/><path d="M 70 35 Q 75 50 62 55 L 62 38" fill="none" stroke="#ff4d1f" stroke-width="2"/><line x1="55" y1="68" x2="50" y2="84" stroke="#888" stroke-width="1.5"/><line x1="65" y1="68" x2="70" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+
+  // ===== LEGS =====
+  {
+    id: 'pigeon', name: 'Pigeon Pose', duration: '1m/side',
+    targets: ['Legs'],
+    instructions: 'From all fours, bring one knee forward bent, extend the other leg back. Lower hips toward the floor.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="38" cy="42" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 38 47 Q 45 56 58 60" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 58 60 Q 50 70 38 68" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 58 60 Q 75 65 100 76" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><line x1="33" y1="46" x2="42" y2="56" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'couch-stretch', name: 'Couch Stretch', duration: '1m/side',
+    targets: ['Legs'],
+    instructions: 'Kneel with back foot up against a wall or couch. Front knee at 90°. Stay tall to feel the quad and hip flexor stretch.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><line x1="92" y1="20" x2="92" y2="82" stroke="#444" stroke-width="2"/><circle cx="50" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="50" y1="27" x2="50" y2="55" stroke="#888" stroke-width="1.5"/><path d="M 50 55 L 38 78" stroke="#888" stroke-width="1.5"/><path d="M 50 55 Q 65 60 78 60 Q 88 55 90 30" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><line x1="45" y1="35" x2="38" y2="45" stroke="#888" stroke-width="1.5"/><line x1="55" y1="35" x2="62" y2="45" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'standing-hamstring', name: 'Standing Hamstring Stretch', duration: '45s/side',
+    targets: ['Legs'],
+    instructions: 'Place one heel on a low surface, leg straight. Hinge at the hips, keeping the back flat, until you feel the hamstring engage.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><rect x="60" y="62" width="35" height="6" fill="#444"/><circle cx="40" cy="32" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 40 37 Q 42 48 50 55" fill="none" stroke="#888" stroke-width="1.5"/><line x1="50" y1="55" x2="42" y2="78" stroke="#888" stroke-width="1.5"/><path d="M 50 55 Q 65 58 90 64" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><line x1="32" y1="38" x2="22" y2="50" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'wall-calf', name: 'Wall Calf Stretch', duration: '45s/side',
+    targets: ['Legs'],
+    instructions: 'Place hands on a wall, step one foot back keeping the heel pressed to the floor and the leg straight.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="20" y1="8" x2="20" y2="85" stroke="#444" stroke-width="2"/><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="48" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="48" y1="27" x2="48" y2="50" stroke="#888" stroke-width="1.5"/><line x1="44" y1="32" x2="22" y2="28" stroke="#888" stroke-width="1.5"/><line x1="52" y1="32" x2="22" y2="32" stroke="#888" stroke-width="1.5"/><line x1="48" y1="50" x2="38" y2="80" stroke="#888" stroke-width="1.5"/><line x1="48" y1="50" x2="78" y2="80" stroke="#ff4d1f" stroke-width="2.2"/></svg>`
+  },
+  {
+    id: 'seated-fold', name: 'Seated Forward Fold', duration: '1m',
+    targets: ['Legs', 'Back'],
+    instructions: 'Sit with legs extended, hinge forward from the hips reaching toward the toes. Keep the spine long.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="32" cy="35" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 32 40 Q 40 55 55 60" fill="none" stroke="#888" stroke-width="1.5"/><line x1="55" y1="60" x2="100" y2="65" stroke="#ff4d1f" stroke-width="2.2"/><line x1="55" y1="60" x2="60" y2="55" stroke="#888" stroke-width="1.5"/><line x1="60" y1="55" x2="92" y2="60" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'figure-four', name: 'Lying Figure-4 Stretch', duration: '45s/side',
+    targets: ['Legs'],
+    instructions: 'Lie on back, cross one ankle over the opposite knee. Pull the bottom thigh toward the chest until you feel a glute stretch.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="22" cy="58" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 28 60 Q 50 55 72 50" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 72 50 L 80 32" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 80 32 L 65 30" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 65 30 L 75 38" fill="none" stroke="#ff4d1f" stroke-width="2.2"/></svg>`
+  },
+
+  // ===== CORE =====
+  {
+    id: 'cobra', name: 'Cobra Stretch', duration: '45s',
+    targets: ['Core'],
+    instructions: 'Lie face down, palms by ribs. Press up to lift the chest while keeping hips on the floor.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 28 78 Q 50 70 65 55 Q 75 40 80 28" fill="none" stroke="#888" stroke-width="2"/><path d="M 50 70 Q 60 60 65 50" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><circle cx="82" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="62" y1="58" x2="58" y2="78" stroke="#888" stroke-width="1.5"/><line x1="68" y1="58" x2="72" y2="78" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'sphinx', name: 'Sphinx Pose', duration: '1m',
+    targets: ['Core', 'Back'],
+    instructions: 'Lie face down, prop yourself on the forearms with elbows under shoulders. A gentler version of cobra.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 25 78 Q 50 65 70 55 Q 80 50 85 45" fill="none" stroke="#888" stroke-width="2"/><line x1="55" y1="60" x2="55" y2="78" stroke="#888" stroke-width="1.5"/><line x1="65" y1="55" x2="62" y2="78" stroke="#888" stroke-width="1.5"/><path d="M 50 65 Q 55 70 58 78" fill="none" stroke="#ff4d1f" stroke-width="2"/><circle cx="88" cy="40" r="5" fill="none" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'side-bend', name: 'Standing Side Bend', duration: '30s/side',
+    targets: ['Core'],
+    instructions: 'Stand tall, raise one arm overhead, bend gently to the opposite side. Reach long through the fingertips.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="58" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 60 27 Q 65 50 60 78" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 58 30 L 38 12" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round"/><path d="M 62 40 L 70 55" fill="none" stroke="#888" stroke-width="1.5"/><line x1="55" y1="78" x2="50" y2="82" stroke="#888" stroke-width="1.5"/><line x1="65" y1="78" x2="68" y2="82" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'spinal-rotation', name: 'Supine Spinal Rotation', duration: '45s/side',
+    targets: ['Core', 'Back'],
+    instructions: 'Lie on back, knees bent. Drop both knees to one side while keeping shoulders on the floor.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="22" cy="55" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 28 60 Q 60 65 80 50" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 80 50 Q 90 38 95 28" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 80 50 L 95 65" fill="none" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'dead-bug', name: 'Dead Bug Mobility', duration: '8 reps/side',
+    targets: ['Core'],
+    instructions: 'Lie on back, arms up and knees over hips. Slowly extend opposite arm and leg while keeping the back flat.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="22" cy="60" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="28" y1="62" x2="78" y2="62" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 32 60 L 22 38" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 60 62 Q 70 50 75 32" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 75 62 L 95 50" fill="none" stroke="#ff4d1f" stroke-width="2.2"/></svg>`
+  },
+
+  // ===== FULL BODY =====
+  {
+    id: 'worlds-greatest', name: "World's Greatest Stretch", duration: '5 reps/side',
+    targets: ['Full Body', 'Legs', 'Back', 'Shoulders'],
+    instructions: 'Step into a deep lunge, place opposite hand inside the front foot. Rotate the same-side arm up toward the sky.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="55" cy="32" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 55 37 Q 50 55 45 65" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 45 65 Q 35 75 30 80" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 45 65 Q 65 70 80 80" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 53 38 L 38 60" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 58 35 L 80 12" fill="none" stroke="#ff4d1f" stroke-width="2.2"/></svg>`
+  },
+  {
+    id: 'deep-squat', name: 'Deep Squat Hold', duration: '1m',
+    targets: ['Full Body', 'Legs', 'Core'],
+    instructions: 'Sit deep into a squat, feet flat. Use elbows to gently press knees outward. Keep chest tall.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="60" cy="25" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 60 30 Q 60 45 60 55" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 60 55 L 42 65 L 38 80" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 60 55 L 78 65 L 82 80" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 55 38 L 42 55" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 65 38 L 78 55" fill="none" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'down-dog', name: 'Downward Dog', duration: '45s',
+    targets: ['Full Body', 'Back', 'Legs', 'Shoulders'],
+    instructions: 'From all fours, lift hips up and back into an inverted V. Press chest toward thighs, heels toward floor.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 22 78 L 60 28 L 95 78" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><circle cx="60" cy="32" r="4" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 30 78 L 45 78" fill="none" stroke="#888" stroke-width="2"/><path d="M 80 78 L 95 78" fill="none" stroke="#888" stroke-width="2"/></svg>`
+  },
+  {
+    id: 'standing-cat-cow', name: 'Standing Cat-Cow', duration: '8 reps',
+    targets: ['Full Body', 'Back', 'Core'],
+    instructions: 'Stand with hands on thighs. Round and arch the spine slowly while breathing deeply. Great for warm-up.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="50" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 50 27 Q 60 40 50 60" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><line x1="50" y1="60" x2="45" y2="80" stroke="#888" stroke-width="1.5"/><line x1="50" y1="60" x2="55" y2="80" stroke="#888" stroke-width="1.5"/><line x1="55" y1="35" x2="60" y2="55" stroke="#888" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: 'lunge-twist', name: 'Lunge with Spinal Twist', duration: '30s/side',
+    targets: ['Full Body', 'Legs', 'Core', 'Back'],
+    instructions: 'In a low lunge, place one hand on the floor inside the front foot. Reach the other arm up, opening the chest.',
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="55" cy="35" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 55 40 Q 52 55 48 65" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 48 65 Q 32 75 28 82" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 48 65 Q 65 70 82 82" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 52 40 L 42 60" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 58 38 L 78 8" fill="none" stroke="#ff4d1f" stroke-width="2.2"/></svg>`
+  }
+];
+
+/* ============== ANATOMICAL MANNEQUIN — MALE ============== */
+const BODY_SVG_M = `
 <svg viewBox="0 0 200 440" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="muscleSheen" x1="50%" y1="0%" x2="50%" y2="100%">
@@ -431,7 +809,68 @@ const BODY_SVG = `
   </g>
 </svg>`;
 
-/* ============== RANK LOGIC ============== */
+/* ============== ANATOMICAL MANNEQUIN — FEMALE ==============
+   Compared to male: narrower shoulders & traps, rounded bust replacing
+   pec division, more pronounced waist taper, wider hip/pelvis, slightly
+   thinner arms. */
+const BODY_SVG_F = `
+<svg viewBox="0 0 200 440" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="muscleSheen" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#3a3a3a"/>
+      <stop offset="50%" stop-color="#2a2a2a"/>
+      <stop offset="100%" stop-color="#1a1a1a"/>
+    </linearGradient>
+    <linearGradient id="activeSheen" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#ff8a5b"/>
+      <stop offset="50%" stop-color="#ff4d1f"/>
+      <stop offset="100%" stop-color="#c93a14"/>
+    </linearGradient>
+  </defs>
+  <g id="bodyScaler" transform-origin="100 430">
+    <ellipse cx="100" cy="34" rx="17" ry="22" class="muscle"/>
+    <path d="M 88 48 Q 100 58 112 48" class="muscle-line"/>
+    <path d="M 93 54 Q 94 66 92 72 L 108 72 Q 106 66 107 54 Z" class="muscle"/>
+    <path d="M 92 70 Q 80 74 70 84 Q 82 82 100 80 Q 118 82 130 84 Q 120 74 108 70 Z" class="muscle" data-zone="Back"/>
+    <path d="M 70 84 Q 56 90 54 108 Q 58 118 74 116 Q 82 104 86 92 Q 80 84 70 84 Z" class="muscle" data-zone="Shoulders"/>
+    <path d="M 130 84 Q 144 90 146 108 Q 142 118 126 116 Q 118 104 114 92 Q 120 84 130 84 Z" class="muscle" data-zone="Shoulders"/>
+    <path d="M 86 92 Q 72 100 72 130 Q 80 148 100 144 Q 120 148 128 130 Q 128 100 114 92 Q 100 88 86 92 Z" class="muscle" data-zone="Chest"/>
+    <path d="M 88 110 Q 95 122 100 122 Q 105 122 112 110" class="muscle-line"/>
+    <path d="M 72 130 Q 68 152 76 175 Q 82 178 86 174 Q 84 158 82 138 Q 76 132 72 130 Z" class="muscle" data-zone="Back"/>
+    <path d="M 128 130 Q 132 152 124 175 Q 118 178 114 174 Q 116 158 118 138 Q 124 132 128 130 Z" class="muscle" data-zone="Back"/>
+    <path d="M 54 108 Q 46 130 48 168 Q 58 174 66 170 Q 70 146 70 114 Q 62 108 54 108 Z" class="muscle" data-zone="Arms"/>
+    <path d="M 146 108 Q 154 130 152 168 Q 142 174 134 170 Q 130 146 130 114 Q 138 108 146 108 Z" class="muscle" data-zone="Arms"/>
+    <ellipse cx="58" cy="174" rx="8" ry="5" class="muscle"/>
+    <ellipse cx="142" cy="174" rx="8" ry="5" class="muscle"/>
+    <path d="M 50 178 Q 44 200 48 232 Q 58 238 64 234 Q 66 204 66 180 Q 56 176 50 178 Z" class="muscle" data-zone="Arms"/>
+    <path d="M 150 178 Q 156 200 152 232 Q 142 238 136 234 Q 134 204 134 180 Q 144 176 150 178 Z" class="muscle" data-zone="Arms"/>
+    <ellipse cx="56" cy="244" rx="8" ry="10" class="muscle"/>
+    <ellipse cx="144" cy="244" rx="8" ry="10" class="muscle"/>
+    <path d="M 88 150 Q 88 166 92 170 L 99 170 L 99 150 Z" class="muscle" data-zone="Core"/>
+    <path d="M 112 150 Q 112 166 108 170 L 101 170 L 101 150 Z" class="muscle" data-zone="Core"/>
+    <path d="M 90 172 L 99 172 L 99 192 L 92 192 Z" class="muscle" data-zone="Core"/>
+    <path d="M 110 172 L 101 172 L 101 192 L 108 192 Z" class="muscle" data-zone="Core"/>
+    <path d="M 92 194 L 99 194 L 99 214 L 96 214 Z" class="muscle" data-zone="Core"/>
+    <path d="M 108 194 L 101 194 L 101 214 L 104 214 Z" class="muscle" data-zone="Core"/>
+    <path d="M 82 178 Q 78 198 86 218 Q 90 220 92 216 Q 90 198 88 180 Z" class="muscle" data-zone="Core"/>
+    <path d="M 118 178 Q 122 198 114 218 Q 110 220 108 216 Q 110 198 112 180 Z" class="muscle" data-zone="Core"/>
+    <path d="M 82 216 Q 76 240 90 256 L 110 256 Q 124 240 118 216 L 112 232 L 100 236 L 88 232 Z" class="muscle"/>
+    <path d="M 88 252 Q 78 290 80 332 L 84 342 Q 96 346 99 342 L 99 320 Q 100 280 99 254 Z" class="muscle" data-zone="Legs"/>
+    <path d="M 112 252 Q 122 290 120 332 L 116 342 Q 104 346 101 342 L 101 320 Q 100 280 101 254 Z" class="muscle" data-zone="Legs"/>
+    <path d="M 92 262 Q 91 295 90 330" class="muscle-line"/>
+    <path d="M 108 262 Q 109 295 110 330" class="muscle-line"/>
+    <ellipse cx="91" cy="346" rx="9" ry="6" class="muscle"/>
+    <ellipse cx="109" cy="346" rx="9" ry="6" class="muscle"/>
+    <path d="M 84 354 Q 80 388 86 422 L 96 422 L 97 388 L 96 354 Z" class="muscle" data-zone="Legs"/>
+    <path d="M 116 354 Q 120 388 114 422 L 104 422 L 103 388 L 104 354 Z" class="muscle" data-zone="Legs"/>
+    <path d="M 86 366 Q 84 388 88 410" class="muscle-line"/>
+    <path d="M 114 366 Q 116 388 112 410" class="muscle-line"/>
+    <ellipse cx="90" cy="428" rx="10" ry="6" class="muscle"/>
+    <ellipse cx="110" cy="428" rx="10" ry="6" class="muscle"/>
+  </g>
+</svg>`;
+
+/* ============== PER-EXERCISE RANK (weight-based, kept from your version) ============== */
 function getRank(weight) {
   if (weight >= 120) return 'S';
   if (weight >= 80) return 'A';
@@ -441,36 +880,145 @@ function getRank(weight) {
   return 'E';
 }
 
-function updateGlobalRank() {
-  const rankDisplay = document.getElementById('globalRank');
-  const subtitle = document.getElementById('rankSubtitle');
-  
-  let maxWeightEver = 0;
+/* ============== HUNTER RANK SYSTEM (composite RP) ==============
+   Composite RP score across all logged history:
+     RP = workouts × 10
+        + (volume_kg / 1000) × 2     // 2 points per ton lifted
+        + total_PRs × 25
+        + unique_body_parts × 5
+
+   Tuned so a brand-new user sits in E-rank and a long-term consistent
+   lifter eventually reaches S. Rewards consistency, strength milestones,
+   and balanced training rather than just a single heavy lift. */
+const RANK_THRESHOLDS = [
+  { rank: 'E', min: 0,    next: 50,   colorVar: '--rank-e', glow: 'rgba(136,136,136,0.25)' },
+  { rank: 'D', min: 50,   next: 150,  colorVar: '--rank-d', glow: 'rgba(255,187,0,0.35)' },
+  { rank: 'C', min: 150,  next: 400,  colorVar: '--rank-c', glow: 'rgba(0,255,136,0.35)' },
+  { rank: 'B', min: 400,  next: 900,  colorVar: '--rank-b', glow: 'rgba(174,0,255,0.4)' },
+  { rank: 'A', min: 900,  next: 1800, colorVar: '--rank-a', glow: 'rgba(255,0,85,0.45)' },
+  { rank: 'S', min: 1800, next: null, colorVar: '--rank-s', glow: 'rgba(0,242,255,0.5)' }
+];
+
+const RANK_DESCRIPTIONS = {
+  'S': 'National Level Hunter',
+  'A': 'Elite Raid Leader',
+  'B': 'High-Rank Striker',
+  'C': 'Solid Tanker',
+  'D': 'Active Hunter',
+  'E': 'E-Class Awakened'
+};
+
+function calculateHunterStats() {
+  let workouts = state.history.length;
+  let totalVolume = 0;
+  let totalPRs = 0;
+  const bodyPartsHit = new Set();
+
   state.history.forEach(session => {
     session.exercises.forEach(ex => {
-      if (ex.weight > maxWeightEver) maxWeightEver = ex.weight;
+      const vol = (ex.weight || 0) * (ex.sets || 1) * (ex.reps || 1);
+      totalVolume += vol;
+      if (ex.isPR) totalPRs += 1;
+      if (ex.bodyPart) bodyPartsHit.add(ex.bodyPart);
     });
   });
 
-  const rank = getRank(maxWeightEver);
-  
-  // Clean up existing rank classes and apply the correct glowing class
-  rankDisplay.className = 'rank-display rank-' + rank.toLowerCase();
-  rankDisplay.textContent = rank;
+  const rp = Math.round(
+    workouts * 10
+    + (totalVolume / 1000) * 2
+    + totalPRs * 25
+    + bodyPartsHit.size * 5
+  );
 
-  const descriptions = {
-    'S': 'National Level Hunter',
-    'A': 'Elite Raid Leader',
-    'B': 'High-Rank Striker',
-    'C': 'Solid Tanker',
-    'D': 'Active Hunter',
-    'E': 'E-Class Awakened'
+  let rankInfo = RANK_THRESHOLDS[0];
+  for (const tier of RANK_THRESHOLDS) {
+    if (rp >= tier.min) rankInfo = tier;
+  }
+
+  let progress = 100;
+  let rpToNext = 0;
+  if (rankInfo.next !== null) {
+    progress = ((rp - rankInfo.min) / (rankInfo.next - rankInfo.min)) * 100;
+    rpToNext = rankInfo.next - rp;
+  }
+  const nextIdx = RANK_THRESHOLDS.findIndex(r => r.rank === rankInfo.rank) + 1;
+  const nextRank = nextIdx < RANK_THRESHOLDS.length ? RANK_THRESHOLDS[nextIdx].rank : null;
+
+  return {
+    rp, workouts, totalVolume, totalPRs,
+    bodyPartsCount: bodyPartsHit.size,
+    rank: rankInfo.rank,
+    colorVar: rankInfo.colorVar,
+    glow: rankInfo.glow,
+    progress: Math.max(0, Math.min(100, progress)),
+    rpToNext, nextRank
   };
-  
-  subtitle.textContent = `Rank: ${rank}-Class (${descriptions[rank]})`;
 }
 
-/* ============== CORE LOGIC ============== */
+function renderRankCard() {
+  const container = document.getElementById('rankCardContainer');
+  const stats = calculateHunterStats();
+  const volumeTons = (stats.totalVolume / 1000).toFixed(1);
+
+  let progressHTML;
+  if (stats.nextRank) {
+    progressHTML = `
+      <div class="rank-progress">
+        <div class="rank-progress-bar">
+          <div class="rank-progress-fill" style="width:${stats.progress.toFixed(1)}%"></div>
+        </div>
+        <div class="rank-progress-label">
+          <span>${stats.progress.toFixed(0)}% to next tier</span>
+          <span><strong>${stats.rpToNext} RP</strong> to ${stats.nextRank}-Rank</span>
+        </div>
+      </div>`;
+  } else {
+    progressHTML = `
+      <div class="rank-progress">
+        <div class="rank-progress-bar">
+          <div class="rank-progress-fill" style="width:100%"></div>
+        </div>
+        <div class="rank-progress-label">
+          <span>Maximum tier achieved</span>
+          <span><strong>S-RANK HUNTER</strong></span>
+        </div>
+      </div>`;
+  }
+
+  container.innerHTML = `
+    <div class="rank-card" style="--rank-glow:${stats.glow}; --rank-fill:var(${stats.colorVar});">
+      <div class="rank-card-header">
+        <div class="rank-card-title">Hunter Rank</div>
+        <div class="rank-card-rp">${stats.rp.toLocaleString()}<span class="rp-suffix">RP</span></div>
+      </div>
+      <div class="rank-card-body">
+        <div class="rank-letter-big rank-${stats.rank.toLowerCase()}">${stats.rank}</div>
+        <div class="rank-card-stats">
+          <div class="rank-stat-row">
+            <span class="rank-stat-label">Workouts</span>
+            <span class="rank-stat-num">${stats.workouts}</span>
+          </div>
+          <div class="rank-stat-row">
+            <span class="rank-stat-label">Personal Records</span>
+            <span class="rank-stat-num">${stats.totalPRs}</span>
+          </div>
+          <div class="rank-stat-row">
+            <span class="rank-stat-label">Volume Lifted</span>
+            <span class="rank-stat-num">${volumeTons}t</span>
+          </div>
+          <div class="rank-stat-row">
+            <span class="rank-stat-label">Zones Trained</span>
+            <span class="rank-stat-num">${stats.bodyPartsCount}/6</span>
+          </div>
+        </div>
+      </div>
+      <div class="rank-subtitle">${RANK_DESCRIPTIONS[stats.rank]}</div>
+      ${progressHTML}
+    </div>
+  `;
+}
+
+/* ============== PR & ANALYTICS ============== */
 function getPRForExercise(name) {
   let maxWeight = 0;
   state.history.forEach(session => {
@@ -522,29 +1070,53 @@ function renderMuscleChart() {
   });
 }
 
+/* ============== AVATAR PROPORTION SCALING (sex / age / BMI / body fat) ============== */
 function updateAvatarProportions() {
     const h = parseFloat(document.getElementById('userHeight').value) || 180;
     const w = parseFloat(document.getElementById('userWeight').value) || 80;
-    profile = { height: h, weight: w };
+    const age = parseFloat(document.getElementById('userAge').value) || 30;
+    const bf = parseFloat(document.getElementById('userBodyFat').value) || 18;
+
+    profile = { ...profile, height: h, weight: w, age, bodyFat: bf };
     localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(profile));
-    const scaler = document.getElementById('bodyScaler');
-    if (!scaler) return;
+
+    document.getElementById('bfValue').textContent = `${bf}%`;
+
+    const fig = document.getElementById('bodyFigure');
+    if (!fig) return;
+
+    // BMI-based width (clamped, square-root softened to avoid cartoonish extremes)
     const refBMI = 80 / Math.pow(1.80, 2);
     const userBMI = w / Math.pow(h / 100, 2);
     const hScale = Math.max(0.88, Math.min(1.12, h / 180));
     const bmiRatio = userBMI / refBMI;
-    const wScale = Math.max(0.85, Math.min(1.25, Math.pow(bmiRatio, 0.55)));
-    scaler.setAttribute('transform', `scale(${wScale.toFixed(3)}, ${hScale.toFixed(3)})`);
+
+    // Body fat above ~18% baseline adds extra width fullness
+    const bfWidthBonus = 1 + Math.max(0, bf - 18) * 0.008;
+    const wScale = Math.max(0.85, Math.min(1.30, Math.pow(bmiRatio, 0.55) * bfWidthBonus));
+
+    // Higher body fat → muscle separation lines fade, strokes thin
+    const defOpacity = Math.max(0.05, 1 - Math.max(0, bf - 8) * 0.04);
+    const muscleStroke = Math.max(0.15, 0.7 - Math.max(0, bf - 8) * 0.025);
+
+    fig.style.setProperty('--definition-opacity', defOpacity.toFixed(2));
+    fig.style.setProperty('--muscle-stroke', muscleStroke.toFixed(2));
+
+    const scaler = fig.querySelector('#bodyScaler');
+    if (scaler) scaler.setAttribute('transform', `scale(${wScale.toFixed(3)}, ${hScale.toFixed(3)})`);
+
+    // Readout includes age now
     const readout = document.getElementById('bmiReadout');
     if (readout) {
       let category = 'Normal';
       if (userBMI < 18.5) category = 'Underweight';
       else if (userBMI >= 25 && userBMI < 30) category = 'Overweight';
       else if (userBMI >= 30) category = 'Obese';
-      readout.innerHTML = `BMI <strong>${userBMI.toFixed(1)}</strong> · ${category}`;
+      readout.innerHTML = `${age} yo · BMI <strong>${userBMI.toFixed(1)}</strong> · ${category}`;
     }
 }
 
+/* ============== STATE PERSISTENCE ============== */
 function saveState() {
   localStorage.setItem(STORAGE_KEYS.current, JSON.stringify(state));
   localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(state.history));
@@ -557,19 +1129,28 @@ function loadState() {
   if (hist) state.history = JSON.parse(hist);
   const prof = localStorage.getItem(STORAGE_KEYS.profile);
   if (prof) {
-      profile = JSON.parse(prof);
+      const stored = JSON.parse(prof);
+      profile = { ...profile, ...stored };
       document.getElementById('userHeight').value = profile.height;
       document.getElementById('userWeight').value = profile.weight;
+      document.getElementById('userAge').value = profile.age;
+      document.getElementById('userBodyFat').value = profile.bodyFat;
+      document.getElementById('bfValue').textContent = `${profile.bodyFat}%`;
+      document.querySelectorAll('.sex-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.sex === profile.sex);
+      });
   }
 }
 
+/* ============== EXERCISE LOGIC ============== */
 function addExercise() {
   const name = document.getElementById('exName').value.trim();
   const weight = parseFloat(document.getElementById('exWeight').value);
   if (!name) return;
+
   const currentPR = getPRForExercise(name);
   const isPR = weight > currentPR && currentPR > 0;
-  const rank = getRank(weight);
+
   state.exercises.push({
     id: Date.now(),
     name,
@@ -578,10 +1159,12 @@ function addExercise() {
     sets: parseInt(document.getElementById('exSets').value),
     reps: parseInt(document.getElementById('exReps').value),
     isPR: isPR,
-    rank: rank
+    rank: getRank(weight)
   });
+
   if (isPR) toast("🚨 RANK UP! NEW PR 🚨");
   else toast("Logged");
+
   if (!state.timerRunning && state.timerElapsed === 0) startTimer();
   document.getElementById('exName').value = '';
   saveState();
@@ -591,20 +1174,98 @@ function addExercise() {
 function endWorkout() {
   if (state.exercises.length === 0) return;
   if (!confirm('Save workout to history?')) return;
+
+  const finalElapsed = state.timerElapsed + (state.timerRunning ? Date.now() - state.timerStart : 0);
+
   const session = {
     id: Date.now(),
     date: new Date().toISOString(),
-    duration: state.timerElapsed + (state.timerRunning ? Date.now() - state.timerStart : 0),
+    duration: finalElapsed,
     exercises: [...state.exercises]
   };
+
   state.history.unshift(session);
   state.exercises = [];
   state.timerRunning = false;
   state.timerElapsed = 0;
+  state.timerStart = null;
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  document.getElementById('timerDisplay').textContent = '00:00:00';
   saveState();
   renderAll();
 }
 
+/* ============== TIMER (proper pause/resume) ============== */
+function startTimer() {
+  if (state.timerRunning) return;
+  state.timerStart = Date.now();
+  state.timerRunning = true;
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(updateTimer, 1000);
+  saveState();
+  renderTimerUI();
+}
+
+function pauseTimer() {
+  if (!state.timerRunning) return;
+  state.timerElapsed += Date.now() - state.timerStart;
+  state.timerRunning = false;
+  state.timerStart = null;
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  saveState();
+  renderTimerUI();
+  updateTimer();
+}
+
+function resumeTimer() {
+  if (state.timerRunning) return;
+  state.timerStart = Date.now();
+  state.timerRunning = true;
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(updateTimer, 1000);
+  saveState();
+  renderTimerUI();
+}
+
+function updateTimer() {
+  const ms = state.timerElapsed + (state.timerRunning ? Date.now() - state.timerStart : 0);
+  document.getElementById('timerDisplay').textContent = new Date(ms).toISOString().substr(11, 8);
+}
+
+function renderTimerUI() {
+  const card = document.getElementById('timerCard');
+  const display = document.getElementById('timerDisplay');
+  const startBtn = document.getElementById('timerStart');
+  const pauseBtn = document.getElementById('timerPause');
+  const resumeBtn = document.getElementById('timerResume');
+  const endBtn = document.getElementById('timerEnd');
+
+  card.classList.remove('running', 'paused');
+  display.classList.remove('running', 'paused');
+
+  if (state.timerRunning) {
+    card.classList.add('running');
+    display.classList.add('running');
+    startBtn.classList.add('hidden');
+    pauseBtn.classList.remove('hidden');
+    resumeBtn.classList.add('hidden');
+    endBtn.classList.remove('hidden');
+  } else if (state.timerElapsed > 0) {
+    card.classList.add('paused');
+    display.classList.add('paused');
+    startBtn.classList.add('hidden');
+    pauseBtn.classList.add('hidden');
+    resumeBtn.classList.remove('hidden');
+    endBtn.classList.remove('hidden');
+  } else {
+    startBtn.classList.remove('hidden');
+    pauseBtn.classList.add('hidden');
+    resumeBtn.classList.add('hidden');
+    endBtn.classList.add('hidden');
+  }
+}
+
+/* ============== UI RENDERING ============== */
 function renderTodayList() {
   const list = document.getElementById('todayList');
   document.getElementById('loggedMeta').textContent = `${state.exercises.length} items`;
@@ -619,29 +1280,61 @@ function renderTodayList() {
   `).join('');
 }
 
+/* ============== STRETCH RECOMMENDATION ENGINE ============== */
+function getRecommendedStretches(workedParts) {
+  if (workedParts.length === 0) {
+    return STRETCH_LIBRARY.filter(s => s.targets.includes('Full Body')).slice(0, 5);
+  }
+
+  // Score every stretch by how many of the worked parts it hits
+  const scored = STRETCH_LIBRARY.map(s => ({
+    stretch: s,
+    score: s.targets.filter(t => workedParts.includes(t)).length
+  })).filter(x => x.score > 0);
+
+  scored.sort((a, b) => b.score - a.score);
+  let recommended = scored.map(x => x.stretch);
+
+  // Top up with full-body stretches if fewer than 5
+  if (recommended.length < 5) {
+    const fillers = STRETCH_LIBRARY.filter(s =>
+      s.targets.includes('Full Body') && !recommended.includes(s)
+    );
+    recommended = [...recommended, ...fillers].slice(0, Math.max(5, recommended.length));
+  }
+
+  return recommended;
+}
+
 function renderStretches() {
   const container = document.getElementById('stretchesContent');
   const workedParts = [...new Set(state.exercises.map(ex => ex.bodyPart))];
+  const recommended = getRecommendedStretches(workedParts);
+
   let html = `<h2 class="section-title">Recovery Plan</h2>`;
   if (workedParts.length === 0) {
-    html += `<p style="color:var(--text-muted); margin-bottom:15px;">Pick a stretching routine. Always gotta stretch gang</p>`;
-    workedParts.push("Full Body");
+    html += `<p style="color:var(--text-muted); margin-bottom:15px; font-size:13px;">No workout logged today — here's a full-body mobility flow to keep things loose.</p>`;
   } else {
-    html += `<p style="color:var(--accent); font-family:var(--mono); font-size:10px; text-transform:uppercase; margin-bottom:15px;">Targeting: ${workedParts.join(' + ')}</p>`;
+    html += `<p style="color:var(--accent); font-family:var(--mono); font-size:10px; text-transform:uppercase; margin-bottom:15px; letter-spacing:0.08em;">Targeting: ${workedParts.join(' + ')}</p>`;
   }
-  workedParts.forEach(part => {
-    const stretches = stretchLibrary[part] || stretchLibrary["Full Body"];
-    stretches.forEach(s => {
-      html += `
-        <div class="history-item" style="border-left: 2px solid var(--accent); margin-bottom: 12px;">
-          <div style="display:flex; justify-content:space-between; align-items:baseline;">
-            <div style="font-weight:700; color:var(--text);">${s.name}</div>
-            <div style="font-family:var(--mono); font-size:11px; color:var(--accent);">${s.duration}</div>
+
+  recommended.forEach(s => {
+    const tags = s.targets.map(t => `<span class="stretch-target-tag">${t}</span>`).join('');
+    html += `
+      <div class="stretch-card">
+        <div class="stretch-illustration">${s.illustration}</div>
+        <div class="stretch-content">
+          <div class="stretch-header">
+            <div class="stretch-name">${s.name}</div>
+            <div class="stretch-duration">${s.duration}</div>
           </div>
-          <div style="font-size:12px; color:var(--text-muted); margin-top:4px; line-height:1.4;">${s.instructions}</div>
-        </div>`;
-    });
+          <div class="stretch-instruction">${s.instructions}</div>
+          <div class="stretch-targets">${tags}</div>
+        </div>
+      </div>
+    `;
   });
+
   container.innerHTML = html;
 }
 
@@ -653,37 +1346,39 @@ function renderHistory() {
         <div class="history-date">${new Date(s.date).toLocaleDateString().toUpperCase()}</div>
         <div style="color: var(--text-muted); font-size: 12px;">${Math.round(s.duration/60000)}m</div>
       </div>
-      ${s.exercises.map(e => `<div style="font-size: 13px; display:flex; justify-content:space-between"><span>${e.name}</span><span class="rank-${e.rank.toLowerCase()}">${e.weight}kg</span></div>`).join('')}
+      ${s.exercises.map(e => `<div style="font-size: 13px; display:flex; justify-content:space-between"><span>${e.name}</span><span class="rank-${(e.rank || 'e').toLowerCase()}">${e.weight}kg</span></div>`).join('')}
     </div>
   `).join('');
+  renderRankCard();
   renderMuscleChart();
-  updateGlobalRank();
 }
 
 function renderBody() {
   const fig = document.getElementById('bodyFigure');
-  fig.innerHTML = BODY_SVG;
+  const svg = profile.sex === 'female' ? BODY_SVG_F : BODY_SVG_M;
+  fig.innerHTML = svg;
+
   const worked = new Set(state.exercises.map(e => e.bodyPart));
   fig.querySelectorAll('.muscle').forEach(m => {
     if (worked.has(m.dataset.zone)) m.classList.add('active');
     if (worked.has("Full Body")) m.classList.add('active');
   });
-  document.getElementById('workedSummary').innerHTML = Array.from(worked).map(p => `<span class="worked-tag">${p}</span>`).join(' ');
+
+  document.getElementById('workedSummary').innerHTML = Array.from(worked).map(p =>
+    `<span class="worked-tag">${p}</span>`
+  ).join('');
+
   updateAvatarProportions();
 }
 
-/* ============== TIMER UTILS ============== */
-function startTimer() { state.timerStart = Date.now(); state.timerRunning = true; setInterval(updateTimer, 1000); renderTimerUI(); }
-function updateTimer() { if (!state.timerRunning) return; const ms = state.timerElapsed + (Date.now() - state.timerStart); document.getElementById('timerDisplay').textContent = new Date(ms).toISOString().substr(11, 8); }
-function renderTimerUI() {
-  const isRun = state.timerRunning;
-  document.getElementById('timerStart').classList.toggle('hidden', isRun || state.timerElapsed > 0);
-  document.getElementById('timerPause').classList.toggle('hidden', !isRun);
-  document.getElementById('timerEnd').classList.toggle('hidden', !isRun && state.timerElapsed === 0);
-}
-
+/* ============== INIT ============== */
 function renderAll() { renderTodayList(); renderBody(); renderTimerUI(); }
-function toast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
+function toast(m) {
+  const t = document.getElementById('toast');
+  t.textContent = m;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
 
 document.querySelectorAll('.tab').forEach(btn => {
   btn.onclick = () => {
@@ -698,12 +1393,37 @@ document.querySelectorAll('.tab').forEach(btn => {
   };
 });
 
+// Sex toggle
+document.querySelectorAll('.sex-btn').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.sex-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    profile.sex = btn.dataset.sex;
+    localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(profile));
+    renderBody();
+  };
+});
+
+// Profile inputs trigger proportion updates
+['userAge', 'userHeight', 'userWeight'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateAvatarProportions);
+});
+document.getElementById('userBodyFat').addEventListener('input', updateAvatarProportions);
+
 document.getElementById('addExercise').onclick = addExercise;
 document.getElementById('timerStart').onclick = startTimer;
+document.getElementById('timerPause').onclick = pauseTimer;
+document.getElementById('timerResume').onclick = resumeTimer;
 document.getElementById('timerEnd').onclick = endWorkout;
 document.getElementById('todayDate').textContent = new Date().toDateString().toUpperCase();
 
 loadState();
+
+// Resume timer interval if a workout was running when the page closed
+if (state.timerRunning && state.timerStart) {
+  timerInterval = setInterval(updateTimer, 1000);
+}
+
 renderAll();
 </script>
 </body>
