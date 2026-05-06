@@ -21,11 +21,11 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body { background: var(--bg); color: var(--text); font-family: var(--body); min-height: 100vh; padding-bottom: 50px; }
+  body { background: var(--bg); color: var(--text); font-family: var(--body); min-height: 100vh; padding-bottom: 80px; overflow-x: hidden; }
   .app { max-width: 540px; margin: 0 auto; padding: 20px; }
   
-  .header { padding: 20px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-end; }
-  .logo { font-family: var(--display); font-size: 38px; color: var(--text); letter-spacing: 1px; }
+  .header { padding: 24px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-end; }
+  .logo { font-family: var(--display); font-size: 38px; color: var(--text); letter-spacing: 1px; line-height: 0.9; }
   .logo span { color: var(--accent); text-shadow: 0 0 15px rgba(246, 170, 28, 0.4); }
 
   .tabs { display: flex; gap: 4px; margin: 20px 0; padding: 4px; background: rgba(0,0,0,0.3); border-radius: 999px; border: 1px solid var(--border); }
@@ -34,21 +34,28 @@
 
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
   
-  /* Restored Mannequin Styles */
+  /* FULL MANNEQUIN STYLES */
   .muscle { fill: #3a1109; stroke: #220901; stroke-width: 0.8; transition: all 0.4s ease; }
   .muscle.active { fill: var(--accent); filter: drop-shadow(0 0 8px var(--accent)); stroke: var(--bg); }
 
-  .btn { background: var(--accent); color: var(--bg); border: none; padding: 15px; border-radius: 10px; font-weight: 800; text-transform: uppercase; cursor: pointer; width: 100%; margin-top: 10px; }
+  .btn { background: var(--accent); color: var(--bg); border: none; padding: 16px; border-radius: 10px; font-weight: 800; text-transform: uppercase; cursor: pointer; width: 100%; margin-top: 10px; font-family: var(--body); letter-spacing: 1px; }
   .btn-ghost { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
   
   .field { margin-bottom: 15px; }
-  .field label { font-family: var(--mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 5px; }
-  .field input, .field select { width: 100%; background: var(--bg); border: 1px solid var(--surface-2); color: white; padding: 12px; border-radius: 8px; font-family: var(--body); }
+  .field label { font-family: var(--mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 6px; }
+  .field input, .field select { width: 100%; background: var(--bg); border: 1px solid var(--surface-2); color: white; padding: 12px; border-radius: 8px; font-family: var(--body); font-size: 14px; }
 
-  .rank-display { font-family: var(--display); font-size: 80px; line-height: 1; }
+  .rank-display { font-family: var(--display); font-size: 80px; line-height: 1; margin: 10px 0; }
   .rank-s { color: var(--rank-s); text-shadow: 0 0 20px var(--accent); }
-  .history-item { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--accent-alt); }
-  .worked-tag { font-family: var(--mono); font-size: 10px; background: rgba(246, 170, 28, 0.1); color: var(--accent); padding: 4px 8px; border-radius: 4px; margin-right: 5px; margin-top: 5px; display: inline-block; }
+  .rank-a { color: var(--rank-a); }
+  .rank-b { color: var(--rank-b); }
+  .rank-c { color: var(--rank-c); }
+  .rank-d { color: var(--rank-d); }
+  .rank-e { color: var(--rank-e); }
+
+  .history-item { background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid var(--accent-alt); position: relative; }
+  .worked-tag { font-family: var(--mono); font-size: 10px; background: rgba(246, 170, 28, 0.1); color: var(--accent); padding: 4px 8px; border-radius: 4px; margin-right: 6px; margin-top: 6px; display: inline-block; border: 1px solid rgba(246,170,28,0.2); }
+  
   .hidden { display: none !important; }
 </style>
 </head>
@@ -69,68 +76,89 @@
   <!-- TODAY VIEW -->
   <div id="view-today">
     <div class="card" style="text-align:center">
-        <div id="timerDisplay" style="font-family: var(--mono); font-size: 40px; margin-bottom: 10px;">00:00:00</div>
+        <div style="font-family: var(--mono); font-size: 10px; color: var(--text-muted); margin-bottom: 5px;">ELAPSED TIME</div>
+        <div id="timerDisplay" style="font-family: var(--mono); font-size: 44px; margin-bottom: 12px; font-weight: 600;">00:00:00</div>
         <button class="btn" id="timerBtn">Awaken</button>
     </div>
 
-    <div class="card" style="display:flex; align-items:center; gap:20px;">
-        <div id="bodyFigure" style="width:100px"></div>
+    <div class="card" style="display:flex; align-items:center; gap:24px;">
+        <div id="bodyFigure" style="width:110px"></div>
         <div style="flex:1">
-            <div style="font-family: var(--display); font-size: 18px; margin-bottom: 10px;">TARGETS HIT</div>
+            <div style="font-family: var(--display); font-size: 20px; margin-bottom: 10px; letter-spacing: 1px;">ZONE STATUS</div>
             <div id="workedSummary"></div>
         </div>
     </div>
 
     <div class="card">
-        <div class="field"><label>Exercise Name</label><input type="text" id="exName" placeholder="e.g. Heavy Strike"></div>
-        <div style="display:flex; gap:10px">
-            <div class="field" style="flex:1"><label>Target</label>
+        <div class="field"><label>Exercise Name</label><input type="text" id="exName" placeholder="e.g. Deadlift"></div>
+        <div style="display:flex; gap:12px">
+            <div class="field" style="flex:1.2"><label>Target Zone</label>
                 <select id="exBodyPart">
                     <option>Chest</option><option>Back</option><option>Shoulders</option><option>Arms</option><option>Legs</option><option>Core</option>
                 </select>
             </div>
-            <div class="field" style="flex:1"><label>Weight KG</label><input type="number" id="exWeight"></div>
+            <div class="field" style="flex:1"><label>Weight (KG)</label><input type="number" id="exWeight" placeholder="0"></div>
         </div>
-        <button class="btn" id="addExBtn">Log Combat Data</button>
+        <button class="btn" id="addExBtn">Record Combat Data</button>
     </div>
     <div id="todayList" style="margin-top:20px"></div>
   </div>
 
-  <!-- STRETCHES VIEW -->
+  <!-- RECOVERY VIEW -->
   <div id="view-stretches" class="hidden">
-    <div id="stretchesContent"></div>
+    <div id="stretchesContent">
+        <!-- Injected via JS -->
+    </div>
   </div>
 
   <!-- HISTORY VIEW -->
   <div id="view-history" class="hidden">
     <div class="card" style="text-align:center">
-        <div style="font-family: var(--mono); font-size: 10px; color: var(--text-muted);">HUNTER GRADE</div>
+        <div style="font-family: var(--mono); font-size: 10px; color: var(--text-muted);">HUNTER RANK</div>
         <div id="globalRank" class="rank-display rank-e">E</div>
-        <div id="rankSubtitle" style="font-family: var(--mono); font-size: 12px; color: var(--accent)">Calculating Power...</div>
+        <div id="rankSubtitle" style="font-family: var(--mono); font-size: 11px; color: var(--accent); text-transform: uppercase;">Awaiting Awakening...</div>
     </div>
-    <div class="card"><canvas id="muscleChart"></canvas></div>
+    <div class="card" style="padding: 10px;">
+        <canvas id="muscleChart" style="max-height: 250px;"></canvas>
+    </div>
     <div id="historyList"></div>
   </div>
 </div>
 
 <script>
-// Data Setup
-const STORAGE_KEY = 'gymlog_ultimate_storage';
-const BODY_SVG = `<svg viewBox="0 0 200 440" xmlns="http://www.w3.org/2000/svg"><g transform-origin="100 430"><ellipse cx="100" cy="34" rx="19" ry="23" class="muscle"/><path d="M 90 70 Q 76 74 64 84 Q 78 82 100 80 Q 122 82 136 84 Q 124 74 110 70 Z" class="muscle" data-zone="Back"/><path d="M 64 84 Q 48 90 46 110 Q 50 122 68 118 Q 78 104 82 92 Q 76 84 64 84 Z" class="muscle" data-zone="Shoulders"/><path d="M 136 84 Q 152 90 154 110 Q 150 122 132 118 Q 122 104 118 92 Q 124 84 136 84 Z" class="muscle" data-zone="Shoulders"/><path d="M 82 90 Q 70 98 68 132 Q 76 148 98 148 L 99 104 Q 96 92 82 90 Z" class="muscle" data-zone="Chest"/><path d="M 118 90 Q 130 98 132 132 Q 124 148 102 148 L 101 104 Q 104 92 118 90 Z" class="muscle" data-zone="Chest"/><path d="M 46 110 Q 38 132 40 168 Q 50 174 60 170 Q 64 146 64 116 Q 56 110 46 110 Z" class="muscle" data-zone="Arms"/><path d="M 154 110 Q 162 132 160 168 Q 150 174 140 170 Q 136 146 136 116 Q 144 110 154 110 Z" class="muscle" data-zone="Arms"/><path d="M 84 150 Q 84 216 116 216 Q 116 150 100 150 Z" class="muscle" data-zone="Core"/><path d="M 86 248 Q 76 290 78 332 L 82 342 Q 96 346 99 342 L 99 250 Z" class="muscle" data-zone="Legs"/><path d="M 114 248 Q 124 290 122 332 L 118 342 Q 104 346 101 342 L 101 250 Z" class="muscle" data-zone="Legs"/></g></svg>`;
+// FULL ASSETS
+const STORAGE_KEY = 'gymlog_v3_final';
+const BODY_SVG = `<svg viewBox="0 0 200 440" xmlns="http://www.w3.org/2000/svg">
+    <g transform-origin="100 430">
+        <ellipse cx="100" cy="34" rx="19" ry="23" class="muscle"/>
+        <path d="M 90 70 Q 76 74 64 84 Q 78 82 100 80 Q 122 82 136 84 Q 124 74 110 70 Z" class="muscle" data-zone="Back"/>
+        <path d="M 64 84 Q 48 90 46 110 Q 50 122 68 118 Q 78 104 82 92 Q 76 84 64 84 Z" class="muscle" data-zone="Shoulders"/>
+        <path d="M 136 84 Q 152 90 154 110 Q 150 122 132 118 Q 122 104 118 92 Q 124 84 136 84 Z" class="muscle" data-zone="Shoulders"/>
+        <path d="M 82 90 Q 70 98 68 132 Q 76 148 98 148 L 99 104 Q 96 92 82 90 Z" class="muscle" data-zone="Chest"/>
+        <path d="M 118 90 Q 130 98 132 132 Q 124 148 102 148 L 101 104 Q 104 92 118 90 Z" class="muscle" data-zone="Chest"/>
+        <path d="M 46 110 Q 38 132 40 168 Q 50 174 60 170 Q 64 146 64 116 Q 56 110 46 110 Z" class="muscle" data-zone="Arms"/>
+        <path d="M 154 110 Q 162 132 160 168 Q 150 174 140 170 Q 136 146 136 116 Q 144 110 154 110 Z" class="muscle" data-zone="Arms"/>
+        <path d="M 84 150 Q 84 216 116 216 Q 116 150 100 150 Z" class="muscle" data-zone="Core"/>
+        <path d="M 86 248 Q 76 290 78 332 L 82 342 Q 96 346 99 342 L 99 250 Z" class="muscle" data-zone="Legs"/>
+        <path d="M 114 248 Q 124 290 122 332 L 118 342 Q 104 346 101 342 L 101 250 Z" class="muscle" data-zone="Legs"/>
+        <path d="M 82 354 Q 78 388 84 422 L 96 422 L 97 354 Z" class="muscle" data-zone="Legs"/>
+        <path d="M 118 354 Q 122 388 116 422 L 104 422 L 103 354 Z" class="muscle" data-zone="Legs"/>
+    </g>
+</svg>`;
 
 const stretchLibrary = {
-  "Chest": ["Doorway Stretch", "Cobra Pose"],
-  "Back": ["Child's Pose", "Cat-Cow"],
-  "Shoulders": ["Cross-Arm Stretch", "Wall Slide"],
-  "Arms": ["Tricep Overhead", "Wrist Extension"],
-  "Legs": ["Pigeon Pose", "Quad Stretch"],
-  "Core": ["Plank Transition", "Dead Bug"]
+  "Chest": ["Doorway Chest Stretch", "Cobra Pose", "Behind-the-Back Interlock"],
+  "Back": ["Child's Pose", "Cat-Cow Stretch", "Lat Foam Rolling"],
+  "Shoulders": ["Cross-Body Arm Stretch", "Wall Slide", "Thread the Needle"],
+  "Arms": ["Overhead Tricep Stretch", "Wrist Flexor Stretch", "Bicep Wall Stretch"],
+  "Legs": ["Pigeon Pose", "World's Greatest Stretch", "Hamstring Scissor Stretch"],
+  "Core": ["Plank to Downward Dog", "Seated Torso Twist", "Sphinx Pose"]
 };
 
 let state = { exercises: [], history: [], timerRunning: false, start: null };
-let chart = null;
+let chartInstance = null;
 
-// Core Functions
+// LOGIC
 function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 
 function load() {
@@ -145,12 +173,15 @@ function getRank(w) {
 }
 
 function renderAll() {
-    // Today's List
+    // 1. Today's List
     document.getElementById('todayList').innerHTML = state.exercises.map(ex => `
-        <div class="history-item"><b>${ex.name}</b> <span style="color:var(--accent)">${ex.weight}kg</span> <span style="float:right; font-family:var(--display)">${getRank(ex.weight)}</span></div>
+        <div class="history-item">
+            <b>${ex.name}</b> <span style="color:var(--accent); margin-left:8px;">${ex.weight}kg</span> 
+            <span style="float:right; font-family:var(--display); font-size:18px; color:var(--rank-${getRank(ex.weight).toLowerCase()})">${getRank(ex.weight)}</span>
+        </div>
     `).join('');
 
-    // Mannequin
+    // 2. Body Visualization
     const fig = document.getElementById('bodyFigure');
     fig.innerHTML = BODY_SVG;
     const worked = new Set(state.exercises.map(e => e.bodyPart));
@@ -159,15 +190,17 @@ function renderAll() {
     });
     document.getElementById('workedSummary').innerHTML = Array.from(worked).map(p => `<span class="worked-tag">${p}</span>`).join('');
 
-    // History List
+    // 3. History Archive
     document.getElementById('historyList').innerHTML = state.history.map(s => `
         <div class="card">
-            <div style="font-family:var(--mono); font-size:10px; color:var(--accent); margin-bottom:10px; border-bottom:1px solid var(--border); padding-bottom:5px;">SESSION: ${new Date(s.date).toLocaleDateString()}</div>
-            ${s.exercises.map(e => `<div style="margin-bottom:4px;">${e.name} <small style="color:var(--text-muted)">(${e.weight}kg)</small></div>`).join('')}
+            <div style="font-family:var(--mono); font-size:10px; color:var(--accent); margin-bottom:10px; border-bottom:1px solid var(--border); padding-bottom:5px; text-transform:uppercase;">
+                Quest Completed: ${new Date(s.date).toLocaleDateString()}
+            </div>
+            ${s.exercises.map(e => `<div style="margin-bottom:6px; font-size:14px;">${e.name} <small style="color:var(--text-muted)">— ${e.weight}kg (${getRank(e.weight)})</small></div>`).join('')}
         </div>
     `).join('');
 
-    // Global Rank
+    // 4. Update Rankings
     let maxW = 0;
     state.history.forEach(s => s.exercises.forEach(e => { if(e.weight > maxW) maxW = e.weight; }));
     const r = getRank(maxW);
@@ -177,7 +210,7 @@ function renderAll() {
     document.getElementById('rankSubtitle').textContent = titles[r];
 }
 
-function updateChart() {
+function initChart() {
     const ctx = document.getElementById('muscleChart').getContext('2d');
     const parts = ["Chest", "Back", "Shoulders", "Arms", "Legs", "Core"];
     const counts = parts.map(p => {
@@ -186,15 +219,29 @@ function updateChart() {
         return c;
     });
 
-    if (chart) chart.destroy();
-    chart = new Chart(ctx, {
+    if (chartInstance) chartInstance.destroy();
+    chartInstance = new Chart(ctx, {
         type: 'radar',
         data: {
             labels: parts,
-            datasets: [{ data: counts, backgroundColor: 'rgba(246, 170, 28, 0.2)', borderColor: '#F6AA1C', pointBackgroundColor: '#F6AA1C' }]
+            datasets: [{ 
+                label: 'Volume',
+                data: counts, 
+                backgroundColor: 'rgba(246, 170, 28, 0.2)', 
+                borderColor: '#F6AA1C', 
+                pointBackgroundColor: '#F6AA1C',
+                borderWidth: 2
+            }]
         },
         options: { 
-            scales: { r: { grid: { color: 'rgba(255,255,255,0.05)'}, angleLines: {color:'rgba(255,255,255,0.1)'}, ticks: { display: false }, pointLabels: { color: '#d1b8b0', font: {size: 10} } } },
+            scales: { 
+                r: { 
+                    grid: { color: 'rgba(255,255,255,0.1)'}, 
+                    angleLines: {color:'rgba(255,255,255,0.1)'}, 
+                    ticks: { display: false }, 
+                    pointLabels: { color: '#d1b8b0', font: {family: 'JetBrains Mono', size: 10} } 
+                } 
+            },
             plugins: { legend: { display: false } }
         }
     });
@@ -202,35 +249,46 @@ function updateChart() {
 
 function renderStretches() {
     const worked = [...new Set(state.exercises.map(ex => ex.bodyPart))];
-    const parts = worked.length > 0 ? worked : ["Legs", "Back"];
-    let html = `<h2 style="font-family:var(--display); font-size:24px; margin: 20px 0;">RECOVERY PROTOCOL</h2>`;
-    parts.forEach(p => {
+    const partsToShow = worked.length > 0 ? worked : ["Legs", "Back"];
+    let html = `<h2 style="font-family:var(--display); font-size:26px; margin: 20px 0; color:var(--text);">RECOVERY PROTOCOL</h2>`;
+    
+    partsToShow.forEach(p => {
         if (stretchLibrary[p]) {
-            html += `<div style="color:var(--accent); font-family:var(--mono); font-size:12px; margin-top:15px;">${p.toUpperCase()}</div>`;
+            html += `<div style="color:var(--accent); font-family:var(--mono); font-size:12px; margin-top:20px; letter-spacing:1px;">${p.toUpperCase()} REPAIR</div>`;
             stretchLibrary[p].forEach(s => {
-                html += `<div class="history-item"><b>${s}</b><br><small style="color:var(--text-muted)">Hold for 45 seconds</small></div>`;
+                html += `<div class="history-item"><b>${s}</b><br><small style="color:var(--text-muted)">Duration: 45 - 60 seconds</small></div>`;
             });
         }
     });
     document.getElementById('stretchesContent').innerHTML = html;
 }
 
-// Events
+// EVENTS
 document.getElementById('addExBtn').onclick = () => {
-    const name = document.getElementById('exName').value;
-    const weight = parseFloat(document.getElementById('exWeight').value) || 0;
-    if (!name) return;
-    state.exercises.push({ name, weight, bodyPart: document.getElementById('exBodyPart').value });
+    const nameInput = document.getElementById('exName');
+    const weightInput = document.getElementById('exWeight');
+    const partInput = document.getElementById('exBodyPart');
+    
+    if (!nameInput.value) return;
+    
+    state.exercises.push({ 
+        name: nameInput.value, 
+        weight: parseFloat(weightInput.value) || 0, 
+        bodyPart: partInput.value 
+    });
+    
     save(); renderAll();
-    document.getElementById('exName').value = "";
+    nameInput.value = "";
+    weightInput.value = "";
 };
 
 document.getElementById('timerBtn').onclick = () => {
     if (!state.timerRunning) {
         state.timerRunning = true;
         state.start = Date.now();
-        document.getElementById('timerBtn').textContent = "Finish Raid";
-        tick();
+        document.getElementById('timerBtn').textContent = "Finish Session";
+        document.getElementById('timerBtn').classList.add('btn-ghost');
+        updateTimer();
     } else {
         if (state.exercises.length > 0) {
             state.history.unshift({ date: new Date().toISOString(), exercises: [...state.exercises] });
@@ -238,16 +296,17 @@ document.getElementById('timerBtn').onclick = () => {
         }
         state.timerRunning = false;
         document.getElementById('timerBtn').textContent = "Awaken";
+        document.getElementById('timerBtn').classList.remove('btn-ghost');
         document.getElementById('timerDisplay').textContent = "00:00:00";
         save(); renderAll();
     }
 };
 
-function tick() {
+function updateTimer() {
     if (!state.timerRunning) return;
-    const ms = Date.now() - state.start;
-    document.getElementById('timerDisplay').textContent = new Date(ms).toISOString().substr(11, 8);
-    setTimeout(tick, 1000);
+    const diff = Date.now() - state.start;
+    document.getElementById('timerDisplay').textContent = new Date(diff).toISOString().substr(11, 8);
+    setTimeout(updateTimer, 1000);
 }
 
 document.querySelectorAll('.tab').forEach(t => {
@@ -258,11 +317,13 @@ document.querySelectorAll('.tab').forEach(t => {
         document.getElementById('view-today').classList.toggle('hidden', view !== 'today');
         document.getElementById('view-stretches').classList.toggle('hidden', view !== 'stretches');
         document.getElementById('view-history').classList.toggle('hidden', view !== 'history');
-        if (view === 'history') updateChart();
+        
+        if (view === 'history') initChart();
         if (view === 'stretches') renderStretches();
     }
 });
 
+// INIT
 load();
 document.getElementById('todayDate').textContent = new Date().toDateString();
 </script>
