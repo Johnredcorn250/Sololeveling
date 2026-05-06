@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="GYMLOG">
-<title>GYMLOG | Solo Leveling</title>
+<title>GYMLOG</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="apple-touch-icon" href="icon.svg">
@@ -414,7 +414,7 @@
   <!-- TODAY VIEW -->
   <div id="view-today">
     <div class="timer-card" id="timerCard">
-      <div class="timer-label" id="timerLabel">Workout Duration</div>
+      <div class="timer-label" id="timerLabel">Raid Duration</div>
       <div class="timer-display" id="timerDisplay">00:00:00</div>
       <div class="timer-actions">
         <button class="btn btn-accent" id="timerStart">Start Workout</button>
@@ -447,7 +447,7 @@
     </div>
 
     <section class="section">
-      <h2 class="section-title">Log Exercise</h2>
+      <h2 class="section-title">Log Raid</h2>
       <div class="form-card">
         <div class="form-row">
           <div class="field" style="flex: 2">
@@ -1317,7 +1317,7 @@ function renderStretches() {
 
   let html = `<h2 class="section-title">Recovery Plan</h2>`;
   if (workedParts.length === 0) {
-    html += `<p style="color:var(--text-muted); margin-bottom:15px; font-size:13px;">No workout logged today — here's a full-body mobility flow to keep things loose.</p>`;
+    html += `<p style="color:var(--text-muted); margin-bottom:15px; font-size:13px;">Stretch before and after working out gang.</p>`;
   } else {
     html += `<p style="color:var(--accent); font-family:var(--mono); font-size:10px; text-transform:uppercase; margin-bottom:15px; letter-spacing:0.08em;">Targeting: ${workedParts.join(' + ')}</p>`;
   }
