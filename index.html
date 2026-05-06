@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0a0a0a">
+<meta name="theme-color" content="#220901">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="GYMLOG">
-<title>GYMLOG | Solo Leveling</title>
+<title>GYMLOG | Inferno Edition</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="apple-touch-icon" href="icon.svg">
@@ -18,28 +18,30 @@
 
 <style>
   :root {
-    --bg: #0a0a0a;
-    --surface: #141414;
-    --surface-2: #1c1c1c;
-    --border: #262626;
+    /* Your New Palette */
+    --bg: #220901;         /* Dark Seal */
+    --surface: #621708;    /* Blood Oak */
+    --surface-2: #941B0C;  /* Deep Oxide */
+    --accent: #F6AA1C;     /* Ember Gold */
+    --accent-alt: #BC3908; /* Vulcan Red */
+    
+    --border: rgba(246, 170, 28, 0.2);
     --text: #f5f1ea;
-    --text-muted: #888;
-    --text-faint: #555;
-    --accent: #ff4d1f;
-    --accent-light: #ff8a5b;
-    --accent-dim: rgba(255, 77, 31, 0.15);
+    --text-muted: #d1b8b0;
+    --text-faint: #941B0C;
     --success: #5fc97e;
+    
     --display: 'Anton', sans-serif;
     --body: 'Manrope', sans-serif;
     --mono: 'JetBrains Mono', monospace;
     
-    /* Rank Colors */
-    --rank-s: #00f2ff;
-    --rank-a: #ff0055;
-    --rank-b: #ae00ff;
-    --rank-c: #00ff88;
-    --rank-d: #ffbb00;
-    --rank-e: #888888;
+    /* Rank Colors adjusted for new palette */
+    --rank-s: #F6AA1C;
+    --rank-a: #BC3908;
+    --rank-b: #941B0C;
+    --rank-c: #ffbb00;
+    --rank-d: #888888;
+    --rank-e: #555555;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -57,8 +59,8 @@
 
   body {
     background-image:
-      radial-gradient(circle at 20% 0%, rgba(255, 77, 31, 0.08) 0%, transparent 40%),
-      radial-gradient(circle at 80% 100%, rgba(255, 77, 31, 0.04) 0%, transparent 50%);
+      radial-gradient(circle at 50% 0%, rgba(246, 170, 28, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 0% 100%, rgba(188, 57, 8, 0.05) 0%, transparent 50%);
     background-attachment: fixed;
   }
 
@@ -72,8 +74,8 @@
     justify-content: space-between;
     align-items: flex-end;
   }
-  .logo { font-family: var(--display); font-size: 38px; letter-spacing: 0.02em; line-height: 0.85; }
-  .logo .accent { color: var(--accent); }
+  .logo { font-family: var(--display); font-size: 38px; letter-spacing: 0.02em; line-height: 0.85; color: var(--text); }
+  .logo .accent { color: var(--accent); text-shadow: 0 0 15px rgba(246, 170, 28, 0.4); }
   .date {
     font-family: var(--mono); font-size: 11px; color: var(--text-muted);
     text-transform: uppercase; letter-spacing: 0.08em; text-align: right;
@@ -82,23 +84,23 @@
   /* TABS */
   .tabs {
     display: flex; gap: 4px; margin-top: 16px; padding: 4px;
-    background: var(--surface); border-radius: 999px; border: 1px solid var(--border);
+    background: rgba(0,0,0,0.3); border-radius: 999px; border: 1px solid var(--border);
   }
   .tab {
     flex: 1; padding: 10px 12px; background: transparent; border: none;
-    color: var(--text-muted); font-family: var(--body); font-size: 12px;
-    font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-muted); font-family: var(--body); font-size: 11px;
+    font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
     border-radius: 999px; cursor: pointer; transition: all 0.25s;
   }
-  .tab.active { background: var(--text); color: var(--bg); }
+  .tab.active { background: var(--accent); color: var(--bg); }
 
   /* ANALYTICS & RANK CARD */
   .analytics-card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 16px; padding: 20px; margin-top: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   }
 
-  /* RANK STYLING */
   .rank-display {
     font-family: var(--display);
     font-size: 72px;
@@ -107,23 +109,16 @@
     transition: all 0.5s ease;
   }
 
-  /* GLOOM CLASSES FOR RANKS */
-  .rank-s { color: var(--rank-s); text-shadow: 0 0 25px rgba(0, 242, 255, 0.7); }
-  .rank-a { color: var(--rank-a); text-shadow: 0 0 20px rgba(255, 0, 85, 0.6); }
-  .rank-b { color: var(--rank-b); text-shadow: 0 0 20px rgba(174, 0, 255, 0.6); }
-  .rank-c { color: var(--rank-c); text-shadow: 0 0 20px rgba(0, 255, 136, 0.6); }
-  .rank-d { color: var(--rank-d); text-shadow: 0 0 20px rgba(255, 187, 0, 0.6); }
-  .rank-e { color: var(--rank-e); text-shadow: none; opacity: 0.7; }
+  .rank-s { color: var(--rank-s); text-shadow: 0 0 30px rgba(246, 170, 28, 0.8); }
+  .rank-a { color: var(--rank-a); text-shadow: 0 0 20px rgba(188, 57, 8, 0.6); }
+  .rank-b { color: var(--rank-b); }
+  .rank-c { color: var(--rank-c); }
+  .rank-d { color: var(--rank-d); }
+  .rank-e { color: var(--rank-e); opacity: 0.5; }
 
-  /* PR BADGE */
   .pr-badge {
-    font-family: var(--display); background: var(--accent); color: white;
+    font-family: var(--display); background: var(--accent); color: var(--bg);
     padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px;
-    animation: rankGlow 2s infinite alternate;
-  }
-  @keyframes rankGlow {
-    from { box-shadow: 0 0 5px var(--accent); }
-    to { box-shadow: 0 0 15px var(--accent); }
   }
 
   /* TIMER CARD */
@@ -133,101 +128,48 @@
   }
   .timer-card.running {
     border-color: var(--accent);
-    box-shadow: 0 0 0 1px var(--accent), 0 8px 32px rgba(255, 77, 31, 0.12);
-  }
-  .timer-card.running::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0;
-    height: 2px; background: var(--accent); animation: pulse 1.5s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 0.4; }
-    50% { opacity: 1; }
-  }
-  .timer-label {
-    font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em;
-    text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;
+    box-shadow: 0 0 20px rgba(246, 170, 28, 0.2);
   }
   .timer-display {
     font-family: var(--mono); font-size: 48px; font-weight: 600;
     letter-spacing: -0.02em; color: var(--text); line-height: 1;
   }
   .timer-display.running { color: var(--accent); }
-  .timer-actions { display: flex; gap: 8px; margin-top: 16px; }
 
   /* BODY SILHOUETTE */
   .body-section {
     margin-top: 24px; background: var(--surface); border: 1px solid var(--border);
     border-radius: 16px; padding: 24px; display: flex; gap: 20px; align-items: center;
-    position: relative; overflow: hidden;
   }
-  .body-section::before {
-    content: ''; position: absolute; top: 0; left: 0; width: 170px; height: 100%;
-    background-image:
-      linear-gradient(rgba(255,77,31,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,77,31,0.04) 1px, transparent 1px);
-    background-size: 20px 20px;
-    mask-image: radial-gradient(ellipse 80px 200px at 65px 50%, black 30%, transparent 70%);
-    pointer-events: none;
-  }
-  .body-figure { width: 140px; flex-shrink: 0; display: flex; justify-content: center; position: relative; z-index: 1; }
-  .body-figure svg { width: 100%; height: auto; overflow: visible; display: block; }
+  .muscle { fill: #3a1109; stroke: var(--bg); stroke-width: 0.6; transition: fill 0.6s ease; }
+  .muscle.active { fill: var(--accent); filter: drop-shadow(0 0 5px var(--accent)); }
 
-  .muscle { fill: url(#muscleSheen); stroke: #0a0a0a; stroke-width: 0.6; transition: fill 0.6s ease, filter 0.6s ease; }
-  .muscle.active { fill: url(#activeSheen); filter: drop-shadow(0 0 3px rgba(255, 77, 31, 0.7)); }
-  .muscle-line { fill: none; stroke: #0a0a0a; stroke-width: 0.5; stroke-linecap: round; pointer-events: none; opacity: 0.6; }
-  .body-summary { flex: 1; position: relative; z-index: 1; }
-  .body-summary h3 { font-family: var(--display); font-size: 22px; letter-spacing: 0.02em; margin-bottom: 8px; }
-  .worked-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
   .worked-tag {
-    font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
-    text-transform: uppercase; padding: 4px 10px;
-    background: var(--accent-dim); color: var(--accent); border-radius: 999px;
+    font-family: var(--mono); font-size: 10px; padding: 4px 10px;
+    background: rgba(246, 170, 28, 0.15); color: var(--accent); border-radius: 999px;
+    margin-right: 4px; margin-top: 4px; display: inline-block;
   }
-
-  .stats-inputs { display: flex; gap: 8px; margin-bottom: 12px; }
-  .stat-field { flex: 1; }
-  .stat-field input {
-    width: 100%; background: var(--surface-2); border: 1px solid var(--border);
-    color: var(--text); padding: 6px 10px; border-radius: 8px;
-    font-family: var(--mono); font-size: 11px;
-  }
-  .stat-field input:focus { outline: none; border-color: var(--accent); }
-
-  .bmi-readout {
-    font-family: var(--mono); font-size: 10px; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
-  }
-  .bmi-readout strong { color: var(--text); font-weight: 600; }
 
   /* FORM & LISTS */
-  .section { margin-top: 32px; }
   .section-title {
     font-family: var(--display); font-size: 24px; letter-spacing: 0.02em;
-    margin-bottom: 12px; display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 12px; color: var(--text); text-transform: uppercase;
   }
   .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
-  .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
   .field label { font-family: var(--mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; display: block; }
   .field input, .field select {
-    width: 100%; background: var(--surface-2); border: 1px solid var(--border);
+    width: 100%; background: var(--bg); border: 1px solid var(--surface-2);
     color: var(--text); padding: 12px 14px; border-radius: 10px; font-family: var(--body);
   }
 
-  .btn { background: var(--text); color: var(--bg); border: none; padding: 14px 20px; border-radius: 10px; font-weight: 700; text-transform: uppercase; cursor: pointer; width: 100%; transition: opacity 0.2s; }
-  .btn:active { opacity: 0.8; }
-  .btn-accent { background: var(--accent); color: var(--text); }
-  .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  .btn { background: var(--accent); color: var(--bg); border: none; padding: 14px 20px; border-radius: 10px; font-weight: 800; text-transform: uppercase; cursor: pointer; width: 100%; }
+  .btn-ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
   .hidden { display: none !important; }
 
-  /* HISTORY LIST */
   .history-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 10px; }
-  .history-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
-  .history-date { font-family: var(--display); font-size: 18px; }
-
-  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--text); color: var(--bg); padding: 10px 20px; border-radius: 999px; font-weight: 600; transition: transform 0.3s; z-index: 100; }
+  
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--accent); color: var(--bg); padding: 10px 20px; border-radius: 999px; font-weight: 800; transition: transform 0.3s; z-index: 100; }
   .toast.show { transform: translateX(-50%) translateY(0); }
-
-  #muscleChart { max-height: 250px; margin-top: 15px; }
 </style>
 </head>
 <body>
@@ -247,88 +189,72 @@
   <!-- TODAY VIEW -->
   <div id="view-today">
     <div class="timer-card" id="timerCard">
-      <div class="timer-label" id="timerLabel">Workout Duration</div>
+      <div style="font-family: var(--mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Active Session</div>
       <div class="timer-display" id="timerDisplay">00:00:00</div>
-      <div class="timer-actions">
-        <button class="btn btn-accent" id="timerStart">Start Workout</button>
-        <button class="btn btn-ghost hidden" id="timerPause" style="flex:1">Pause</button>
-        <button class="btn btn-ghost hidden" id="timerEnd" style="flex:1">End</button>
+      <div style="display: flex; gap: 8px; margin-top: 16px;">
+        <button class="btn" id="timerStart">Awaken</button>
+        <button class="btn btn-ghost hidden" id="timerPause">Pause</button>
+        <button class="btn btn-ghost hidden" id="timerEnd">Finish Raid</button>
       </div>
     </div>
 
     <div class="body-section">
-      <div class="body-figure" id="bodyFigure"></div>
-      <div class="body-summary">
-        <h3>My Profile</h3>
-        <div class="stats-inputs">
-            <div class="stat-field">
-                <input type="number" id="userHeight" placeholder="H (cm)" oninput="updateAvatarProportions()">
-            </div>
-            <div class="stat-field">
-                <input type="number" id="userWeight" placeholder="W (kg)" oninput="updateAvatarProportions()">
-            </div>
+      <div id="bodyFigure" style="width: 120px;"></div>
+      <div style="flex:1">
+        <h3 style="font-family: var(--display); font-size: 20px; margin-bottom: 10px;">STATS</h3>
+        <div style="display:flex; gap: 5px; margin-bottom: 10px;">
+            <input type="number" id="userHeight" placeholder="cm" style="width:50%; background:var(--bg); border:1px solid var(--surface-2); color:white; padding:5px; border-radius:5px;" oninput="updateAvatarProportions()">
+            <input type="number" id="userWeight" placeholder="kg" style="width:50%; background:var(--bg); border:1px solid var(--surface-2); color:white; padding:5px; border-radius:5px;" oninput="updateAvatarProportions()">
         </div>
-        <div class="bmi-readout" id="bmiReadout"></div>
-        <div id="workedSummary" class="empty">No exercises logged yet.</div>
+        <div id="bmiReadout" style="font-size: 10px; font-family: var(--mono); color: var(--accent);"></div>
+        <div id="workedSummary"></div>
       </div>
     </div>
 
-    <section class="section">
-      <h2 class="section-title">Log Exercise</h2>
+    <section class="section" style="margin-top:25px;">
+      <h2 class="section-title">New Entry</h2>
       <div class="form-card">
-        <div class="form-row">
-          <div class="field" style="flex: 2">
-            <label>Exercise</label>
-            <input type="text" id="exName" placeholder="Bench press" oninput="checkPRSuggestion()">
+        <div class="field" style="margin-bottom:12px;">
+            <label>Exercise Name</label>
+            <input type="text" id="exName" placeholder="Squats..." oninput="checkPRSuggestion()">
             <div id="prHint" style="font-size: 10px; color: var(--accent); margin-top: 4px; display: none;"></div>
-          </div>
-          <div class="field">
-            <label>Body Part</label>
-            <select id="exBodyPart">
-              <option value="Chest">Chest</option>
-              <option value="Back">Back</option>
-              <option value="Shoulders">Shoulders</option>
-              <option value="Arms">Arms</option>
-              <option value="Legs">Legs</option>
-              <option value="Core">Core</option>
-              <option value="Full Body">Full Body</option>
-            </select>
-          </div>
         </div>
-        <div class="form-row">
-          <div class="field"><label>Weight (kg)</label><input type="number" id="exWeight" step="0.5"></div>
-          <div class="field"><label>Sets</label><input type="number" id="exSets"></div>
-          <div class="field"><label>Reps</label><input type="number" id="exReps"></div>
+        <div style="display:flex; gap:10px; margin-bottom:12px;">
+            <div class="field" style="flex:1">
+                <label>Target</label>
+                <select id="exBodyPart">
+                  <option value="Chest">Chest</option><option value="Back">Back</option>
+                  <option value="Shoulders">Shoulders</option><option value="Arms">Arms</option>
+                  <option value="Legs">Legs</option><option value="Core">Core</option>
+                </select>
+            </div>
+            <div class="field" style="flex:1"><label>KG</label><input type="number" id="exWeight"></div>
         </div>
-        <button class="btn" id="addExercise">+ Add Exercise</button>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <div class="field" style="flex:1"><label>Sets</label><input type="number" id="exSets"></div>
+            <div class="field" style="flex:1"><label>Reps</label><input type="number" id="exReps"></div>
+        </div>
+        <button class="btn" id="addExercise">Log Slaying</button>
       </div>
     </section>
 
-    <section class="section">
-      <h2 class="section-title">Logged <span class="meta" id="loggedMeta">0 exercises</span></h2>
-      <div class="exercise-list" id="todayList"></div>
-    </section>
+    <div id="todayList" style="margin-top:20px;"></div>
   </div>
 
   <!-- STRETCHES VIEW -->
-  <div id="view-stretches" class="hidden section">
+  <div id="view-stretches" class="hidden section" style="margin-top:25px;">
     <div id="stretchesContent"></div>
   </div>
 
   <!-- HISTORY VIEW -->
-  <div id="view-history" class="hidden">
-    <!-- GLOBAL RANK BADGE -->
-    <div class="analytics-card" style="text-align: center; margin-bottom: 12px; border-color: rgba(255,255,255,0.1);">
-      <div class="timer-label">Global Hunter Rank</div>
+  <div id="view-history" class="hidden" style="margin-top:25px;">
+    <div class="analytics-card" style="text-align: center; margin-bottom: 20px;">
+      <div style="font-family: var(--mono); font-size: 10px; color: var(--text-muted);">GLOBAL RANK</div>
       <div id="globalRank" class="rank-display rank-e">E</div>
-      <div id="rankSubtitle" style="font-family: var(--mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Awaiting Awakening</div>
+      <div id="rankSubtitle" style="font-family: var(--mono); font-size: 10px; color: var(--accent);">Hunter Association Data Incomplete</div>
     </div>
-
-    <div class="analytics-card">
-      <h3 style="font-family: var(--display); letter-spacing: 0.05em;">MUSCLE BALANCE</h3>
-      <canvas id="muscleChart"></canvas>
-    </div>
-    <div id="historyList"></div>
+    <div class="analytics-card"><canvas id="muscleChart"></canvas></div>
+    <div id="historyList" style="margin-top:20px;"></div>
   </div>
 
 </div>
@@ -336,46 +262,23 @@
 <div class="toast" id="toast">Saved</div>
 
 <script>
-/* ============== STATE & CONSTANTS ============== */
 const STORAGE_KEYS = { current: 'gymlog_current', history: 'gymlog_history', profile: 'gymlog_profile' };
 let state = { exercises: [], timerStart: null, timerElapsed: 0, timerRunning: false, history: [] };
 let profile = { height: 180, weight: 80 };
 let chartInstance = null;
 
 const stretchLibrary = {
-  "Chest": [
-    { name: "Doorway Chest Stretch", duration: "45s", instructions: "Place forearms on doorway frames and lean forward." },
-    { name: "Pec Minor Floor Stretch", duration: "30s/side", instructions: "Lying on stomach, extend one arm out at 90° and roll away from it." }
-  ],
-  "Back": [
-    { name: "Cat-Cow Stretch", duration: "10 reps", instructions: "On all fours, alternate between arching and rounding your spine." },
-    { name: "Child's Pose", duration: "1m", instructions: "Sit on heels, arms extended forward on the floor." }
-  ],
-  "Shoulders": [
-    { name: "Cross-Body Shoulder Stretch", duration: "30s/side", instructions: "Pull one arm across your chest using the other arm." },
-    { name: "Sleeper Stretch", duration: "30s/side", instructions: "Lying on your side, gently press your forearm toward the floor." }
-  ],
-  "Arms": [
-    { name: "Overhead Tricep Stretch", duration: "30s/side", instructions: "Reach one hand down your spine and pull the elbow with the other hand." },
-    { name: "Wrist Extensor Stretch", duration: "30s/side", instructions: "Extend arm, palm down, and gently pull fingers toward you." }
-  ],
-  "Legs": [
-    { name: "Pigeon Pose", duration: "1m/side", instructions: "Bring one knee forward and rotate it outward; sink hips toward the floor." },
-    { name: "Couch Stretch", duration: "1m/side", instructions: "Back knee on ground, foot against a wall; stay upright to stretch quads/hip flexors." }
-  ],
-  "Core": [
-    { name: "Cobra Stretch", duration: "45s", instructions: "Lying on stomach, press up with hands to stretch the abdominals." },
-    { name: "Sphinx Pose", duration: "1m", instructions: "Prop yourself up on your forearms to gently extend the spine." }
-  ],
-  "Full Body": [
-    { name: "World's Greatest Stretch", duration: "5 reps/side", instructions: "Lunge forward, elbow to instep, then rotate arm to the sky." },
-    { name: "Deep Squat Hold", duration: "1m", instructions: "Sit in a deep squat, using elbows to push knees out." }
-  ]
+  "Chest": [{ name: "Doorway Stretch", duration: "45s", instructions: "Lean through a doorway with arms braced." }],
+  "Back": [{ name: "Child's Pose", duration: "60s", instructions: "Kneel and reach forward on the floor." }],
+  "Shoulders": [{ name: "Cross-Arm", duration: "30s/side", instructions: "Pull arm across chest." }],
+  "Arms": [{ name: "Wall Bicep Stretch", duration: "30s/side", instructions: "Arm against wall, rotate body away." }],
+  "Legs": [{ name: "Pigeon Pose", duration: "60s/side", instructions: "One leg bent forward, other straight back." }],
+  "Core": [{ name: "Cobra", duration: "45s", instructions: "Push up from stomach." }],
+  "Full Body": [{ name: "Deep Squat Hold", duration: "60s", instructions: "Sit deep in a squat and breathe." }]
 };
 
-const BODY_SVG = `<svg viewBox="0 0 200 440" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="muscleSheen" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#3a3a3a"/><stop offset="50%" stop-color="#2a2a2a"/><stop offset="100%" stop-color="#1a1a1a"/></linearGradient><linearGradient id="activeSheen" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#ff8a5b"/><stop offset="50%" stop-color="#ff4d1f"/><stop offset="100%" stop-color="#c93a14"/></linearGradient></defs><g id="bodyScaler" transform-origin="100 430"><ellipse cx="100" cy="34" rx="19" ry="23" class="muscle"/><path d="M 86 48 Q 100 60 114 48" class="muscle-line"/><path d="M 91 54 Q 92 66 90 72 L 110 72 Q 108 66 109 54 Z" class="muscle"/><path d="M 90 70 Q 76 74 64 84 Q 78 82 100 80 Q 122 82 136 84 Q 124 74 110 70 Z" class="muscle" data-zone="Back"/><path d="M 64 84 Q 48 90 46 110 Q 50 122 68 118 Q 78 104 82 92 Q 76 84 64 84 Z" class="muscle" data-zone="Shoulders"/><path d="M 136 84 Q 152 90 154 110 Q 150 122 132 118 Q 122 104 118 92 Q 124 84 136 84 Z" class="muscle" data-zone="Shoulders"/><path d="M 82 90 Q 70 98 68 132 Q 76 148 98 148 L 99 104 Q 96 92 82 90 Z" class="muscle" data-zone="Chest"/><path d="M 118 90 Q 130 98 132 132 Q 124 148 102 148 L 101 104 Q 104 92 118 90 Z" class="muscle" data-zone="Chest"/><path d="M 100 100 L 100 148" class="muscle-line"/><path d="M 72 142 Q 86 150 98 148" class="muscle-line"/><path d="M 128 142 Q 114 150 102 148" class="muscle-line"/><path d="M 68 130 Q 64 152 70 178 Q 76 182 80 178 Q 78 158 78 138 Q 72 132 68 130 Z" class="muscle" data-zone="Back"/><path d="M 132 130 Q 136 152 130 178 Q 124 182 120 178 Q 122 158 122 138 Q 128 132 132 130 Z" class="muscle" data-zone="Back"/><path d="M 46 110 Q 38 132 40 168 Q 50 174 60 170 Q 64 146 64 116 Q 56 110 46 110 Z" class="muscle" data-zone="Arms"/><path d="M 154 110 Q 162 132 160 168 Q 150 174 140 170 Q 136 146 136 116 Q 144 110 154 110 Z" class="muscle" data-zone="Arms"/><ellipse cx="50" cy="174" rx="9" ry="5" class="muscle"/><ellipse cx="150" cy="174" rx="9" ry="5" class="muscle"/><path d="M 42 178 Q 36 200 40 232 Q 50 238 58 234 Q 60 204 60 180 Q 50 176 42 178 Z" class="muscle" data-zone="Arms"/><path d="M 158 178 Q 164 200 160 232 Q 150 238 142 234 Q 140 204 140 180 Q 150 176 158 178 Z" class="muscle" data-zone="Arms"/><ellipse cx="48" cy="244" rx="9" ry="11" class="muscle"/><ellipse cx="152" cy="244" rx="9" ry="11" class="muscle"/><path d="M 84 150 Q 84 166 88 170 L 99 170 L 99 150 Z" class="muscle" data-zone="Core"/><path d="M 116 150 Q 116 166 112 170 L 101 170 L 101 150 Z" class="muscle" data-zone="Core"/><path d="M 86 172 L 99 172 L 99 192 L 88 192 Z" class="muscle" data-zone="Core"/><path d="M 114 172 L 101 172 L 101 192 L 112 192 Z" class="muscle" data-zone="Core"/><path d="M 88 194 L 99 194 L 99 216 L 92 216 Z" class="muscle" data-zone="Core"/><path d="M 112 194 L 101 194 L 101 216 L 108 216 Z" class="muscle" data-zone="Core"/><path d="M 78 178 Q 76 200 84 220 Q 88 222 90 218 Q 88 198 86 180 Z" class="muscle" data-zone="Core"/><path d="M 122 178 Q 124 200 116 220 Q 112 222 110 218 Q 112 198 114 180 Z" class="muscle" data-zone="Core"/><path d="M 84 218 Q 80 238 90 252 L 110 252 Q 120 238 116 218 L 110 230 L 100 234 L 90 230 Z" class="muscle"/><path d="M 86 248 Q 76 290 78 332 L 82 342 Q 96 346 99 342 L 99 320 Q 100 280 99 250 Z" class="muscle" data-zone="Legs"/><path d="M 114 248 Q 124 290 122 332 L 118 342 Q 104 346 101 342 L 101 320 Q 100 280 101 250 Z" class="muscle" data-zone="Legs"/><path d="M 90 260 Q 89 295 88 330" class="muscle-line"/><path d="M 110 260 Q 111 295 112 330" class="muscle-line"/><ellipse cx="89" cy="346" rx="10" ry="6" class="muscle"/><ellipse cx="111" cy="346" rx="10" ry="6" class="muscle"/><path d="M 82 354 Q 78 388 84 422 L 96 422 L 97 388 L 96 354 Z" class="muscle" data-zone="Legs"/><path d="M 118 354 Q 122 388 116 422 L 104 422 L 103 388 L 104 354 Z" class="muscle" data-zone="Legs"/><path d="M 84 366 Q 82 388 86 410" class="muscle-line"/><path d="M 116 366 Q 118 388 114 410" class="muscle-line"/><ellipse cx="90" cy="428" rx="10" ry="6" class="muscle"/><ellipse cx="110" cy="428" rx="10" ry="6" class="muscle"/></g></svg>`;
+const BODY_SVG = `<svg viewBox="0 0 200 440" xmlns="http://www.w3.org/2000/svg"><g id="bodyScaler" transform-origin="100 430"><ellipse cx="100" cy="34" rx="19" ry="23" class="muscle"/><path d="M 90 70 Q 76 74 64 84 Q 78 82 100 80 Q 122 82 136 84 Q 124 74 110 70 Z" class="muscle" data-zone="Back"/><path d="M 64 84 Q 48 90 46 110 Q 50 122 68 118 Q 78 104 82 92 Q 76 84 64 84 Z" class="muscle" data-zone="Shoulders"/><path d="M 136 84 Q 152 90 154 110 Q 150 122 132 118 Q 122 104 118 92 Q 124 84 136 84 Z" class="muscle" data-zone="Shoulders"/><path d="M 82 90 Q 70 98 68 132 Q 76 148 98 148 L 99 104 Q 96 92 82 90 Z" class="muscle" data-zone="Chest"/><path d="M 118 90 Q 130 98 132 132 Q 124 148 102 148 L 101 104 Q 104 92 118 90 Z" class="muscle" data-zone="Chest"/><path d="M 46 110 Q 38 132 40 168 Q 50 174 60 170 Q 64 146 64 116 Q 56 110 46 110 Z" class="muscle" data-zone="Arms"/><path d="M 154 110 Q 162 132 160 168 Q 150 174 140 170 Q 136 146 136 116 Q 144 110 154 110 Z" class="muscle" data-zone="Arms"/><path d="M 42 178 Q 36 200 40 232 Q 50 238 58 234 Q 60 204 60 180 Q 50 176 42 178 Z" class="muscle" data-zone="Arms"/><path d="M 158 178 Q 164 200 160 232 Q 150 238 142 234 Q 140 204 140 180 Q 150 176 158 178 Z" class="muscle" data-zone="Arms"/><path d="M 84 150 Q 84 216 116 216 Q 116 150 100 150 Z" class="muscle" data-zone="Core"/><path d="M 86 248 Q 76 290 78 332 L 82 342 Q 96 346 99 342 L 99 250 Z" class="muscle" data-zone="Legs"/><path d="M 114 248 Q 124 290 122 332 L 118 342 Q 104 346 101 342 L 101 250 Z" class="muscle" data-zone="Legs"/><path d="M 82 354 Q 78 388 84 422 L 96 422 L 97 354 Z" class="muscle" data-zone="Legs"/><path d="M 118 354 Q 122 388 116 422 L 104 422 L 103 354 Z" class="muscle" data-zone="Legs"/></g></svg>`;
 
-/* ============== RANK LOGIC ============== */
 function getRank(weight) {
   if (weight >= 120) return 'S';
   if (weight >= 80) return 'A';
@@ -388,151 +291,83 @@ function getRank(weight) {
 function updateGlobalRank() {
   const rankDisplay = document.getElementById('globalRank');
   const subtitle = document.getElementById('rankSubtitle');
-  let maxWeightEver = 0;
-  state.history.forEach(session => {
-    session.exercises.forEach(ex => {
-      if (ex.weight > maxWeightEver) maxWeightEver = ex.weight;
-    });
-  });
-  const rank = getRank(maxWeightEver);
+  let maxW = 0;
+  state.history.forEach(s => s.exercises.forEach(e => { if (e.weight > maxW) maxW = e.weight; }));
+  const rank = getRank(maxW);
   rankDisplay.className = 'rank-display rank-' + rank.toLowerCase();
   rankDisplay.textContent = rank;
-  const descriptions = {
-    'S': 'National Level Hunter',
-    'A': 'Elite Raid Leader',
-    'B': 'High-Rank Striker',
-    'C': 'Solid Tanker',
-    'D': 'Active Hunter',
-    'E': 'E-Class Awakened'
-  };
-  subtitle.textContent = `Rank: ${rank}-Class (${descriptions[rank]})`;
+  const des = { 'S': 'National Level Hunter', 'A': 'Elite Ranker', 'B': 'High Class', 'C': 'Mid Class', 'D': 'Novice', 'E': 'Awakened' };
+  subtitle.textContent = `Hunter Tier: ${des[rank]}`;
 }
 
-/* ============== STRETCH LOGIC ============== */
 function renderStretches() {
   const container = document.getElementById('stretchesContent');
-  const workedParts = [...new Set(state.exercises.map(ex => ex.bodyPart))];
-  let html = `<h2 class="section-title">Recovery & Mobility</h2>`;
-
-  if (workedParts.length > 0) {
-    html += `<p style="color:var(--accent); font-family:var(--mono); font-size:10px; text-transform:uppercase; margin-bottom:15px;">Targeted for your session: ${workedParts.join(' + ')}</p>`;
-  } else {
-    html += `<p style="color:var(--text-muted); font-family:var(--mono); font-size:10px; text-transform:uppercase; margin-bottom:15px;">Daily Maintenance Mode</p>`;
-  }
-
-  const displayParts = workedParts.length > 0 ? workedParts : ["Full Body", "Shoulders", "Legs"];
-
-  displayParts.forEach(part => {
-    const stretches = stretchLibrary[part];
-    if (stretches) {
-      html += `<div style="font-family:var(--display); font-size:14px; color:var(--text-faint); margin: 20px 0 10px; text-transform:uppercase; letter-spacing:0.1em;">${part} Focus</div>`;
-      stretches.forEach(s => {
-        html += `
-          <div class="history-item" style="border-left: 2px solid var(--accent); margin-bottom: 12px; background: var(--surface-2);">
-            <div style="display:flex; justify-content:space-between; align-items:baseline;">
-              <div style="font-weight:700; color:var(--text);">${s.name}</div>
-              <div style="font-family:var(--mono); font-size:11px; color:var(--accent);">${s.duration}</div>
-            </div>
-            <div style="font-size:12px; color:var(--text-muted); margin-top:4px; line-height:1.4;">${s.instructions}</div>
-          </div>`;
+  const worked = [...new Set(state.exercises.map(ex => ex.bodyPart))];
+  let html = `<h2 class="section-title">Recovery</h2>`;
+  const parts = worked.length > 0 ? worked : ["Full Body", "Legs"];
+  parts.forEach(p => {
+    if (stretchLibrary[p]) {
+      html += `<div style="color:var(--accent); font-size:12px; margin:15px 0 5px; font-family:var(--mono);">${p.toUpperCase()}</div>`;
+      stretchLibrary[p].forEach(s => {
+        html += `<div class="history-item"><div style="font-weight:700;">${s.name}</div><div style="font-size:11px; color:var(--text-muted);">${s.instructions} (${s.duration})</div></div>`;
       });
     }
   });
-
-  html += `<button class="btn btn-ghost" style="margin-top:20px; font-size:11px;" onclick="renderAllStretches()">View Full Library</button>`;
+  html += `<button class="btn btn-ghost" style="margin-top:15px; font-size:10px;" onclick="renderAllStretches()">Browse All</button>`;
   container.innerHTML = html;
 }
 
 function renderAllStretches() {
   const container = document.getElementById('stretchesContent');
-  let html = `<h2 class="section-title">Stretch Library</h2>`;
-  Object.keys(stretchLibrary).forEach(part => {
-    html += `<div style="font-family:var(--display); font-size:14px; color:var(--accent); margin: 25px 0 10px; text-transform:uppercase;">${part}</div>`;
-    stretchLibrary[part].forEach(s => {
-      html += `
-        <div class="history-item" style="background: var(--surface-2); margin-bottom: 8px;">
-          <div style="display:flex; justify-content:space-between; align-items: center;">
-            <div style="font-weight:700; color:var(--text);">${s.name}</div>
-            <div style="font-family:var(--mono); font-size:11px; color:var(--text-muted);">${s.duration}</div>
-          </div>
-        </div>`;
-    });
+  let html = `<h2 class="section-title">Catalogue</h2>`;
+  Object.keys(stretchLibrary).forEach(p => {
+    html += `<div style="color:var(--accent); font-size:12px; margin:15px 0 5px; font-family:var(--mono);">${p}</div>`;
+    stretchLibrary[p].forEach(s => { html += `<div class="history-item"><b>${s.name}</b></div>`; });
   });
-  html += `<button class="btn btn-accent" style="margin-top:20px;" onclick="renderStretches()">Back to Recommended</button>`;
+  html += `<button class="btn btn-ghost" style="margin-top:15px;" onclick="renderStretches()">Back</button>`;
   container.innerHTML = html;
 }
 
-/* ============== CORE ENGINE ============== */
-function getPRForExercise(name) {
-  let maxWeight = 0;
-  state.history.forEach(session => {
-    session.exercises.forEach(ex => {
-      if (ex.name.toLowerCase() === name.toLowerCase()) maxWeight = Math.max(maxWeight, ex.weight || 0);
-    });
+function renderBody() {
+  const fig = document.getElementById('bodyFigure');
+  fig.innerHTML = BODY_SVG;
+  const worked = new Set(state.exercises.map(e => e.bodyPart));
+  fig.querySelectorAll('.muscle').forEach(m => {
+    if (worked.has(m.dataset.zone)) m.classList.add('active');
   });
-  return maxWeight;
-}
-
-function checkPRSuggestion() {
-  const name = document.getElementById('exName').value.trim();
-  const hint = document.getElementById('prHint');
-  if (name.length < 3) { hint.style.display = 'none'; return; }
-  const pr = getPRForExercise(name);
-  if (pr > 0) {
-    hint.textContent = `Current Max: ${pr}kg. Level up to ${pr + 2.5}kg?`;
-    hint.style.display = 'block';
-  } else { hint.style.display = 'none'; }
-}
-
-function renderMuscleChart() {
-  const ctx = document.getElementById('muscleChart').getContext('2d');
-  const counts = { Chest: 0, Back: 0, Shoulders: 0, Arms: 0, Legs: 0, Core: 0 };
-  state.history.forEach(s => {
-    s.exercises.forEach(e => {
-      if (counts[e.bodyPart] !== undefined) counts[e.bodyPart] += (e.weight * (e.sets || 1) * (e.reps || 1));
-    });
-  });
-  if (chartInstance) chartInstance.destroy();
-  chartInstance = new Chart(ctx, {
-    type: 'radar',
-    data: {
-      labels: Object.keys(counts),
-      datasets: [{
-        label: 'Volume Distribution',
-        data: Object.values(counts),
-        backgroundColor: 'rgba(255, 77, 31, 0.2)',
-        borderColor: '#ff4d1f',
-        pointBackgroundColor: '#ff4d1f'
-      }]
-    },
-    options: {
-      scales: { r: { grid: { color: '#262626' }, angleLines: { color: '#262626' }, ticks: { display: false } } },
-      plugins: { legend: { display: false } }
-    }
-  });
+  document.getElementById('workedSummary').innerHTML = Array.from(worked).map(p => `<span class="worked-tag">${p}</span>`).join('');
+  updateAvatarProportions();
 }
 
 function updateAvatarProportions() {
     const h = parseFloat(document.getElementById('userHeight').value) || 180;
     const w = parseFloat(document.getElementById('userWeight').value) || 80;
-    profile = { height: h, weight: w };
-    localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(profile));
     const scaler = document.getElementById('bodyScaler');
     if (!scaler) return;
-    const refBMI = 80 / Math.pow(1.80, 2);
     const userBMI = w / Math.pow(h / 100, 2);
-    const hScale = Math.max(0.88, Math.min(1.12, h / 180));
-    const bmiRatio = userBMI / refBMI;
-    const wScale = Math.max(0.85, Math.min(1.25, Math.pow(bmiRatio, 0.55)));
-    scaler.setAttribute('transform', `scale(${wScale.toFixed(3)}, ${hScale.toFixed(3)})`);
-    const readout = document.getElementById('bmiReadout');
-    if (readout) {
-      let category = 'Normal';
-      if (userBMI < 18.5) category = 'Underweight';
-      else if (userBMI >= 25 && userBMI < 30) category = 'Overweight';
-      else if (userBMI >= 30) category = 'Obese';
-      readout.innerHTML = `BMI <strong>${userBMI.toFixed(1)}</strong> · ${category}`;
-    }
+    scaler.setAttribute('transform', `scale(${(userBMI/24.5).toFixed(2)}, ${(h/180).toFixed(2)})`);
+    document.getElementById('bmiReadout').textContent = `BMI: ${userBMI.toFixed(1)}`;
+}
+
+function startTimer() { 
+    state.timerStart = Date.now(); state.timerRunning = true; 
+    setInterval(() => {
+        if(!state.timerRunning) return;
+        const ms = state.timerElapsed + (Date.now() - state.timerStart);
+        document.getElementById('timerDisplay').textContent = new Date(ms).toISOString().substr(11, 8);
+    }, 1000);
+    renderTimerUI();
+}
+
+function endWorkout() {
+  if (state.exercises.length === 0) return;
+  const session = { id: Date.now(), date: new Date().toISOString(), exercises: [...state.exercises] };
+  state.history.unshift(session);
+  state.exercises = [];
+  state.timerRunning = false;
+  state.timerElapsed = 0;
+  saveState();
+  renderAll();
 }
 
 function saveState() {
@@ -545,123 +380,56 @@ function loadState() {
   if (cur) Object.assign(state, JSON.parse(cur));
   const hist = localStorage.getItem(STORAGE_KEYS.history);
   if (hist) state.history = JSON.parse(hist);
-  const prof = localStorage.getItem(STORAGE_KEYS.profile);
-  if (prof) {
-      profile = JSON.parse(prof);
-      document.getElementById('userHeight').value = profile.height;
-      document.getElementById('userWeight').value = profile.weight;
-  }
 }
 
 function addExercise() {
-  const name = document.getElementById('exName').value.trim();
-  const weight = parseFloat(document.getElementById('exWeight').value);
+  const name = document.getElementById('exName').value;
+  const weight = parseFloat(document.getElementById('exWeight').value) || 0;
   if (!name) return;
-  const currentPR = getPRForExercise(name);
-  const isPR = weight > currentPR && currentPR > 0;
-  const rank = getRank(weight);
   state.exercises.push({
-    id: Date.now(),
-    name,
+    name, weight,
     bodyPart: document.getElementById('exBodyPart').value,
-    weight,
-    sets: parseInt(document.getElementById('exSets').value),
-    reps: parseInt(document.getElementById('exReps').value),
-    isPR: isPR,
-    rank: rank
+    sets: document.getElementById('exSets').value,
+    reps: document.getElementById('exReps').value,
+    rank: getRank(weight)
   });
-  if (isPR) toast("🚨 RANK UP! NEW PR 🚨"); else toast("Logged");
-  if (!state.timerRunning && state.timerElapsed === 0) startTimer();
-  document.getElementById('exName').value = '';
+  if (!state.timerRunning) startTimer();
   saveState();
   renderAll();
 }
 
-function endWorkout() {
-  if (state.exercises.length === 0) return;
-  if (!confirm('Save workout to history?')) return;
-  const session = {
-    id: Date.now(),
-    date: new Date().toISOString(),
-    duration: state.timerElapsed + (state.timerRunning ? Date.now() - state.timerStart : 0),
-    exercises: [...state.exercises]
-  };
-  state.history.unshift(session);
-  state.exercises = [];
-  state.timerRunning = false;
-  state.timerElapsed = 0;
-  saveState();
-  renderAll();
-}
-
-function renderTodayList() {
-  const list = document.getElementById('todayList');
-  document.getElementById('loggedMeta').textContent = `${state.exercises.length} items`;
-  list.innerHTML = state.exercises.slice().reverse().map(ex => `
-    <div class="exercise-item" style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-      <div style="flex:1">
-        <div class="exercise-name" style="font-weight: 700; color: var(--text);">${ex.name} ${ex.isPR ? '<span class="pr-badge">PR</span>' : ''}</div>
-        <div class="exercise-meta" style="font-size: 12px; color: var(--text-muted);">${ex.bodyPart} · ${ex.weight}kg · ${ex.sets}x${ex.reps}</div>
-      </div>
-      <div class="rank-${ex.rank.toLowerCase()}" style="font-family: var(--display); font-size: 24px;">${ex.rank}</div>
-    </div>
-  `).join('');
-}
-
-function renderHistory() {
-  const list = document.getElementById('historyList');
-  list.innerHTML = state.history.map(s => `
-    <div class="history-item">
-      <div class="history-header">
-        <div class="history-date">${new Date(s.date).toLocaleDateString().toUpperCase()}</div>
-        <div style="color: var(--text-muted); font-size: 12px;">${Math.round(s.duration/60000)}m</div>
-      </div>
-      ${s.exercises.map(e => `<div style="font-size: 13px; display:flex; justify-content:space-between; margin-bottom: 4px;"><span>${e.name}</span><span class="rank-${e.rank.toLowerCase()}">${e.weight}kg</span></div>`).join('')}
-    </div>
-  `).join('');
-  renderMuscleChart();
-  updateGlobalRank();
-}
-
-function renderBody() {
-  const fig = document.getElementById('bodyFigure');
-  fig.innerHTML = BODY_SVG;
-  const worked = new Set(state.exercises.map(e => e.bodyPart));
-  fig.querySelectorAll('.muscle').forEach(m => {
-    if (worked.has(m.dataset.zone) || worked.has("Full Body")) m.classList.add('active');
-  });
-  document.getElementById('workedSummary').innerHTML = Array.from(worked).map(p => `<span class="worked-tag">${p}</span>`).join(' ');
-  updateAvatarProportions();
-}
-
-/* ============== TIMER UTILS ============== */
-function startTimer() { state.timerStart = Date.now(); state.timerRunning = true; setInterval(updateTimer, 1000); renderTimerUI(); }
-function updateTimer() { if (!state.timerRunning) return; const ms = state.timerElapsed + (Date.now() - state.timerStart); document.getElementById('timerDisplay').textContent = new Date(ms).toISOString().substr(11, 8); }
 function renderTimerUI() {
   const isRun = state.timerRunning;
-  document.getElementById('timerStart').classList.toggle('hidden', isRun || state.timerElapsed > 0);
+  document.getElementById('timerStart').classList.toggle('hidden', isRun);
   document.getElementById('timerPause').classList.toggle('hidden', !isRun);
-  document.getElementById('timerEnd').classList.toggle('hidden', !isRun && state.timerElapsed === 0);
+  document.getElementById('timerEnd').classList.toggle('hidden', !isRun);
 }
 
-function renderAll() { renderTodayList(); renderBody(); renderTimerUI(); }
-function toast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
+function renderAll() {
+  renderBody();
+  renderTimerUI();
+  document.getElementById('todayList').innerHTML = state.exercises.map(ex => `
+    <div class="history-item" style="display:flex; justify-content:space-between; align-items:center;">
+        <div><b>${ex.name}</b><br><small>${ex.sets}x${ex.reps} @ ${ex.weight}kg</small></div>
+        <div class="rank-${ex.rank.toLowerCase()}" style="font-family:var(--display); font-size:20px;">${ex.rank}</div>
+    </div>
+  `).join('');
+}
 
 document.querySelectorAll('.tab').forEach(btn => {
   btn.onclick = () => {
     document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    const target = btn.dataset.tab;
-    document.getElementById('view-today').classList.toggle('hidden', target !== 'today');
-    document.getElementById('view-history').classList.toggle('hidden', target !== 'history');
-    document.getElementById('view-stretches').classList.toggle('hidden', target !== 'stretches');
-    if (target === 'history') renderHistory();
-    if (target === 'stretches') renderStretches();
+    const t = btn.dataset.tab;
+    document.getElementById('view-today').classList.toggle('hidden', t !== 'today');
+    document.getElementById('view-stretches').classList.toggle('hidden', t !== 'stretches');
+    document.getElementById('view-history').classList.toggle('hidden', t !== 'history');
+    if (t === 'stretches') renderStretches();
+    if (t === 'history') { updateGlobalRank(); }
   };
 });
 
 document.getElementById('addExercise').onclick = addExercise;
-document.getElementById('timerStart').onclick = startTimer;
 document.getElementById('timerEnd').onclick = endWorkout;
 document.getElementById('todayDate').textContent = new Date().toDateString().toUpperCase();
 
