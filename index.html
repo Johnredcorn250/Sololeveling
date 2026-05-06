@@ -107,12 +107,13 @@
     transition: all 0.5s ease;
   }
 
-  .rank-s { color: var(--rank-s); text-shadow: 0 0 20px rgba(0, 242, 255, 0.6); }
-  .rank-a { color: var(--rank-a); text-shadow: 0 0 20px rgba(255, 0, 85, 0.5); }
-  .rank-b { color: var(--rank-b); text-shadow: 0 0 20px rgba(174, 0, 255, 0.5); }
-  .rank-c { color: var(--rank-c); text-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
-  .rank-d { color: var(--rank-d); text-shadow: 0 0 20px rgba(255, 187, 0, 0.5); }
-  .rank-e { color: var(--rank-e); text-shadow: none; }
+  /* GLOOM CLASSES FOR RANKS */
+  .rank-s { color: var(--rank-s); text-shadow: 0 0 25px rgba(0, 242, 255, 0.7); }
+  .rank-a { color: var(--rank-a); text-shadow: 0 0 20px rgba(255, 0, 85, 0.6); }
+  .rank-b { color: var(--rank-b); text-shadow: 0 0 20px rgba(174, 0, 255, 0.6); }
+  .rank-c { color: var(--rank-c); text-shadow: 0 0 20px rgba(0, 255, 136, 0.6); }
+  .rank-d { color: var(--rank-d); text-shadow: 0 0 20px rgba(255, 187, 0, 0.6); }
+  .rank-e { color: var(--rank-e); text-shadow: none; opacity: 0.7; }
 
   /* PR BADGE */
   .pr-badge {
@@ -212,7 +213,8 @@
     color: var(--text); padding: 12px 14px; border-radius: 10px; font-family: var(--body);
   }
 
-  .btn { background: var(--text); color: var(--bg); border: none; padding: 14px 20px; border-radius: 10px; font-weight: 700; text-transform: uppercase; cursor: pointer; width: 100%; }
+  .btn { background: var(--text); color: var(--bg); border: none; padding: 14px 20px; border-radius: 10px; font-weight: 700; text-transform: uppercase; cursor: pointer; width: 100%; transition: opacity 0.2s; }
+  .btn:active { opacity: 0.8; }
   .btn-accent { background: var(--accent); color: var(--text); }
   .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
   .hidden { display: none !important; }
@@ -371,65 +373,7 @@ const stretchLibrary = {
   ]
 };
 
-const BODY_SVG = `
-<svg viewBox="0 0 200 440" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="muscleSheen" x1="50%" y1="0%" x2="50%" y2="100%">
-      <stop offset="0%" stop-color="#3a3a3a"/>
-      <stop offset="50%" stop-color="#2a2a2a"/>
-      <stop offset="100%" stop-color="#1a1a1a"/>
-    </linearGradient>
-    <linearGradient id="activeSheen" x1="50%" y1="0%" x2="50%" y2="100%">
-      <stop offset="0%" stop-color="#ff8a5b"/>
-      <stop offset="50%" stop-color="#ff4d1f"/>
-      <stop offset="100%" stop-color="#c93a14"/>
-    </linearGradient>
-  </defs>
-  <g id="bodyScaler" transform-origin="100 430">
-    <ellipse cx="100" cy="34" rx="19" ry="23" class="muscle"/>
-    <path d="M 86 48 Q 100 60 114 48" class="muscle-line"/>
-    <path d="M 91 54 Q 92 66 90 72 L 110 72 Q 108 66 109 54 Z" class="muscle"/>
-    <path d="M 90 70 Q 76 74 64 84 Q 78 82 100 80 Q 122 82 136 84 Q 124 74 110 70 Z" class="muscle" data-zone="Back"/>
-    <path d="M 64 84 Q 48 90 46 110 Q 50 122 68 118 Q 78 104 82 92 Q 76 84 64 84 Z" class="muscle" data-zone="Shoulders"/>
-    <path d="M 136 84 Q 152 90 154 110 Q 150 122 132 118 Q 122 104 118 92 Q 124 84 136 84 Z" class="muscle" data-zone="Shoulders"/>
-    <path d="M 82 90 Q 70 98 68 132 Q 76 148 98 148 L 99 104 Q 96 92 82 90 Z" class="muscle" data-zone="Chest"/>
-    <path d="M 118 90 Q 130 98 132 132 Q 124 148 102 148 L 101 104 Q 104 92 118 90 Z" class="muscle" data-zone="Chest"/>
-    <path d="M 100 100 L 100 148" class="muscle-line"/>
-    <path d="M 72 142 Q 86 150 98 148" class="muscle-line"/>
-    <path d="M 128 142 Q 114 150 102 148" class="muscle-line"/>
-    <path d="M 68 130 Q 64 152 70 178 Q 76 182 80 178 Q 78 158 78 138 Q 72 132 68 130 Z" class="muscle" data-zone="Back"/>
-    <path d="M 132 130 Q 136 152 130 178 Q 124 182 120 178 Q 122 158 122 138 Q 128 132 132 130 Z" class="muscle" data-zone="Back"/>
-    <path d="M 46 110 Q 38 132 40 168 Q 50 174 60 170 Q 64 146 64 116 Q 56 110 46 110 Z" class="muscle" data-zone="Arms"/>
-    <path d="M 154 110 Q 162 132 160 168 Q 150 174 140 170 Q 136 146 136 116 Q 144 110 154 110 Z" class="muscle" data-zone="Arms"/>
-    <ellipse cx="50" cy="174" rx="9" ry="5" class="muscle"/>
-    <ellipse cx="150" cy="174" rx="9" ry="5" class="muscle"/>
-    <path d="M 42 178 Q 36 200 40 232 Q 50 238 58 234 Q 60 204 60 180 Q 50 176 42 178 Z" class="muscle" data-zone="Arms"/>
-    <path d="M 158 178 Q 164 200 160 232 Q 150 238 142 234 Q 140 204 140 180 Q 150 176 158 178 Z" class="muscle" data-zone="Arms"/>
-    <ellipse cx="48" cy="244" rx="9" ry="11" class="muscle"/>
-    <ellipse cx="152" cy="244" rx="9" ry="11" class="muscle"/>
-    <path d="M 84 150 Q 84 166 88 170 L 99 170 L 99 150 Z" class="muscle" data-zone="Core"/>
-    <path d="M 116 150 Q 116 166 112 170 L 101 170 L 101 150 Z" class="muscle" data-zone="Core"/>
-    <path d="M 86 172 L 99 172 L 99 192 L 88 192 Z" class="muscle" data-zone="Core"/>
-    <path d="M 114 172 L 101 172 L 101 192 L 112 192 Z" class="muscle" data-zone="Core"/>
-    <path d="M 88 194 L 99 194 L 99 216 L 92 216 Z" class="muscle" data-zone="Core"/>
-    <path d="M 112 194 L 101 194 L 101 216 L 108 216 Z" class="muscle" data-zone="Core"/>
-    <path d="M 78 178 Q 76 200 84 220 Q 88 222 90 218 Q 88 198 86 180 Z" class="muscle" data-zone="Core"/>
-    <path d="M 122 178 Q 124 200 116 220 Q 112 222 110 218 Q 112 198 114 180 Z" class="muscle" data-zone="Core"/>
-    <path d="M 84 218 Q 80 238 90 252 L 110 252 Q 120 238 116 218 L 110 230 L 100 234 L 90 230 Z" class="muscle"/>
-    <path d="M 86 248 Q 76 290 78 332 L 82 342 Q 96 346 99 342 L 99 320 Q 100 280 99 250 Z" class="muscle" data-zone="Legs"/>
-    <path d="M 114 248 Q 124 290 122 332 L 118 342 Q 104 346 101 342 L 101 320 Q 100 280 101 250 Z" class="muscle" data-zone="Legs"/>
-    <path d="M 90 260 Q 89 295 88 330" class="muscle-line"/>
-    <path d="M 110 260 Q 111 295 112 330" class="muscle-line"/>
-    <ellipse cx="89" cy="346" rx="10" ry="6" class="muscle"/>
-    <ellipse cx="111" cy="346" rx="10" ry="6" class="muscle"/>
-    <path d="M 82 354 Q 78 388 84 422 L 96 422 L 97 388 L 96 354 Z" class="muscle" data-zone="Legs"/>
-    <path d="M 118 354 Q 122 388 116 422 L 104 422 L 103 388 L 104 354 Z" class="muscle" data-zone="Legs"/>
-    <path d="M 84 366 Q 82 388 86 410" class="muscle-line"/>
-    <path d="M 116 366 Q 118 388 114 410" class="muscle-line"/>
-    <ellipse cx="90" cy="428" rx="10" ry="6" class="muscle"/>
-    <ellipse cx="110" cy="428" rx="10" ry="6" class="muscle"/>
-  </g>
-</svg>`;
+const BODY_SVG = `<svg viewBox="0 0 200 440" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="muscleSheen" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#3a3a3a"/><stop offset="50%" stop-color="#2a2a2a"/><stop offset="100%" stop-color="#1a1a1a"/></linearGradient><linearGradient id="activeSheen" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#ff8a5b"/><stop offset="50%" stop-color="#ff4d1f"/><stop offset="100%" stop-color="#c93a14"/></linearGradient></defs><g id="bodyScaler" transform-origin="100 430"><ellipse cx="100" cy="34" rx="19" ry="23" class="muscle"/><path d="M 86 48 Q 100 60 114 48" class="muscle-line"/><path d="M 91 54 Q 92 66 90 72 L 110 72 Q 108 66 109 54 Z" class="muscle"/><path d="M 90 70 Q 76 74 64 84 Q 78 82 100 80 Q 122 82 136 84 Q 124 74 110 70 Z" class="muscle" data-zone="Back"/><path d="M 64 84 Q 48 90 46 110 Q 50 122 68 118 Q 78 104 82 92 Q 76 84 64 84 Z" class="muscle" data-zone="Shoulders"/><path d="M 136 84 Q 152 90 154 110 Q 150 122 132 118 Q 122 104 118 92 Q 124 84 136 84 Z" class="muscle" data-zone="Shoulders"/><path d="M 82 90 Q 70 98 68 132 Q 76 148 98 148 L 99 104 Q 96 92 82 90 Z" class="muscle" data-zone="Chest"/><path d="M 118 90 Q 130 98 132 132 Q 124 148 102 148 L 101 104 Q 104 92 118 90 Z" class="muscle" data-zone="Chest"/><path d="M 100 100 L 100 148" class="muscle-line"/><path d="M 72 142 Q 86 150 98 148" class="muscle-line"/><path d="M 128 142 Q 114 150 102 148" class="muscle-line"/><path d="M 68 130 Q 64 152 70 178 Q 76 182 80 178 Q 78 158 78 138 Q 72 132 68 130 Z" class="muscle" data-zone="Back"/><path d="M 132 130 Q 136 152 130 178 Q 124 182 120 178 Q 122 158 122 138 Q 128 132 132 130 Z" class="muscle" data-zone="Back"/><path d="M 46 110 Q 38 132 40 168 Q 50 174 60 170 Q 64 146 64 116 Q 56 110 46 110 Z" class="muscle" data-zone="Arms"/><path d="M 154 110 Q 162 132 160 168 Q 150 174 140 170 Q 136 146 136 116 Q 144 110 154 110 Z" class="muscle" data-zone="Arms"/><ellipse cx="50" cy="174" rx="9" ry="5" class="muscle"/><ellipse cx="150" cy="174" rx="9" ry="5" class="muscle"/><path d="M 42 178 Q 36 200 40 232 Q 50 238 58 234 Q 60 204 60 180 Q 50 176 42 178 Z" class="muscle" data-zone="Arms"/><path d="M 158 178 Q 164 200 160 232 Q 150 238 142 234 Q 140 204 140 180 Q 150 176 158 178 Z" class="muscle" data-zone="Arms"/><ellipse cx="48" cy="244" rx="9" ry="11" class="muscle"/><ellipse cx="152" cy="244" rx="9" ry="11" class="muscle"/><path d="M 84 150 Q 84 166 88 170 L 99 170 L 99 150 Z" class="muscle" data-zone="Core"/><path d="M 116 150 Q 116 166 112 170 L 101 170 L 101 150 Z" class="muscle" data-zone="Core"/><path d="M 86 172 L 99 172 L 99 192 L 88 192 Z" class="muscle" data-zone="Core"/><path d="M 114 172 L 101 172 L 101 192 L 112 192 Z" class="muscle" data-zone="Core"/><path d="M 88 194 L 99 194 L 99 216 L 92 216 Z" class="muscle" data-zone="Core"/><path d="M 112 194 L 101 194 L 101 216 L 108 216 Z" class="muscle" data-zone="Core"/><path d="M 78 178 Q 76 200 84 220 Q 88 222 90 218 Q 88 198 86 180 Z" class="muscle" data-zone="Core"/><path d="M 122 178 Q 124 200 116 220 Q 112 222 110 218 Q 112 198 114 180 Z" class="muscle" data-zone="Core"/><path d="M 84 218 Q 80 238 90 252 L 110 252 Q 120 238 116 218 L 110 230 L 100 234 L 90 230 Z" class="muscle"/><path d="M 86 248 Q 76 290 78 332 L 82 342 Q 96 346 99 342 L 99 320 Q 100 280 99 250 Z" class="muscle" data-zone="Legs"/><path d="M 114 248 Q 124 290 122 332 L 118 342 Q 104 346 101 342 L 101 320 Q 100 280 101 250 Z" class="muscle" data-zone="Legs"/><path d="M 90 260 Q 89 295 88 330" class="muscle-line"/><path d="M 110 260 Q 111 295 112 330" class="muscle-line"/><ellipse cx="89" cy="346" rx="10" ry="6" class="muscle"/><ellipse cx="111" cy="346" rx="10" ry="6" class="muscle"/><path d="M 82 354 Q 78 388 84 422 L 96 422 L 97 388 L 96 354 Z" class="muscle" data-zone="Legs"/><path d="M 118 354 Q 122 388 116 422 L 104 422 L 103 388 L 104 354 Z" class="muscle" data-zone="Legs"/><path d="M 84 366 Q 82 388 86 410" class="muscle-line"/><path d="M 116 366 Q 118 388 114 410" class="muscle-line"/><ellipse cx="90" cy="428" rx="10" ry="6" class="muscle"/><ellipse cx="110" cy="428" rx="10" ry="6" class="muscle"/></g></svg>`;
 
 /* ============== RANK LOGIC ============== */
 function getRank(weight) {
@@ -444,20 +388,15 @@ function getRank(weight) {
 function updateGlobalRank() {
   const rankDisplay = document.getElementById('globalRank');
   const subtitle = document.getElementById('rankSubtitle');
-  
   let maxWeightEver = 0;
   state.history.forEach(session => {
     session.exercises.forEach(ex => {
       if (ex.weight > maxWeightEver) maxWeightEver = ex.weight;
     });
   });
-
   const rank = getRank(maxWeightEver);
-  
-  // Clean up existing rank classes and apply the correct glowing class
   rankDisplay.className = 'rank-display rank-' + rank.toLowerCase();
   rankDisplay.textContent = rank;
-
   const descriptions = {
     'S': 'National Level Hunter',
     'A': 'Elite Raid Leader',
@@ -466,18 +405,69 @@ function updateGlobalRank() {
     'D': 'Active Hunter',
     'E': 'E-Class Awakened'
   };
-  
   subtitle.textContent = `Rank: ${rank}-Class (${descriptions[rank]})`;
 }
 
-/* ============== CORE LOGIC ============== */
+/* ============== STRETCH LOGIC ============== */
+function renderStretches() {
+  const container = document.getElementById('stretchesContent');
+  const workedParts = [...new Set(state.exercises.map(ex => ex.bodyPart))];
+  let html = `<h2 class="section-title">Recovery & Mobility</h2>`;
+
+  if (workedParts.length > 0) {
+    html += `<p style="color:var(--accent); font-family:var(--mono); font-size:10px; text-transform:uppercase; margin-bottom:15px;">Targeted for your session: ${workedParts.join(' + ')}</p>`;
+  } else {
+    html += `<p style="color:var(--text-muted); font-family:var(--mono); font-size:10px; text-transform:uppercase; margin-bottom:15px;">Daily Maintenance Mode</p>`;
+  }
+
+  const displayParts = workedParts.length > 0 ? workedParts : ["Full Body", "Shoulders", "Legs"];
+
+  displayParts.forEach(part => {
+    const stretches = stretchLibrary[part];
+    if (stretches) {
+      html += `<div style="font-family:var(--display); font-size:14px; color:var(--text-faint); margin: 20px 0 10px; text-transform:uppercase; letter-spacing:0.1em;">${part} Focus</div>`;
+      stretches.forEach(s => {
+        html += `
+          <div class="history-item" style="border-left: 2px solid var(--accent); margin-bottom: 12px; background: var(--surface-2);">
+            <div style="display:flex; justify-content:space-between; align-items:baseline;">
+              <div style="font-weight:700; color:var(--text);">${s.name}</div>
+              <div style="font-family:var(--mono); font-size:11px; color:var(--accent);">${s.duration}</div>
+            </div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:4px; line-height:1.4;">${s.instructions}</div>
+          </div>`;
+      });
+    }
+  });
+
+  html += `<button class="btn btn-ghost" style="margin-top:20px; font-size:11px;" onclick="renderAllStretches()">View Full Library</button>`;
+  container.innerHTML = html;
+}
+
+function renderAllStretches() {
+  const container = document.getElementById('stretchesContent');
+  let html = `<h2 class="section-title">Stretch Library</h2>`;
+  Object.keys(stretchLibrary).forEach(part => {
+    html += `<div style="font-family:var(--display); font-size:14px; color:var(--accent); margin: 25px 0 10px; text-transform:uppercase;">${part}</div>`;
+    stretchLibrary[part].forEach(s => {
+      html += `
+        <div class="history-item" style="background: var(--surface-2); margin-bottom: 8px;">
+          <div style="display:flex; justify-content:space-between; align-items: center;">
+            <div style="font-weight:700; color:var(--text);">${s.name}</div>
+            <div style="font-family:var(--mono); font-size:11px; color:var(--text-muted);">${s.duration}</div>
+          </div>
+        </div>`;
+    });
+  });
+  html += `<button class="btn btn-accent" style="margin-top:20px;" onclick="renderStretches()">Back to Recommended</button>`;
+  container.innerHTML = html;
+}
+
+/* ============== CORE ENGINE ============== */
 function getPRForExercise(name) {
   let maxWeight = 0;
   state.history.forEach(session => {
     session.exercises.forEach(ex => {
-      if (ex.name.toLowerCase() === name.toLowerCase()) {
-        maxWeight = Math.max(maxWeight, ex.weight || 0);
-      }
+      if (ex.name.toLowerCase() === name.toLowerCase()) maxWeight = Math.max(maxWeight, ex.weight || 0);
     });
   });
   return maxWeight;
@@ -580,8 +570,7 @@ function addExercise() {
     isPR: isPR,
     rank: rank
   });
-  if (isPR) toast("🚨 RANK UP! NEW PR 🚨");
-  else toast("Logged");
+  if (isPR) toast("🚨 RANK UP! NEW PR 🚨"); else toast("Logged");
   if (!state.timerRunning && state.timerElapsed === 0) startTimer();
   document.getElementById('exName').value = '';
   saveState();
@@ -619,32 +608,6 @@ function renderTodayList() {
   `).join('');
 }
 
-function renderStretches() {
-  const container = document.getElementById('stretchesContent');
-  const workedParts = [...new Set(state.exercises.map(ex => ex.bodyPart))];
-  let html = `<h2 class="section-title">Recovery Plan</h2>`;
-  if (workedParts.length === 0) {
-    html += `<p style="color:var(--text-muted); margin-bottom:15px;">Pick a stretching routine. Always gotta stretch gang</p>`;
-    workedParts.push("Full Body");
-  } else {
-    html += `<p style="color:var(--accent); font-family:var(--mono); font-size:10px; text-transform:uppercase; margin-bottom:15px;">Targeting: ${workedParts.join(' + ')}</p>`;
-  }
-  workedParts.forEach(part => {
-    const stretches = stretchLibrary[part] || stretchLibrary["Full Body"];
-    stretches.forEach(s => {
-      html += `
-        <div class="history-item" style="border-left: 2px solid var(--accent); margin-bottom: 12px;">
-          <div style="display:flex; justify-content:space-between; align-items:baseline;">
-            <div style="font-weight:700; color:var(--text);">${s.name}</div>
-            <div style="font-family:var(--mono); font-size:11px; color:var(--accent);">${s.duration}</div>
-          </div>
-          <div style="font-size:12px; color:var(--text-muted); margin-top:4px; line-height:1.4;">${s.instructions}</div>
-        </div>`;
-    });
-  });
-  container.innerHTML = html;
-}
-
 function renderHistory() {
   const list = document.getElementById('historyList');
   list.innerHTML = state.history.map(s => `
@@ -653,7 +616,7 @@ function renderHistory() {
         <div class="history-date">${new Date(s.date).toLocaleDateString().toUpperCase()}</div>
         <div style="color: var(--text-muted); font-size: 12px;">${Math.round(s.duration/60000)}m</div>
       </div>
-      ${s.exercises.map(e => `<div style="font-size: 13px; display:flex; justify-content:space-between"><span>${e.name}</span><span class="rank-${e.rank.toLowerCase()}">${e.weight}kg</span></div>`).join('')}
+      ${s.exercises.map(e => `<div style="font-size: 13px; display:flex; justify-content:space-between; margin-bottom: 4px;"><span>${e.name}</span><span class="rank-${e.rank.toLowerCase()}">${e.weight}kg</span></div>`).join('')}
     </div>
   `).join('');
   renderMuscleChart();
@@ -665,8 +628,7 @@ function renderBody() {
   fig.innerHTML = BODY_SVG;
   const worked = new Set(state.exercises.map(e => e.bodyPart));
   fig.querySelectorAll('.muscle').forEach(m => {
-    if (worked.has(m.dataset.zone)) m.classList.add('active');
-    if (worked.has("Full Body")) m.classList.add('active');
+    if (worked.has(m.dataset.zone) || worked.has("Full Body")) m.classList.add('active');
   });
   document.getElementById('workedSummary').innerHTML = Array.from(worked).map(p => `<span class="worked-tag">${p}</span>`).join(' ');
   updateAvatarProportions();
