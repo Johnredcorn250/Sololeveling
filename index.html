@@ -18,16 +18,20 @@
 
 <style>
   :root {
-    --bg: #0a0a0a;
-    --surface: #141414;
-    --surface-2: #1c1c1c;
-    --border: #262626;
+    /* Base palette — eggplant/aubergine */
+    --bg: #221e22;
+    --surface: #31263e;
+    --surface-2: #44355b;
+    --border: #44355b;
     --text: #f5f1ea;
-    --text-muted: #888;
-    --text-faint: #555;
-    --accent: #ff4d1f;
-    --accent-light: #ff8a5b;
-    --accent-dim: rgba(255, 77, 31, 0.15);
+    --text-muted: #9b8fa8;
+    --text-faint: #6b5d7a;
+    /* Accents */
+    --accent: #ee5622;
+    --accent-light: #f47a4d;
+    --accent-dim: rgba(238, 86, 34, 0.15);
+    --accent-2: #eca72c;          /* amber — paused timer, future warnings */
+    --accent-2-dim: rgba(236, 167, 44, 0.15);
     --success: #5fc97e;
     --display: 'Anton', sans-serif;
     --body: 'Manrope', sans-serif;
@@ -57,8 +61,8 @@
 
   body {
     background-image:
-      radial-gradient(circle at 20% 0%, rgba(255, 77, 31, 0.08) 0%, transparent 40%),
-      radial-gradient(circle at 80% 100%, rgba(255, 77, 31, 0.04) 0%, transparent 50%);
+      radial-gradient(circle at 20% 0%, rgba(238, 86, 34, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 80% 100%, rgba(238, 86, 34, 0.04) 0%, transparent 50%);
     background-attachment: fixed;
   }
 
@@ -124,15 +128,15 @@
   }
   .timer-card.running {
     border-color: var(--accent);
-    box-shadow: 0 0 0 1px var(--accent), 0 8px 32px rgba(255, 77, 31, 0.12);
+    box-shadow: 0 0 0 1px var(--accent), 0 8px 32px rgba(238, 86, 34, 0.12);
   }
   .timer-card.running::before {
     content: ''; position: absolute; top: 0; left: 0; right: 0;
     height: 2px; background: var(--accent); animation: pulse 1.5s ease-in-out infinite;
   }
   .timer-card.paused {
-    border-color: var(--rank-d);
-    box-shadow: 0 0 0 1px var(--rank-d);
+    border-color: var(--accent-2);
+    box-shadow: 0 0 0 1px var(--accent-2);
   }
   @keyframes pulse {
     0%, 100% { opacity: 0.4; }
@@ -147,7 +151,7 @@
     letter-spacing: -0.02em; color: var(--text); line-height: 1;
   }
   .timer-display.running { color: var(--accent); }
-  .timer-display.paused { color: var(--rank-d); }
+  .timer-display.paused { color: var(--accent-2); }
   .timer-actions { display: flex; gap: 8px; margin-top: 16px; }
 
   /* BODY SILHOUETTE */
@@ -159,8 +163,8 @@
   .body-section::before {
     content: ''; position: absolute; top: 0; left: 0; width: 160px; height: 100%;
     background-image:
-      linear-gradient(rgba(255,77,31,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,77,31,0.04) 1px, transparent 1px);
+      linear-gradient(rgba(238,86,34,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(238,86,34,0.04) 1px, transparent 1px);
     background-size: 20px 20px;
     mask-image: radial-gradient(ellipse 80px 200px at 65px 50%, black 30%, transparent 70%);
     pointer-events: none;
@@ -176,7 +180,7 @@
   }
   .muscle.active {
     fill: url(#activeSheen);
-    filter: drop-shadow(0 0 3px rgba(255, 77, 31, 0.7));
+    filter: drop-shadow(0 0 3px rgba(238, 86, 34, 0.7));
   }
   .muscle-line {
     fill: none;
@@ -234,12 +238,12 @@
   .bf-slider::-webkit-slider-thumb {
     -webkit-appearance: none; width: 14px; height: 14px;
     background: var(--text); border-radius: 50%; cursor: pointer;
-    box-shadow: 0 0 8px rgba(255, 77, 31, 0.6);
+    box-shadow: 0 0 8px rgba(238, 86, 34, 0.6);
   }
   .bf-slider::-moz-range-thumb {
     width: 14px; height: 14px; background: var(--text);
     border-radius: 50%; cursor: pointer; border: none;
-    box-shadow: 0 0 8px rgba(255, 77, 31, 0.6);
+    box-shadow: 0 0 8px rgba(238, 86, 34, 0.6);
   }
 
   .bmi-readout {
@@ -388,7 +392,7 @@
   .stretch-target-tag {
     font-family: var(--mono); font-size: 8px; letter-spacing: 0.08em;
     text-transform: uppercase; padding: 2px 6px;
-    background: rgba(255,77,31,0.08); color: var(--text-muted);
+    background: rgba(238,86,34,0.08); color: var(--text-muted);
     border-radius: 999px;
   }
 </style>
@@ -516,31 +520,31 @@ const STRETCH_LIBRARY = [
     id: 'doorway-chest', name: 'Doorway Chest Stretch', duration: '45s',
     targets: ['Chest', 'Shoulders'],
     instructions: 'Stand in a doorway, place forearms on the frame at 90°, step one foot forward and lean gently until you feel a stretch across the chest.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="35" y1="8" x2="35" y2="85" stroke="#444" stroke-width="2"/><line x1="85" y1="8" x2="85" y2="85" stroke="#444" stroke-width="2"/><circle cx="60" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="27" x2="60" y2="55" stroke="#888" stroke-width="1.5"/><path d="M 60 35 Q 50 30 38 28" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><path d="M 60 35 Q 70 30 82 28" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><line x1="60" y1="55" x2="52" y2="80" stroke="#888" stroke-width="1.5"/><line x1="60" y1="55" x2="68" y2="80" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="35" y1="8" x2="35" y2="85" stroke="#444" stroke-width="2"/><line x1="85" y1="8" x2="85" y2="85" stroke="#444" stroke-width="2"/><circle cx="60" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="27" x2="60" y2="55" stroke="#888" stroke-width="1.5"/><path d="M 60 35 Q 50 30 38 28" fill="none" stroke="#ee5622" stroke-width="2.2" stroke-linecap="round"/><path d="M 60 35 Q 70 30 82 28" fill="none" stroke="#ee5622" stroke-width="2.2" stroke-linecap="round"/><line x1="60" y1="55" x2="52" y2="80" stroke="#888" stroke-width="1.5"/><line x1="60" y1="55" x2="68" y2="80" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'pec-floor', name: 'Pec Minor Floor Stretch', duration: '30s/side',
     targets: ['Chest'],
     instructions: 'Lie face down, extend one arm out at 90°, palm flat. Roll your body away from that arm until you feel a deep chest stretch.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="70" x2="110" y2="70" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><ellipse cx="55" cy="60" rx="32" ry="9" fill="none" stroke="#888" stroke-width="1.5"/><circle cx="28" cy="60" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 60 55 L 95 38" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><circle cx="95" cy="38" r="3" fill="#ff4d1f"/><line x1="78" y1="64" x2="92" y2="76" stroke="#888" stroke-width="1.5"/><line x1="78" y1="68" x2="86" y2="78" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="70" x2="110" y2="70" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><ellipse cx="55" cy="60" rx="32" ry="9" fill="none" stroke="#888" stroke-width="1.5"/><circle cx="28" cy="60" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 60 55 L 95 38" stroke="#ee5622" stroke-width="2.2" stroke-linecap="round"/><circle cx="95" cy="38" r="3" fill="#ee5622"/><line x1="78" y1="64" x2="92" y2="76" stroke="#888" stroke-width="1.5"/><line x1="78" y1="68" x2="86" y2="78" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'wall-corner', name: 'Wall Corner Stretch', duration: '40s',
     targets: ['Chest', 'Shoulders'],
     instructions: 'Face a corner, place forearms on each wall at shoulder height, step in and lean forward gently to open the chest.',
-    illustration: `<svg viewBox="0 0 120 90"><path d="M 30 8 L 60 38 L 90 8" fill="none" stroke="#444" stroke-width="2"/><circle cx="60" cy="48" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="53" x2="60" y2="78" stroke="#888" stroke-width="1.5"/><path d="M 60 58 L 38 32" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><path d="M 60 58 L 82 32" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><path d="M 30 8 L 60 38 L 90 8" fill="none" stroke="#444" stroke-width="2"/><circle cx="60" cy="48" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="53" x2="60" y2="78" stroke="#888" stroke-width="1.5"/><path d="M 60 58 L 38 32" stroke="#ee5622" stroke-width="2.2" stroke-linecap="round"/><path d="M 60 58 L 82 32" stroke="#ee5622" stroke-width="2.2" stroke-linecap="round"/></svg>`
   },
   {
     id: 'thoracic-foam', name: 'Foam Roller Thoracic Extension', duration: '8 reps',
     targets: ['Chest', 'Back'],
     instructions: 'Place a foam roller under your upper back, hands behind head, and slowly extend backwards over the roller.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><ellipse cx="48" cy="60" rx="6" ry="4" fill="#444" stroke="#666" stroke-width="1"/><path d="M 25 55 Q 40 45 60 55 Q 75 60 90 75" fill="none" stroke="#888" stroke-width="1.8"/><circle cx="22" cy="52" r="5" fill="none" stroke="#ff4d1f" stroke-width="1.8"/><line x1="60" y1="56" x2="68" y2="40" stroke="#888" stroke-width="1.5"/><line x1="68" y1="40" x2="62" y2="32" stroke="#888" stroke-width="1.5"/><line x1="92" y1="74" x2="100" y2="78" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><ellipse cx="48" cy="60" rx="6" ry="4" fill="#444" stroke="#666" stroke-width="1"/><path d="M 25 55 Q 40 45 60 55 Q 75 60 90 75" fill="none" stroke="#888" stroke-width="1.8"/><circle cx="22" cy="52" r="5" fill="none" stroke="#ee5622" stroke-width="1.8"/><line x1="60" y1="56" x2="68" y2="40" stroke="#888" stroke-width="1.5"/><line x1="68" y1="40" x2="62" y2="32" stroke="#888" stroke-width="1.5"/><line x1="92" y1="74" x2="100" y2="78" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'cobra-chest', name: 'Cobra Chest Opener', duration: '45s',
     targets: ['Chest', 'Core'],
     instructions: 'Lie face down, palms by ribs. Press up gently, lifting chest while keeping hips on the floor. Open the collarbones.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 30 78 Q 50 68 65 50 Q 72 38 78 28" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><circle cx="80" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="55" x2="58" y2="78" stroke="#888" stroke-width="1.5"/><line x1="68" y1="55" x2="74" y2="78" stroke="#888" stroke-width="1.5"/><path d="M 30 75 Q 25 75 22 78" fill="none" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 30 78 Q 50 68 65 50 Q 72 38 78 28" fill="none" stroke="#ee5622" stroke-width="2.2"/><circle cx="80" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="55" x2="58" y2="78" stroke="#888" stroke-width="1.5"/><line x1="68" y1="55" x2="74" y2="78" stroke="#888" stroke-width="1.5"/><path d="M 30 75 Q 25 75 22 78" fill="none" stroke="#888" stroke-width="1.5"/></svg>`
   },
 
   // ===== BACK =====
@@ -548,37 +552,37 @@ const STRETCH_LIBRARY = [
     id: 'cat-cow', name: 'Cat-Cow Stretch', duration: '10 reps',
     targets: ['Back', 'Core'],
     instructions: 'On all fours, alternate between rounding the spine upward (cat) and arching it downward (cow). Move with breath.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 30 50 Q 60 30 90 50" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><circle cx="92" cy="48" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="32" y1="52" x2="32" y2="76" stroke="#888" stroke-width="1.5"/><line x1="40" y1="54" x2="40" y2="76" stroke="#888" stroke-width="1.5"/><line x1="80" y1="54" x2="80" y2="76" stroke="#888" stroke-width="1.5"/><line x1="88" y1="54" x2="88" y2="76" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 30 50 Q 60 30 90 50" fill="none" stroke="#ee5622" stroke-width="2.2"/><circle cx="92" cy="48" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="32" y1="52" x2="32" y2="76" stroke="#888" stroke-width="1.5"/><line x1="40" y1="54" x2="40" y2="76" stroke="#888" stroke-width="1.5"/><line x1="80" y1="54" x2="80" y2="76" stroke="#888" stroke-width="1.5"/><line x1="88" y1="54" x2="88" y2="76" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'childs-pose', name: "Child's Pose", duration: '1m',
     targets: ['Back'],
     instructions: 'Kneel, sit back on heels. Fold forward, arms extended, forehead toward the floor. Breathe into the back.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 70 78 Q 60 60 45 50 Q 30 45 18 48" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><circle cx="20" cy="52" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 70 78 Q 78 70 80 60" fill="none" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 70 78 Q 60 60 45 50 Q 30 45 18 48" fill="none" stroke="#ee5622" stroke-width="2.2"/><circle cx="20" cy="52" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 70 78 Q 78 70 80 60" fill="none" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'thread-needle', name: 'Thread the Needle', duration: '30s/side',
     targets: ['Back', 'Shoulders'],
     instructions: 'On all fours, slide one arm under the body palm up. Lower shoulder and ear toward the floor.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 28 50 Q 55 38 85 50" fill="none" stroke="#888" stroke-width="1.8"/><circle cx="22" cy="62" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="35" y1="55" x2="60" y2="68" stroke="#ff4d1f" stroke-width="2.2"/><line x1="60" y1="68" x2="80" y2="64" stroke="#ff4d1f" stroke-width="2.2"/><line x1="32" y1="52" x2="32" y2="76" stroke="#888" stroke-width="1.5"/><line x1="80" y1="54" x2="80" y2="76" stroke="#888" stroke-width="1.5"/><line x1="88" y1="54" x2="88" y2="76" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 28 50 Q 55 38 85 50" fill="none" stroke="#888" stroke-width="1.8"/><circle cx="22" cy="62" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="35" y1="55" x2="60" y2="68" stroke="#ee5622" stroke-width="2.2"/><line x1="60" y1="68" x2="80" y2="64" stroke="#ee5622" stroke-width="2.2"/><line x1="32" y1="52" x2="32" y2="76" stroke="#888" stroke-width="1.5"/><line x1="80" y1="54" x2="80" y2="76" stroke="#888" stroke-width="1.5"/><line x1="88" y1="54" x2="88" y2="76" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'dead-hang', name: 'Dead Hang', duration: '30s',
     targets: ['Back', 'Shoulders'],
     instructions: 'Hang from a pull-up bar with arms straight, shoulders relaxed. Decompresses the spine and stretches the lats.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="20" y1="12" x2="100" y2="12" stroke="#444" stroke-width="2.5"/><line x1="60" y1="12" x2="60" y2="22" stroke="#ff4d1f" stroke-width="2"/><line x1="55" y1="12" x2="55" y2="22" stroke="#ff4d1f" stroke-width="2"/><line x1="65" y1="12" x2="65" y2="22" stroke="#ff4d1f" stroke-width="2"/><circle cx="60" cy="30" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="35" x2="60" y2="68" stroke="#888" stroke-width="1.5"/><line x1="60" y1="68" x2="55" y2="84" stroke="#888" stroke-width="1.5"/><line x1="60" y1="68" x2="65" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="20" y1="12" x2="100" y2="12" stroke="#444" stroke-width="2.5"/><line x1="60" y1="12" x2="60" y2="22" stroke="#ee5622" stroke-width="2"/><line x1="55" y1="12" x2="55" y2="22" stroke="#ee5622" stroke-width="2"/><line x1="65" y1="12" x2="65" y2="22" stroke="#ee5622" stroke-width="2"/><circle cx="60" cy="30" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="35" x2="60" y2="68" stroke="#888" stroke-width="1.5"/><line x1="60" y1="68" x2="55" y2="84" stroke="#888" stroke-width="1.5"/><line x1="60" y1="68" x2="65" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'forward-fold', name: 'Standing Forward Fold', duration: '45s',
     targets: ['Back', 'Legs'],
     instructions: 'Stand tall, hinge at the hips and let the upper body hang. Keep a slight bend in the knees. Let arms dangle.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="60" cy="55" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 60 60 Q 60 45 60 38" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><line x1="55" y1="55" x2="48" y2="65" stroke="#888" stroke-width="1.5"/><line x1="65" y1="55" x2="72" y2="65" stroke="#888" stroke-width="1.5"/><line x1="58" y1="38" x2="55" y2="80" stroke="#888" stroke-width="1.5"/><line x1="62" y1="38" x2="65" y2="80" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="60" cy="55" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 60 60 Q 60 45 60 38" fill="none" stroke="#ee5622" stroke-width="2.2"/><line x1="55" y1="55" x2="48" y2="65" stroke="#888" stroke-width="1.5"/><line x1="65" y1="55" x2="72" y2="65" stroke="#888" stroke-width="1.5"/><line x1="58" y1="38" x2="55" y2="80" stroke="#888" stroke-width="1.5"/><line x1="62" y1="38" x2="65" y2="80" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'supine-twist', name: 'Supine Spinal Twist', duration: '45s/side',
     targets: ['Back', 'Core'],
     instructions: 'Lie on back, draw one knee across the body to the opposite side. Keep both shoulders pressed to the floor.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="22" cy="55" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="22" y1="62" x2="25" y2="76" stroke="#888" stroke-width="1.5"/><line x1="22" y1="62" x2="20" y2="76" stroke="#888" stroke-width="1.5"/><path d="M 28 65 Q 55 70 80 50" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 80 50 Q 92 38 100 30" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 80 50 L 95 60" fill="none" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="22" cy="55" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="22" y1="62" x2="25" y2="76" stroke="#888" stroke-width="1.5"/><line x1="22" y1="62" x2="20" y2="76" stroke="#888" stroke-width="1.5"/><path d="M 28 65 Q 55 70 80 50" fill="none" stroke="#ee5622" stroke-width="2.2"/><path d="M 80 50 Q 92 38 100 30" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 80 50 L 95 60" fill="none" stroke="#888" stroke-width="1.5"/></svg>`
   },
 
   // ===== SHOULDERS =====
@@ -586,31 +590,31 @@ const STRETCH_LIBRARY = [
     id: 'cross-body', name: 'Cross-Body Shoulder Stretch', duration: '30s/side',
     targets: ['Shoulders'],
     instructions: 'Bring one arm across the chest, use the other arm to pull it gently toward the body until you feel the stretch in the rear deltoid.',
-    illustration: `<svg viewBox="0 0 120 90"><circle cx="60" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="27" x2="60" y2="65" stroke="#888" stroke-width="1.5"/><path d="M 55 35 Q 38 38 30 32" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><path d="M 60 40 Q 45 38 32 34" fill="none" stroke="#888" stroke-width="1.5"/><line x1="55" y1="65" x2="48" y2="84" stroke="#888" stroke-width="1.5"/><line x1="60" y1="65" x2="68" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><circle cx="60" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="27" x2="60" y2="65" stroke="#888" stroke-width="1.5"/><path d="M 55 35 Q 38 38 30 32" fill="none" stroke="#ee5622" stroke-width="2.2" stroke-linecap="round"/><path d="M 60 40 Q 45 38 32 34" fill="none" stroke="#888" stroke-width="1.5"/><line x1="55" y1="65" x2="48" y2="84" stroke="#888" stroke-width="1.5"/><line x1="60" y1="65" x2="68" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'sleeper-stretch', name: 'Sleeper Stretch', duration: '30s/side',
     targets: ['Shoulders'],
     instructions: 'Lie on your side, arm bent at 90°. With the top hand, gently press the forearm toward the floor.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><ellipse cx="55" cy="60" rx="32" ry="9" fill="none" stroke="#888" stroke-width="1.5"/><circle cx="28" cy="55" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="33" y1="58" x2="50" y2="48" stroke="#ff4d1f" stroke-width="2.2"/><line x1="50" y1="48" x2="48" y2="68" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 50 48 Q 56 55 50 65" fill="none" stroke="#888" stroke-width="1.3"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><ellipse cx="55" cy="60" rx="32" ry="9" fill="none" stroke="#888" stroke-width="1.5"/><circle cx="28" cy="55" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="33" y1="58" x2="50" y2="48" stroke="#ee5622" stroke-width="2.2"/><line x1="50" y1="48" x2="48" y2="68" stroke="#ee5622" stroke-width="2.2"/><path d="M 50 48 Q 56 55 50 65" fill="none" stroke="#888" stroke-width="1.3"/></svg>`
   },
   {
     id: 'wall-slides', name: 'Wall Slides', duration: '10 reps',
     targets: ['Shoulders', 'Back'],
     instructions: 'Stand against a wall, arms in a goalpost position. Slide arms up and down keeping forearms in contact with the wall.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="20" y1="8" x2="20" y2="85" stroke="#444" stroke-width="2.5"/><circle cx="35" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="35" y1="27" x2="35" y2="62" stroke="#888" stroke-width="1.5"/><path d="M 30 32 L 22 22 L 22 12" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><path d="M 40 32 L 50 22 L 50 12" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><line x1="32" y1="62" x2="28" y2="82" stroke="#888" stroke-width="1.5"/><line x1="38" y1="62" x2="42" y2="82" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="20" y1="8" x2="20" y2="85" stroke="#444" stroke-width="2.5"/><circle cx="35" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="35" y1="27" x2="35" y2="62" stroke="#888" stroke-width="1.5"/><path d="M 30 32 L 22 22 L 22 12" fill="none" stroke="#ee5622" stroke-width="2.2" stroke-linecap="round"/><path d="M 40 32 L 50 22 L 50 12" fill="none" stroke="#ee5622" stroke-width="2.2" stroke-linecap="round"/><line x1="32" y1="62" x2="28" y2="82" stroke="#888" stroke-width="1.5"/><line x1="38" y1="62" x2="42" y2="82" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'doorway-shoulder', name: 'Doorway Shoulder Stretch', duration: '30s/side',
     targets: ['Shoulders', 'Chest'],
     instructions: 'Place one hand on a door frame at shoulder height, step forward and rotate the body away from the arm.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="35" y1="8" x2="35" y2="85" stroke="#444" stroke-width="2"/><circle cx="65" cy="25" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="65" y1="30" x2="65" y2="62" stroke="#888" stroke-width="1.5"/><path d="M 60 35 L 38 30" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><line x1="60" y1="62" x2="55" y2="82" stroke="#888" stroke-width="1.5"/><line x1="65" y1="62" x2="72" y2="82" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="35" y1="8" x2="35" y2="85" stroke="#444" stroke-width="2"/><circle cx="65" cy="25" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="65" y1="30" x2="65" y2="62" stroke="#888" stroke-width="1.5"/><path d="M 60 35 L 38 30" fill="none" stroke="#ee5622" stroke-width="2.2" stroke-linecap="round"/><line x1="60" y1="62" x2="55" y2="82" stroke="#888" stroke-width="1.5"/><line x1="65" y1="62" x2="72" y2="82" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'eagle-arms', name: 'Eagle Arms', duration: '30s/side',
     targets: ['Shoulders'],
     instructions: 'Cross one arm under the other at the elbows, wrap forearms, palms touching. Lift elbows away from chest.',
-    illustration: `<svg viewBox="0 0 120 90"><circle cx="60" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="27" x2="60" y2="68" stroke="#888" stroke-width="1.5"/><path d="M 50 38 Q 55 45 60 50 Q 65 55 70 50 Q 70 42 65 38" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 65 38 L 65 28" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><line x1="55" y1="68" x2="50" y2="84" stroke="#888" stroke-width="1.5"/><line x1="65" y1="68" x2="70" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><circle cx="60" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="27" x2="60" y2="68" stroke="#888" stroke-width="1.5"/><path d="M 50 38 Q 55 45 60 50 Q 65 55 70 50 Q 70 42 65 38" fill="none" stroke="#ee5622" stroke-width="2.2"/><path d="M 65 38 L 65 28" fill="none" stroke="#ee5622" stroke-width="2.2"/><line x1="55" y1="68" x2="50" y2="84" stroke="#888" stroke-width="1.5"/><line x1="65" y1="68" x2="70" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
   },
 
   // ===== ARMS =====
@@ -618,31 +622,31 @@ const STRETCH_LIBRARY = [
     id: 'tricep-overhead', name: 'Overhead Tricep Stretch', duration: '30s/side',
     targets: ['Arms', 'Shoulders'],
     instructions: 'Reach one hand down your spine, use the other to pull the elbow gently across the head.',
-    illustration: `<svg viewBox="0 0 120 90"><circle cx="60" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="27" x2="60" y2="68" stroke="#888" stroke-width="1.5"/><path d="M 60 32 L 70 12 L 55 32" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><path d="M 60 32 L 50 12 L 65 18" fill="none" stroke="#888" stroke-width="1.5"/><line x1="55" y1="68" x2="48" y2="84" stroke="#888" stroke-width="1.5"/><line x1="65" y1="68" x2="72" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><circle cx="60" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="27" x2="60" y2="68" stroke="#888" stroke-width="1.5"/><path d="M 60 32 L 70 12 L 55 32" fill="none" stroke="#ee5622" stroke-width="2.2" stroke-linecap="round"/><path d="M 60 32 L 50 12 L 65 18" fill="none" stroke="#888" stroke-width="1.5"/><line x1="55" y1="68" x2="48" y2="84" stroke="#888" stroke-width="1.5"/><line x1="65" y1="68" x2="72" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'wrist-extensor', name: 'Wrist Extensor Stretch', duration: '30s/side',
     targets: ['Arms'],
     instructions: 'Extend one arm forward, palm facing down. With the other hand, gently pull the fingers down and toward you.',
-    illustration: `<svg viewBox="0 0 120 90"><circle cx="35" cy="32" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="35" y1="37" x2="35" y2="68" stroke="#888" stroke-width="1.5"/><line x1="35" y1="42" x2="80" y2="42" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 80 42 L 82 52 L 78 56" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><path d="M 35 48 Q 60 55 80 50" fill="none" stroke="#888" stroke-width="1.5"/><line x1="32" y1="68" x2="28" y2="84" stroke="#888" stroke-width="1.5"/><line x1="38" y1="68" x2="42" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><circle cx="35" cy="32" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="35" y1="37" x2="35" y2="68" stroke="#888" stroke-width="1.5"/><line x1="35" y1="42" x2="80" y2="42" stroke="#ee5622" stroke-width="2.2"/><path d="M 80 42 L 82 52 L 78 56" fill="none" stroke="#ee5622" stroke-width="2.2" stroke-linecap="round"/><path d="M 35 48 Q 60 55 80 50" fill="none" stroke="#888" stroke-width="1.5"/><line x1="32" y1="68" x2="28" y2="84" stroke="#888" stroke-width="1.5"/><line x1="38" y1="68" x2="42" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'wrist-flexor', name: 'Wrist Flexor Stretch', duration: '30s/side',
     targets: ['Arms'],
     instructions: 'Extend one arm forward, palm facing up. With the other hand, gently pull the fingers down and back.',
-    illustration: `<svg viewBox="0 0 120 90"><circle cx="35" cy="32" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="35" y1="37" x2="35" y2="68" stroke="#888" stroke-width="1.5"/><line x1="35" y1="42" x2="80" y2="42" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 80 42 L 78 32 L 82 28" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><path d="M 35 50 Q 55 38 78 36" fill="none" stroke="#888" stroke-width="1.5"/><line x1="32" y1="68" x2="28" y2="84" stroke="#888" stroke-width="1.5"/><line x1="38" y1="68" x2="42" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><circle cx="35" cy="32" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="35" y1="37" x2="35" y2="68" stroke="#888" stroke-width="1.5"/><line x1="35" y1="42" x2="80" y2="42" stroke="#ee5622" stroke-width="2.2"/><path d="M 80 42 L 78 32 L 82 28" fill="none" stroke="#ee5622" stroke-width="2.2" stroke-linecap="round"/><path d="M 35 50 Q 55 38 78 36" fill="none" stroke="#888" stroke-width="1.5"/><line x1="32" y1="68" x2="28" y2="84" stroke="#888" stroke-width="1.5"/><line x1="38" y1="68" x2="42" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'bicep-wall', name: 'Bicep Wall Stretch', duration: '30s/side',
     targets: ['Arms', 'Chest'],
     instructions: 'Place palm on a wall behind you, fingers pointing back. Step forward and rotate the body away from the arm.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="95" y1="8" x2="95" y2="85" stroke="#444" stroke-width="2"/><circle cx="60" cy="25" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="30" x2="60" y2="62" stroke="#888" stroke-width="1.5"/><path d="M 65 35 L 92 38" fill="none" stroke="#ff4d1f" stroke-width="2.2" stroke-linecap="round"/><line x1="55" y1="62" x2="50" y2="82" stroke="#888" stroke-width="1.5"/><line x1="65" y1="62" x2="70" y2="82" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="95" y1="8" x2="95" y2="85" stroke="#444" stroke-width="2"/><circle cx="60" cy="25" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="30" x2="60" y2="62" stroke="#888" stroke-width="1.5"/><path d="M 65 35 L 92 38" fill="none" stroke="#ee5622" stroke-width="2.2" stroke-linecap="round"/><line x1="55" y1="62" x2="50" y2="82" stroke="#888" stroke-width="1.5"/><line x1="65" y1="62" x2="70" y2="82" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'forearm-prayer', name: 'Reverse Prayer Stretch', duration: '30s',
     targets: ['Arms'],
     instructions: 'Bring palms together behind the back, fingers pointing up. Press palms together gently to stretch the wrists and forearms.',
-    illustration: `<svg viewBox="0 0 120 90"><circle cx="60" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="27" x2="60" y2="68" stroke="#888" stroke-width="1.5"/><path d="M 50 35 Q 45 50 58 55 L 58 38" fill="none" stroke="#ff4d1f" stroke-width="2"/><path d="M 70 35 Q 75 50 62 55 L 62 38" fill="none" stroke="#ff4d1f" stroke-width="2"/><line x1="55" y1="68" x2="50" y2="84" stroke="#888" stroke-width="1.5"/><line x1="65" y1="68" x2="70" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><circle cx="60" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="60" y1="27" x2="60" y2="68" stroke="#888" stroke-width="1.5"/><path d="M 50 35 Q 45 50 58 55 L 58 38" fill="none" stroke="#ee5622" stroke-width="2"/><path d="M 70 35 Q 75 50 62 55 L 62 38" fill="none" stroke="#ee5622" stroke-width="2"/><line x1="55" y1="68" x2="50" y2="84" stroke="#888" stroke-width="1.5"/><line x1="65" y1="68" x2="70" y2="84" stroke="#888" stroke-width="1.5"/></svg>`
   },
 
   // ===== LEGS =====
@@ -650,37 +654,37 @@ const STRETCH_LIBRARY = [
     id: 'pigeon', name: 'Pigeon Pose', duration: '1m/side',
     targets: ['Legs'],
     instructions: 'From all fours, bring one knee forward bent, extend the other leg back. Lower hips toward the floor.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="38" cy="42" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 38 47 Q 45 56 58 60" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 58 60 Q 50 70 38 68" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 58 60 Q 75 65 100 76" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><line x1="33" y1="46" x2="42" y2="56" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="38" cy="42" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 38 47 Q 45 56 58 60" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 58 60 Q 50 70 38 68" fill="none" stroke="#ee5622" stroke-width="2.2"/><path d="M 58 60 Q 75 65 100 76" fill="none" stroke="#ee5622" stroke-width="2.2"/><line x1="33" y1="46" x2="42" y2="56" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'couch-stretch', name: 'Couch Stretch', duration: '1m/side',
     targets: ['Legs'],
     instructions: 'Kneel with back foot up against a wall or couch. Front knee at 90°. Stay tall to feel the quad and hip flexor stretch.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><line x1="92" y1="20" x2="92" y2="82" stroke="#444" stroke-width="2"/><circle cx="50" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="50" y1="27" x2="50" y2="55" stroke="#888" stroke-width="1.5"/><path d="M 50 55 L 38 78" stroke="#888" stroke-width="1.5"/><path d="M 50 55 Q 65 60 78 60 Q 88 55 90 30" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><line x1="45" y1="35" x2="38" y2="45" stroke="#888" stroke-width="1.5"/><line x1="55" y1="35" x2="62" y2="45" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><line x1="92" y1="20" x2="92" y2="82" stroke="#444" stroke-width="2"/><circle cx="50" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="50" y1="27" x2="50" y2="55" stroke="#888" stroke-width="1.5"/><path d="M 50 55 L 38 78" stroke="#888" stroke-width="1.5"/><path d="M 50 55 Q 65 60 78 60 Q 88 55 90 30" fill="none" stroke="#ee5622" stroke-width="2.2"/><line x1="45" y1="35" x2="38" y2="45" stroke="#888" stroke-width="1.5"/><line x1="55" y1="35" x2="62" y2="45" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'standing-hamstring', name: 'Standing Hamstring Stretch', duration: '45s/side',
     targets: ['Legs'],
     instructions: 'Place one heel on a low surface, leg straight. Hinge at the hips, keeping the back flat, until you feel the hamstring engage.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><rect x="60" y="62" width="35" height="6" fill="#444"/><circle cx="40" cy="32" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 40 37 Q 42 48 50 55" fill="none" stroke="#888" stroke-width="1.5"/><line x1="50" y1="55" x2="42" y2="78" stroke="#888" stroke-width="1.5"/><path d="M 50 55 Q 65 58 90 64" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><line x1="32" y1="38" x2="22" y2="50" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><rect x="60" y="62" width="35" height="6" fill="#444"/><circle cx="40" cy="32" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 40 37 Q 42 48 50 55" fill="none" stroke="#888" stroke-width="1.5"/><line x1="50" y1="55" x2="42" y2="78" stroke="#888" stroke-width="1.5"/><path d="M 50 55 Q 65 58 90 64" fill="none" stroke="#ee5622" stroke-width="2.2"/><line x1="32" y1="38" x2="22" y2="50" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'wall-calf', name: 'Wall Calf Stretch', duration: '45s/side',
     targets: ['Legs'],
     instructions: 'Place hands on a wall, step one foot back keeping the heel pressed to the floor and the leg straight.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="20" y1="8" x2="20" y2="85" stroke="#444" stroke-width="2"/><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="48" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="48" y1="27" x2="48" y2="50" stroke="#888" stroke-width="1.5"/><line x1="44" y1="32" x2="22" y2="28" stroke="#888" stroke-width="1.5"/><line x1="52" y1="32" x2="22" y2="32" stroke="#888" stroke-width="1.5"/><line x1="48" y1="50" x2="38" y2="80" stroke="#888" stroke-width="1.5"/><line x1="48" y1="50" x2="78" y2="80" stroke="#ff4d1f" stroke-width="2.2"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="20" y1="8" x2="20" y2="85" stroke="#444" stroke-width="2"/><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="48" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="48" y1="27" x2="48" y2="50" stroke="#888" stroke-width="1.5"/><line x1="44" y1="32" x2="22" y2="28" stroke="#888" stroke-width="1.5"/><line x1="52" y1="32" x2="22" y2="32" stroke="#888" stroke-width="1.5"/><line x1="48" y1="50" x2="38" y2="80" stroke="#888" stroke-width="1.5"/><line x1="48" y1="50" x2="78" y2="80" stroke="#ee5622" stroke-width="2.2"/></svg>`
   },
   {
     id: 'seated-fold', name: 'Seated Forward Fold', duration: '1m',
     targets: ['Legs', 'Back'],
     instructions: 'Sit with legs extended, hinge forward from the hips reaching toward the toes. Keep the spine long.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="32" cy="35" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 32 40 Q 40 55 55 60" fill="none" stroke="#888" stroke-width="1.5"/><line x1="55" y1="60" x2="100" y2="65" stroke="#ff4d1f" stroke-width="2.2"/><line x1="55" y1="60" x2="60" y2="55" stroke="#888" stroke-width="1.5"/><line x1="60" y1="55" x2="92" y2="60" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="32" cy="35" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 32 40 Q 40 55 55 60" fill="none" stroke="#888" stroke-width="1.5"/><line x1="55" y1="60" x2="100" y2="65" stroke="#ee5622" stroke-width="2.2"/><line x1="55" y1="60" x2="60" y2="55" stroke="#888" stroke-width="1.5"/><line x1="60" y1="55" x2="92" y2="60" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'figure-four', name: 'Lying Figure-4 Stretch', duration: '45s/side',
     targets: ['Legs'],
     instructions: 'Lie on back, cross one ankle over the opposite knee. Pull the bottom thigh toward the chest until you feel a glute stretch.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="22" cy="58" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 28 60 Q 50 55 72 50" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 72 50 L 80 32" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 80 32 L 65 30" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 65 30 L 75 38" fill="none" stroke="#ff4d1f" stroke-width="2.2"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="22" cy="58" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 28 60 Q 50 55 72 50" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 72 50 L 80 32" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 80 32 L 65 30" fill="none" stroke="#ee5622" stroke-width="2.2"/><path d="M 65 30 L 75 38" fill="none" stroke="#ee5622" stroke-width="2.2"/></svg>`
   },
 
   // ===== CORE =====
@@ -688,31 +692,31 @@ const STRETCH_LIBRARY = [
     id: 'cobra', name: 'Cobra Stretch', duration: '45s',
     targets: ['Core'],
     instructions: 'Lie face down, palms by ribs. Press up to lift the chest while keeping hips on the floor.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 28 78 Q 50 70 65 55 Q 75 40 80 28" fill="none" stroke="#888" stroke-width="2"/><path d="M 50 70 Q 60 60 65 50" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><circle cx="82" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="62" y1="58" x2="58" y2="78" stroke="#888" stroke-width="1.5"/><line x1="68" y1="58" x2="72" y2="78" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 28 78 Q 50 70 65 55 Q 75 40 80 28" fill="none" stroke="#888" stroke-width="2"/><path d="M 50 70 Q 60 60 65 50" fill="none" stroke="#ee5622" stroke-width="2.2"/><circle cx="82" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="62" y1="58" x2="58" y2="78" stroke="#888" stroke-width="1.5"/><line x1="68" y1="58" x2="72" y2="78" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'sphinx', name: 'Sphinx Pose', duration: '1m',
     targets: ['Core', 'Back'],
     instructions: 'Lie face down, prop yourself on the forearms with elbows under shoulders. A gentler version of cobra.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 25 78 Q 50 65 70 55 Q 80 50 85 45" fill="none" stroke="#888" stroke-width="2"/><line x1="55" y1="60" x2="55" y2="78" stroke="#888" stroke-width="1.5"/><line x1="65" y1="55" x2="62" y2="78" stroke="#888" stroke-width="1.5"/><path d="M 50 65 Q 55 70 58 78" fill="none" stroke="#ff4d1f" stroke-width="2"/><circle cx="88" cy="40" r="5" fill="none" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 25 78 Q 50 65 70 55 Q 80 50 85 45" fill="none" stroke="#888" stroke-width="2"/><line x1="55" y1="60" x2="55" y2="78" stroke="#888" stroke-width="1.5"/><line x1="65" y1="55" x2="62" y2="78" stroke="#888" stroke-width="1.5"/><path d="M 50 65 Q 55 70 58 78" fill="none" stroke="#ee5622" stroke-width="2"/><circle cx="88" cy="40" r="5" fill="none" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'side-bend', name: 'Standing Side Bend', duration: '30s/side',
     targets: ['Core'],
     instructions: 'Stand tall, raise one arm overhead, bend gently to the opposite side. Reach long through the fingertips.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="58" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 60 27 Q 65 50 60 78" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 58 30 L 38 12" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round"/><path d="M 62 40 L 70 55" fill="none" stroke="#888" stroke-width="1.5"/><line x1="55" y1="78" x2="50" y2="82" stroke="#888" stroke-width="1.5"/><line x1="65" y1="78" x2="68" y2="82" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="58" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 60 27 Q 65 50 60 78" fill="none" stroke="#ee5622" stroke-width="2.2"/><path d="M 58 30 L 38 12" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round"/><path d="M 62 40 L 70 55" fill="none" stroke="#888" stroke-width="1.5"/><line x1="55" y1="78" x2="50" y2="82" stroke="#888" stroke-width="1.5"/><line x1="65" y1="78" x2="68" y2="82" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'spinal-rotation', name: 'Supine Spinal Rotation', duration: '45s/side',
     targets: ['Core', 'Back'],
     instructions: 'Lie on back, knees bent. Drop both knees to one side while keeping shoulders on the floor.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="22" cy="55" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 28 60 Q 60 65 80 50" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 80 50 Q 90 38 95 28" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 80 50 L 95 65" fill="none" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="80" x2="110" y2="80" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="22" cy="55" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 28 60 Q 60 65 80 50" fill="none" stroke="#ee5622" stroke-width="2.2"/><path d="M 80 50 Q 90 38 95 28" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 80 50 L 95 65" fill="none" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'dead-bug', name: 'Dead Bug Mobility', duration: '8 reps/side',
     targets: ['Core'],
     instructions: 'Lie on back, arms up and knees over hips. Slowly extend opposite arm and leg while keeping the back flat.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="22" cy="60" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="28" y1="62" x2="78" y2="62" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 32 60 L 22 38" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 60 62 Q 70 50 75 32" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 75 62 L 95 50" fill="none" stroke="#ff4d1f" stroke-width="2.2"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="78" x2="110" y2="78" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="22" cy="60" r="5" fill="none" stroke="#888" stroke-width="1.5"/><line x1="28" y1="62" x2="78" y2="62" stroke="#ee5622" stroke-width="2.2"/><path d="M 32 60 L 22 38" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 60 62 Q 70 50 75 32" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 75 62 L 95 50" fill="none" stroke="#ee5622" stroke-width="2.2"/></svg>`
   },
 
   // ===== FULL BODY =====
@@ -720,31 +724,31 @@ const STRETCH_LIBRARY = [
     id: 'worlds-greatest', name: "World's Greatest Stretch", duration: '5 reps/side',
     targets: ['Full Body', 'Legs', 'Back', 'Shoulders'],
     instructions: 'Step into a deep lunge, place opposite hand inside the front foot. Rotate the same-side arm up toward the sky.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="55" cy="32" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 55 37 Q 50 55 45 65" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 45 65 Q 35 75 30 80" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 45 65 Q 65 70 80 80" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 53 38 L 38 60" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 58 35 L 80 12" fill="none" stroke="#ff4d1f" stroke-width="2.2"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="55" cy="32" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 55 37 Q 50 55 45 65" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 45 65 Q 35 75 30 80" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 45 65 Q 65 70 80 80" fill="none" stroke="#ee5622" stroke-width="2.2"/><path d="M 53 38 L 38 60" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 58 35 L 80 12" fill="none" stroke="#ee5622" stroke-width="2.2"/></svg>`
   },
   {
     id: 'deep-squat', name: 'Deep Squat Hold', duration: '1m',
     targets: ['Full Body', 'Legs', 'Core'],
     instructions: 'Sit deep into a squat, feet flat. Use elbows to gently press knees outward. Keep chest tall.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="60" cy="25" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 60 30 Q 60 45 60 55" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 60 55 L 42 65 L 38 80" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 60 55 L 78 65 L 82 80" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 55 38 L 42 55" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 65 38 L 78 55" fill="none" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="60" cy="25" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 60 30 Q 60 45 60 55" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 60 55 L 42 65 L 38 80" fill="none" stroke="#ee5622" stroke-width="2.2"/><path d="M 60 55 L 78 65 L 82 80" fill="none" stroke="#ee5622" stroke-width="2.2"/><path d="M 55 38 L 42 55" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 65 38 L 78 55" fill="none" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'down-dog', name: 'Downward Dog', duration: '45s',
     targets: ['Full Body', 'Back', 'Legs', 'Shoulders'],
     instructions: 'From all fours, lift hips up and back into an inverted V. Press chest toward thighs, heels toward floor.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 22 78 L 60 28 L 95 78" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><circle cx="60" cy="32" r="4" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 30 78 L 45 78" fill="none" stroke="#888" stroke-width="2"/><path d="M 80 78 L 95 78" fill="none" stroke="#888" stroke-width="2"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><path d="M 22 78 L 60 28 L 95 78" fill="none" stroke="#ee5622" stroke-width="2.2"/><circle cx="60" cy="32" r="4" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 30 78 L 45 78" fill="none" stroke="#888" stroke-width="2"/><path d="M 80 78 L 95 78" fill="none" stroke="#888" stroke-width="2"/></svg>`
   },
   {
     id: 'standing-cat-cow', name: 'Standing Cat-Cow', duration: '8 reps',
     targets: ['Full Body', 'Back', 'Core'],
     instructions: 'Stand with hands on thighs. Round and arch the spine slowly while breathing deeply. Great for warm-up.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="50" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 50 27 Q 60 40 50 60" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><line x1="50" y1="60" x2="45" y2="80" stroke="#888" stroke-width="1.5"/><line x1="50" y1="60" x2="55" y2="80" stroke="#888" stroke-width="1.5"/><line x1="55" y1="35" x2="60" y2="55" stroke="#888" stroke-width="1.5"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="50" cy="22" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 50 27 Q 60 40 50 60" fill="none" stroke="#ee5622" stroke-width="2.2"/><line x1="50" y1="60" x2="45" y2="80" stroke="#888" stroke-width="1.5"/><line x1="50" y1="60" x2="55" y2="80" stroke="#888" stroke-width="1.5"/><line x1="55" y1="35" x2="60" y2="55" stroke="#888" stroke-width="1.5"/></svg>`
   },
   {
     id: 'lunge-twist', name: 'Lunge with Spinal Twist', duration: '30s/side',
     targets: ['Full Body', 'Legs', 'Core', 'Back'],
     instructions: 'In a low lunge, place one hand on the floor inside the front foot. Reach the other arm up, opening the chest.',
-    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="55" cy="35" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 55 40 Q 52 55 48 65" fill="none" stroke="#ff4d1f" stroke-width="2.2"/><path d="M 48 65 Q 32 75 28 82" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 48 65 Q 65 70 82 82" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 52 40 L 42 60" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 58 38 L 78 8" fill="none" stroke="#ff4d1f" stroke-width="2.2"/></svg>`
+    illustration: `<svg viewBox="0 0 120 90"><line x1="10" y1="82" x2="110" y2="82" stroke="#444" stroke-width="1" stroke-dasharray="3,3"/><circle cx="55" cy="35" r="5" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 55 40 Q 52 55 48 65" fill="none" stroke="#ee5622" stroke-width="2.2"/><path d="M 48 65 Q 32 75 28 82" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 48 65 Q 65 70 82 82" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 52 40 L 42 60" fill="none" stroke="#888" stroke-width="1.5"/><path d="M 58 38 L 78 8" fill="none" stroke="#ee5622" stroke-width="2.2"/></svg>`
   }
 ];
 
@@ -758,9 +762,9 @@ const BODY_SVG_M = `
       <stop offset="100%" stop-color="#1a1a1a"/>
     </linearGradient>
     <linearGradient id="activeSheen" x1="50%" y1="0%" x2="50%" y2="100%">
-      <stop offset="0%" stop-color="#ff8a5b"/>
-      <stop offset="50%" stop-color="#ff4d1f"/>
-      <stop offset="100%" stop-color="#c93a14"/>
+      <stop offset="0%" stop-color="#f47a4d"/>
+      <stop offset="50%" stop-color="#ee5622"/>
+      <stop offset="100%" stop-color="#b03f15"/>
     </linearGradient>
   </defs>
   <g id="bodyScaler" transform-origin="100 430">
@@ -822,9 +826,9 @@ const BODY_SVG_F = `
       <stop offset="100%" stop-color="#1a1a1a"/>
     </linearGradient>
     <linearGradient id="activeSheen" x1="50%" y1="0%" x2="50%" y2="100%">
-      <stop offset="0%" stop-color="#ff8a5b"/>
-      <stop offset="50%" stop-color="#ff4d1f"/>
-      <stop offset="100%" stop-color="#c93a14"/>
+      <stop offset="0%" stop-color="#f47a4d"/>
+      <stop offset="50%" stop-color="#ee5622"/>
+      <stop offset="100%" stop-color="#b03f15"/>
     </linearGradient>
   </defs>
   <g id="bodyScaler" transform-origin="100 430">
@@ -1058,9 +1062,9 @@ function renderMuscleChart() {
       datasets: [{
         label: 'Volume Distribution',
         data: Object.values(counts),
-        backgroundColor: 'rgba(255, 77, 31, 0.2)',
-        borderColor: '#ff4d1f',
-        pointBackgroundColor: '#ff4d1f'
+        backgroundColor: 'rgba(238, 86, 34, 0.2)',
+        borderColor: '#ee5622',
+        pointBackgroundColor: '#ee5622'
       }]
     },
     options: {
