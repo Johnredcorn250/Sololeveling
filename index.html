@@ -266,6 +266,26 @@
     color: var(--text); padding: 12px 14px; border-radius: 10px; font-family: var(--body);
   }
 
+  /* UNIT TOGGLE — for KG/LB switch inline with weight label */
+  .field-label-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 6px; min-height: 18px;
+  }
+  .field-label-row label { margin-bottom: 0; }
+  .unit-toggle {
+    display: inline-flex; background: var(--surface-2);
+    border: 1px solid var(--border); border-radius: 999px;
+    overflow: hidden; padding: 1px;
+  }
+  .unit-btn {
+    background: transparent; border: none; color: var(--text-faint);
+    padding: 2px 8px; font-family: var(--mono); font-size: 9px;
+    font-weight: 600; letter-spacing: 0.08em; cursor: pointer;
+    border-radius: 999px; transition: all 0.15s;
+    line-height: 1.2;
+  }
+  .unit-btn.active { background: var(--accent); color: var(--text); }
+
   .btn { background: var(--text); color: var(--bg); border: none; padding: 14px 20px; border-radius: 10px; font-weight: 700; text-transform: uppercase; cursor: pointer; width: 100%; }
   .btn-accent { background: var(--accent); color: var(--text); }
   .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
@@ -556,7 +576,7 @@
         <div class="form-row">
           <div class="field" style="flex: 2">
             <label>Exercise</label>
-            <input type="text" id="exName" placeholder="Bench press" oninput="checkPRSuggestion()">
+            <input type="text" id="exName" placeholder="Bench press" oninput="onExerciseNameChange()">
             <div id="prHint" style="font-size: 10px; color: var(--accent); margin-top: 4px; display: none;"></div>
           </div>
           <div class="field">
@@ -573,7 +593,16 @@
           </div>
         </div>
         <div class="form-row">
-          <div class="field"><label>Weight (kg)</label><input type="number" id="exWeight" step="0.5"></div>
+          <div class="field">
+            <div class="field-label-row">
+              <label>Weight</label>
+              <div class="unit-toggle" id="exUnitToggle">
+                <button type="button" class="unit-btn active" data-unit="kg">KG</button>
+                <button type="button" class="unit-btn" data-unit="lb">LB</button>
+              </div>
+            </div>
+            <input type="number" id="exWeight" step="0.5">
+          </div>
           <div class="field"><label>Sets</label><input type="number" id="exSets"></div>
           <div class="field"><label>Reps</label><input type="number" id="exReps"></div>
         </div>
@@ -642,7 +671,16 @@
     </div>
   </div>
   <div class="form-row">
-    <div class="field"><label>Weight (kg)</label><input type="number" id="editWeight" step="0.5"></div>
+    <div class="field">
+      <div class="field-label-row">
+        <label>Weight</label>
+        <div class="unit-toggle" id="editUnitToggle">
+          <button type="button" class="unit-btn" data-unit="kg">KG</button>
+          <button type="button" class="unit-btn" data-unit="lb">LB</button>
+        </div>
+      </div>
+      <input type="number" id="editWeight" step="0.5">
+    </div>
     <div class="field"><label>Sets</label><input type="number" id="editSets"></div>
     <div class="field"><label>Reps</label><input type="number" id="editReps"></div>
   </div>
@@ -657,12 +695,61 @@
 
 <script>
 /* ============== STATE & CONSTANTS ============== */
-const STORAGE_KEYS = { current: 'gymlog_current', history: 'gymlog_history', profile: 'gymlog_profile' };
+const STORAGE_KEYS = {
+  current: 'gymlog_current',
+  history: 'gymlog_history',
+  profile: 'gymlog_profile',
+  unitPrefs: 'gymlog_unit_prefs'   // remembers last unit per exercise name
+};
 const BACKUP_VERSION = 1;
 let state = { exercises: [], timerStart: null, timerElapsed: 0, timerRunning: false, history: [] };
 let profile = { height: 180, weight: 80, sex: 'male', age: 30, bodyFat: 18 };
 let chartInstance = null;
 let timerInterval = null;
+
+/* ============== UNIT CONVERSION ==============
+   The app stores every weight internally in kilograms (the canonical unit).
+   Each logged set carries a `displayUnit` field ('kg' or 'lb') that records
+   what the lifter saw on the machine. Display layers convert kg → that unit
+   on render. PR logic, strength ranks, and history charts all keep using kg
+   so badges stay consistent across mixed-unit sessions. */
+const LB_PER_KG = 2.20462;
+const kgToLb = (kg) => kg * LB_PER_KG;
+const lbToKg = (lb) => lb / LB_PER_KG;
+const round1 = (n) => Math.round(n * 10) / 10;
+
+// Currently-selected unit in the Log form (top of Today tab)
+let currentLogUnit = 'kg';
+// Currently-selected unit in the Edit bottom sheet
+let currentEditUnit = 'kg';
+// Per-exercise unit memory: { 'bench press': 'lb', 'squat': 'kg', ... }
+let unitPrefs = {};
+
+function loadUnitPrefs() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.unitPrefs);
+    unitPrefs = raw ? JSON.parse(raw) : {};
+  } catch (e) { unitPrefs = {}; }
+}
+function saveUnitPrefs() {
+  localStorage.setItem(STORAGE_KEYS.unitPrefs, JSON.stringify(unitPrefs));
+}
+function rememberUnit(exerciseName, unit) {
+  if (!exerciseName) return;
+  unitPrefs[exerciseName.trim().toLowerCase()] = unit;
+  saveUnitPrefs();
+}
+function recallUnit(exerciseName) {
+  if (!exerciseName) return null;
+  return unitPrefs[exerciseName.trim().toLowerCase()] || null;
+}
+
+// Convert a stored kg value to the requested display unit.
+function displayWeight(kg, unit) {
+  if (kg == null || isNaN(kg)) return '';
+  const val = unit === 'lb' ? kgToLb(kg) : kg;
+  return round1(val);
+}
 
 /* ============== STRETCH LIBRARY (with inline SVG illustrations) ==============
    ~30 stretches commonly prescribed in physiotherapy and mobility work.
@@ -1114,16 +1201,7 @@ function getRank(weight, exerciseName, reps, bodyPart) {
   return 'E';
 }
 
-/* ============== HUNTER RANK SYSTEM (composite RP) ==============
-   Composite RP score across all logged history:
-     RP = workouts × 10
-        + (volume_kg / 1000) × 2     // 2 points per ton lifted
-        + total_PRs × 25
-        + unique_body_parts × 5
-
-   Tuned so a brand-new user sits in E-rank and a long-term consistent
-   lifter eventually reaches S. Rewards consistency, strength milestones,
-   and balanced training rather than just a single heavy lift. */
+/* ============== HUNTER RANK SYSTEM (composite RP) ============== */
 const RANK_THRESHOLDS = [
   { rank: 'E', min: 0,    next: 50,   colorVar: '--rank-e', glow: 'rgba(136,136,136,0.25)' },
   { rank: 'D', min: 50,   next: 150,  colorVar: '--rank-d', glow: 'rgba(255,187,0,0.35)' },
@@ -1265,11 +1343,6 @@ function getPRForExercise(name) {
   return maxWeight;
 }
 
-/* Recompute PR badges for every logged instance of a given exercise name,
-   walking chronologically across history + current session. The first
-   instance is never a PR (no prior record to break); subsequent instances
-   are flagged isPR=true only when they exceed the running maximum.
-   Called after add/edit/delete so PR badges always reflect current data. */
 function recomputePRsForName(name) {
   if (!name) return;
   const lower = name.toLowerCase();
@@ -1295,13 +1368,28 @@ function recomputePRsForName(name) {
   });
 }
 
+/* Called when the user types in the exercise name field.
+   Triggers PR hint AND auto-switches the unit toggle to whatever
+   the lifter used last time for this exercise. */
+function onExerciseNameChange() {
+  const name = document.getElementById('exName').value.trim();
+  const remembered = recallUnit(name);
+  if (remembered && remembered !== currentLogUnit) {
+    setLogUnit(remembered, /* convertExistingValue */ true);
+  }
+  checkPRSuggestion();
+}
+
 function checkPRSuggestion() {
   const name = document.getElementById('exName').value.trim();
   const hint = document.getElementById('prHint');
   if (name.length < 3) { hint.style.display = 'none'; return; }
-  const pr = getPRForExercise(name);
-  if (pr > 0) {
-    hint.textContent = `Current Max: ${pr}kg. Level up to ${pr + 2.5}kg?`;
+  const prKg = getPRForExercise(name);
+  if (prKg > 0) {
+    // Show hint in whichever unit the form is currently using
+    const prDisplay = displayWeight(prKg, currentLogUnit);
+    const nextDisplay = displayWeight(prKg + 2.5, currentLogUnit);
+    hint.textContent = `Current Max: ${prDisplay}${currentLogUnit}. Level up to ${nextDisplay}${currentLogUnit}?`;
     hint.style.display = 'block';
   } else { hint.style.display = 'none'; }
 }
@@ -1350,17 +1438,14 @@ function updateAvatarProportions() {
     const fig = document.getElementById('bodyFigure');
     if (!fig) return;
 
-    // BMI-based width (clamped, square-root softened to avoid cartoonish extremes)
     const refBMI = 80 / Math.pow(1.80, 2);
     const userBMI = w / Math.pow(h / 100, 2);
     const hScale = Math.max(0.88, Math.min(1.12, h / 180));
     const bmiRatio = userBMI / refBMI;
 
-    // Body fat above ~18% baseline adds extra width fullness
     const bfWidthBonus = 1 + Math.max(0, bf - 18) * 0.008;
     const wScale = Math.max(0.85, Math.min(1.30, Math.pow(bmiRatio, 0.55) * bfWidthBonus));
 
-    // Higher body fat → muscle separation lines fade, strokes thin
     const defOpacity = Math.max(0.05, 1 - Math.max(0, bf - 8) * 0.04);
     const muscleStroke = Math.max(0.15, 0.7 - Math.max(0, bf - 8) * 0.025);
 
@@ -1370,7 +1455,6 @@ function updateAvatarProportions() {
     const scaler = fig.querySelector('#bodyScaler');
     if (scaler) scaler.setAttribute('transform', `scale(${wScale.toFixed(3)}, ${hScale.toFixed(3)})`);
 
-    // Readout includes age now
     const readout = document.getElementById('bmiReadout');
     if (readout) {
       let category = 'Normal';
@@ -1380,8 +1464,6 @@ function updateAvatarProportions() {
       readout.innerHTML = `${age} yo · BMI <strong>${userBMI.toFixed(1)}</strong> · ${category}`;
     }
 
-    // Bodyweight change → all ranks recompute on next render. Re-render
-    // the Today list and (if visible) History so badges update live.
     if (weightChanged) {
       renderTodayList();
       if (!document.getElementById('view-history').classList.contains('hidden')) {
@@ -1394,6 +1476,21 @@ function updateAvatarProportions() {
 function saveState() {
   localStorage.setItem(STORAGE_KEYS.current, JSON.stringify(state));
   localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(state.history));
+}
+
+/* Migration: stamp `displayUnit: 'kg'` onto any older log entries that
+   don't have one. Safe to run every load — does nothing if already done. */
+function migrateLegacyUnits() {
+  let changed = false;
+  state.exercises.forEach(ex => {
+    if (!ex.displayUnit) { ex.displayUnit = 'kg'; changed = true; }
+  });
+  state.history.forEach(session => {
+    session.exercises.forEach(ex => {
+      if (!ex.displayUnit) { ex.displayUnit = 'kg'; changed = true; }
+    });
+  });
+  if (changed) saveState();
 }
 
 function loadState() {
@@ -1414,6 +1511,8 @@ function loadState() {
         b.classList.toggle('active', b.dataset.sex === profile.sex);
       });
   }
+  loadUnitPrefs();
+  migrateLegacyUnits();
 }
 
 /* ============== EXPORT / IMPORT ============== */
@@ -1421,6 +1520,7 @@ function exportData() {
   const historyRaw = localStorage.getItem(STORAGE_KEYS.history);
   const currentRaw = localStorage.getItem(STORAGE_KEYS.current);
   const profileRaw = localStorage.getItem(STORAGE_KEYS.profile);
+  const unitPrefsRaw = localStorage.getItem(STORAGE_KEYS.unitPrefs);
   const workoutCount = historyRaw ? (JSON.parse(historyRaw) || []).length : 0;
 
   const payload = {
@@ -1431,7 +1531,8 @@ function exportData() {
     data: {
       current: currentRaw,
       history: historyRaw,
-      profile: profileRaw
+      profile: profileRaw,
+      unitPrefs: unitPrefsRaw
     }
   };
 
@@ -1478,6 +1579,8 @@ function importData(file) {
     else localStorage.removeItem(STORAGE_KEYS.history);
     if (payload.data.profile) localStorage.setItem(STORAGE_KEYS.profile, payload.data.profile);
     else localStorage.removeItem(STORAGE_KEYS.profile);
+    // unitPrefs is optional in older backups — only overwrite if present
+    if (payload.data.unitPrefs) localStorage.setItem(STORAGE_KEYS.unitPrefs, payload.data.unitPrefs);
 
     localStorage.setItem('gymlog_last_import', new Date().toISOString());
     alert('Restore complete. App will reload.');
@@ -1499,8 +1602,51 @@ function updateBackupMeta() {
   meta.innerHTML = line;
 }
 
+/* ============== UNIT TOGGLE WIRING ============== */
+/* Set the Log form unit. If convertExistingValue is true and the input
+   has a number, the displayed value is converted in place so the lifter
+   sees the same magnitude in the new unit. */
+function setLogUnit(unit, convertExistingValue) {
+  if (unit !== 'kg' && unit !== 'lb') return;
+  const input = document.getElementById('exWeight');
+  const prev = currentLogUnit;
+  currentLogUnit = unit;
+
+  document.querySelectorAll('#exUnitToggle .unit-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.unit === unit);
+  });
+
+  if (convertExistingValue && input.value !== '' && prev !== unit) {
+    const v = parseFloat(input.value);
+    if (!isNaN(v)) {
+      const converted = unit === 'lb' ? kgToLb(v) : lbToKg(v);
+      input.value = round1(converted);
+    }
+  }
+  checkPRSuggestion();
+}
+
+function setEditUnit(unit, convertExistingValue) {
+  if (unit !== 'kg' && unit !== 'lb') return;
+  const input = document.getElementById('editWeight');
+  const prev = currentEditUnit;
+  currentEditUnit = unit;
+
+  document.querySelectorAll('#editUnitToggle .unit-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.unit === unit);
+  });
+
+  if (convertExistingValue && input.value !== '' && prev !== unit) {
+    const v = parseFloat(input.value);
+    if (!isNaN(v)) {
+      const converted = unit === 'lb' ? kgToLb(v) : lbToKg(v);
+      input.value = round1(converted);
+    }
+  }
+}
+
 /* ============== EDIT / DELETE LOGGED EXERCISES ============== */
-let editContext = null; // { source: 'today'|'history', sessionId, exerciseId }
+let editContext = null;
 
 function findExercise(source, sessionId, exerciseId) {
   if (source === 'today') {
@@ -1517,9 +1663,14 @@ function openEditSheet(source, sessionId, exerciseId) {
 
   editContext = { source, sessionId, exerciseId };
 
+  // Show the weight in the unit it was originally logged in
+  const exUnit = exercise.displayUnit || 'kg';
+  setEditUnit(exUnit, false);
+
   document.getElementById('editName').value = exercise.name || '';
   document.getElementById('editBodyPart').value = exercise.bodyPart || 'Chest';
-  document.getElementById('editWeight').value = exercise.weight ?? '';
+  document.getElementById('editWeight').value =
+    exercise.weight != null ? displayWeight(exercise.weight, exUnit) : '';
   document.getElementById('editSets').value = exercise.sets ?? '';
   document.getElementById('editReps').value = exercise.reps ?? '';
 
@@ -1548,23 +1699,25 @@ function saveEdit() {
 
   const newName = document.getElementById('editName').value.trim();
   if (!newName) { alert('Name cannot be empty.'); return; }
-  const newWeight = parseFloat(document.getElementById('editWeight').value) || 0;
+  const inputVal = parseFloat(document.getElementById('editWeight').value) || 0;
   const newSets = parseInt(document.getElementById('editSets').value) || 0;
   const newReps = parseInt(document.getElementById('editReps').value) || 0;
   const newBodyPart = document.getElementById('editBodyPart').value;
 
+  // Convert displayed value back to kg for storage
+  const weightKg = currentEditUnit === 'lb' ? lbToKg(inputVal) : inputVal;
+
   exercise.name = newName;
   exercise.bodyPart = newBodyPart;
-  exercise.weight = newWeight;
+  exercise.weight = weightKg;
+  exercise.displayUnit = currentEditUnit;
   exercise.sets = newSets;
   exercise.reps = newReps;
-  // Stored rank is informational only — display layer always recomputes
-  // using current profile bodyweight + sex, so old logs stay accurate
-  // if the user updates their profile.
-  exercise.rank = getRank(newWeight, newName, newReps, newBodyPart);
+  exercise.rank = getRank(weightKg, newName, newReps, newBodyPart);
 
-  // Recompute PR flags. If the name changed, both the old and new names'
-  // PR ladders need rewalking.
+  // Remember the chosen unit for this exercise name
+  rememberUnit(newName, currentEditUnit);
+
   recomputePRsForName(oldName);
   if (newName.toLowerCase() !== (oldName || '').toLowerCase()) {
     recomputePRsForName(newName);
@@ -1592,19 +1745,14 @@ function deleteExercise() {
     const session = state.history.find(s => s.id === sessionId);
     if (session) {
       session.exercises = session.exercises.filter(e => e.id !== exerciseId);
-      // If the session has no exercises left, remove the whole session
       if (session.exercises.length === 0) {
         state.history = state.history.filter(s => s.id !== sessionId);
       }
     }
   }
 
-  // Recompute PRs for the affected exercise name
   if (exerciseName) recomputePRsForName(exerciseName);
 
-  // If today's list is now empty and a workout timer is active, reset it.
-  // Without this, the timer keeps running but End Workout refuses to save
-  // an empty session, leaving an orphan timer with no way to stop it.
   if (source === 'today' && state.exercises.length === 0) {
     if (state.timerRunning || state.timerElapsed > 0) {
       state.timerRunning = false;
@@ -1626,24 +1774,30 @@ function deleteExercise() {
 /* ============== EXERCISE LOGIC ============== */
 function addExercise() {
   const name = document.getElementById('exName').value.trim();
-  const weight = parseFloat(document.getElementById('exWeight').value);
+  const inputVal = parseFloat(document.getElementById('exWeight').value);
   const bodyPart = document.getElementById('exBodyPart').value;
   const sets = parseInt(document.getElementById('exSets').value);
   const reps = parseInt(document.getElementById('exReps').value);
   if (!name) return;
 
+  // Convert input to kg before storing
+  const weightKg = currentLogUnit === 'lb' ? lbToKg(inputVal) : inputVal;
+
   state.exercises.push({
     id: Date.now(),
     name,
     bodyPart,
-    weight,
+    weight: weightKg,           // canonical kg
+    displayUnit: currentLogUnit, // what the lifter actually saw
     sets,
     reps,
-    isPR: false, // set below by recompute
-    rank: getRank(weight, name, reps, bodyPart)
+    isPR: false,
+    rank: getRank(weightKg, name, reps, bodyPart)
   });
 
-  // Recompute PR flags for every instance of this exercise name
+  // Remember the unit for this exercise name
+  rememberUnit(name, currentLogUnit);
+
   recomputePRsForName(name);
 
   const justAdded = state.exercises[state.exercises.length - 1];
@@ -1652,6 +1806,7 @@ function addExercise() {
 
   if (!state.timerRunning && state.timerElapsed === 0) startTimer();
   document.getElementById('exName').value = '';
+  document.getElementById('prHint').style.display = 'none';
   saveState();
   renderAll();
 }
@@ -1680,7 +1835,7 @@ function endWorkout() {
   renderAll();
 }
 
-/* ============== TIMER (proper pause/resume) ============== */
+/* ============== TIMER ============== */
 function startTimer() {
   if (state.timerRunning) return;
   state.timerStart = Date.now();
@@ -1757,21 +1912,19 @@ function renderTodayList() {
   const hint = document.getElementById('editHintToday');
   if (hint) hint.style.display = state.exercises.length > 0 ? 'block' : 'none';
   list.innerHTML = state.exercises.slice().reverse().map(ex => {
-    // Compute rank fresh every render so a profile bodyweight change
-    // (or older logs from before the standards-based system) always
-    // reflects the current rules.
     const liveRank = getRank(ex.weight, ex.name, ex.reps, ex.bodyPart);
+    const unit = ex.displayUnit || 'kg';
+    const shownWeight = displayWeight(ex.weight, unit);
     return `
     <div class="exercise-item" data-edit-source="today" data-edit-id="${ex.id}" style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
       <div style="flex:1">
         <div class="exercise-name" style="font-weight: 700; color: var(--text);">${ex.name} ${ex.isPR ? '<span class="pr-badge">PR</span>' : ''}</div>
-        <div class="exercise-meta" style="font-size: 12px; color: var(--text-muted);">${ex.bodyPart} · ${ex.weight}kg · ${ex.sets}x${ex.reps}</div>
+        <div class="exercise-meta" style="font-size: 12px; color: var(--text-muted);">${ex.bodyPart} · ${shownWeight}${unit} · ${ex.sets}x${ex.reps}</div>
       </div>
       <div class="rank-${liveRank.toLowerCase()}" style="font-family: var(--display); font-size: 24px;">${liveRank}</div>
     </div>
   `;
   }).join('');
-  // Attach tap handlers
   list.querySelectorAll('.exercise-item').forEach(el => {
     el.addEventListener('click', () => {
       openEditSheet('today', null, parseInt(el.dataset.editId));
@@ -1785,7 +1938,6 @@ function getRecommendedStretches(workedParts) {
     return STRETCH_LIBRARY.filter(s => s.targets.includes('Full Body')).slice(0, 5);
   }
 
-  // Score every stretch by how many of the worked parts it hits
   const scored = STRETCH_LIBRARY.map(s => ({
     stretch: s,
     score: s.targets.filter(t => workedParts.includes(t)).length
@@ -1794,7 +1946,6 @@ function getRecommendedStretches(workedParts) {
   scored.sort((a, b) => b.score - a.score);
   let recommended = scored.map(x => x.stretch);
 
-  // Top up with full-body stretches if fewer than 5
   if (recommended.length < 5) {
     const fillers = STRETCH_LIBRARY.filter(s =>
       s.targets.includes('Full Body') && !recommended.includes(s)
@@ -1847,11 +1998,12 @@ function renderHistory() {
       </div>
       ${s.exercises.map(e => {
         const liveRank = getRank(e.weight, e.name, e.reps, e.bodyPart);
-        return `<div class="history-exercise-row" data-edit-source="history" data-session-id="${s.id}" data-edit-id="${e.id}" style="font-size: 13px; display:flex; justify-content:space-between"><span>${e.name}</span><span class="rank-${liveRank.toLowerCase()}">${e.weight}kg</span></div>`;
+        const unit = e.displayUnit || 'kg';
+        const shownWeight = displayWeight(e.weight, unit);
+        return `<div class="history-exercise-row" data-edit-source="history" data-session-id="${s.id}" data-edit-id="${e.id}" style="font-size: 13px; display:flex; justify-content:space-between"><span>${e.name}</span><span class="rank-${liveRank.toLowerCase()}">${shownWeight}${unit}</span></div>`;
       }).join('')}
     </div>
   `).join('');
-  // Attach tap handlers for history rows
   list.querySelectorAll('.history-exercise-row').forEach(el => {
     el.addEventListener('click', () => {
       openEditSheet('history', parseInt(el.dataset.sessionId), parseInt(el.dataset.editId));
@@ -1902,7 +2054,6 @@ document.querySelectorAll('.tab').forEach(btn => {
   };
 });
 
-// Sex toggle
 document.querySelectorAll('.sex-btn').forEach(btn => {
   btn.onclick = () => {
     document.querySelectorAll('.sex-btn').forEach(b => b.classList.remove('active'));
@@ -1910,7 +2061,6 @@ document.querySelectorAll('.sex-btn').forEach(btn => {
     profile.sex = btn.dataset.sex;
     localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(profile));
     renderBody();
-    // Sex change → all ranks recompute
     renderTodayList();
     if (!document.getElementById('view-history').classList.contains('hidden')) {
       renderHistory();
@@ -1918,7 +2068,6 @@ document.querySelectorAll('.sex-btn').forEach(btn => {
   };
 });
 
-// Profile inputs trigger proportion updates
 ['userAge', 'userHeight', 'userWeight'].forEach(id => {
   document.getElementById(id).addEventListener('input', updateAvatarProportions);
 });
@@ -1931,16 +2080,23 @@ document.getElementById('timerResume').onclick = resumeTimer;
 document.getElementById('timerEnd').onclick = endWorkout;
 document.getElementById('todayDate').textContent = new Date().toDateString().toUpperCase();
 
-// Backup buttons
+// Unit toggle wiring — Log form
+document.querySelectorAll('#exUnitToggle .unit-btn').forEach(btn => {
+  btn.onclick = () => setLogUnit(btn.dataset.unit, true);
+});
+// Unit toggle wiring — Edit sheet
+document.querySelectorAll('#editUnitToggle .unit-btn').forEach(btn => {
+  btn.onclick = () => setEditUnit(btn.dataset.unit, true);
+});
+
 document.getElementById('exportBtn').onclick = exportData;
 document.getElementById('importBtn').onclick = () => document.getElementById('importFile').click();
 document.getElementById('importFile').addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (file) importData(file);
-  e.target.value = ''; // reset so same file can be reselected later
+  e.target.value = '';
 });
 
-// Edit sheet buttons
 document.getElementById('editCancelBtn').onclick = closeEditSheet;
 document.getElementById('editSaveBtn').onclick = saveEdit;
 document.getElementById('editDeleteBtn').onclick = deleteExercise;
@@ -1948,7 +2104,6 @@ document.getElementById('editOverlay').onclick = closeEditSheet;
 
 loadState();
 
-// Resume timer interval if a workout was running when the page closed
 if (state.timerRunning && state.timerStart) {
   timerInterval = setInterval(updateTimer, 1000);
 }
