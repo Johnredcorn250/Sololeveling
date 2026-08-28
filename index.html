@@ -519,6 +519,49 @@
     margin-top: 12px; text-align: center;
   }
   .backup-meta strong { color: var(--text-muted); }
+
+  /* STUDY TAB (Windmill Dunk Study) */
+  .study-header { margin-bottom: 4px; }
+  .study-sub { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px; }
+  .phase-list { display: flex; flex-direction: column; gap: 8px; }
+  .phase-item {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--surface-2); font-size: 12px;
+  }
+  .phase-item.current { border-color: var(--accent); background: var(--accent-dim); }
+  .phase-item .phase-name { font-weight: 700; color: var(--text); }
+  .phase-item.current .phase-name { color: var(--accent); }
+  .phase-item .phase-dates { font-family: var(--mono); font-size: 10px; color: var(--text-muted); text-align: right; }
+  .countdown-row { display: flex; gap: 10px; margin-top: 14px; }
+  .countdown-stat { flex: 1; background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 12px; text-align: center; }
+  .countdown-num { font-family: var(--display); font-size: 26px; color: var(--accent); }
+  .countdown-label { font-family: var(--mono); font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+
+  .pain-hint-banner {
+    margin-top: 10px; padding: 10px 12px; border-radius: 10px;
+    font-size: 12px; line-height: 1.4; display: none;
+  }
+  .pain-hint-banner.show { display: block; }
+  .pain-hint-banner.tier-0 { background: rgba(95,201,126,0.12); color: var(--success); }
+  .pain-hint-banner.tier-1 { background: var(--accent-2-dim); color: var(--accent-2); }
+  .pain-hint-banner.tier-2 { background: rgba(238,86,34,0.15); color: var(--accent); }
+  .pain-hint-banner.tier-3 { background: rgba(255,107,107,0.15); color: #ff6b6b; }
+
+  .adverse-row { border-left: 2px solid #ff6b6b; }
+  .adverse-empty { font-size: 12px; color: var(--text-muted); padding: 12px 0; text-align: center; }
+
+  .result-toggle { display: flex; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; height: 44px; }
+  .result-btn { flex: 1; background: transparent; border: none; color: var(--text-muted); font-family: var(--body); font-weight: 700; font-size: 12px; text-transform: uppercase; cursor: pointer; }
+  .result-btn.pass.active { background: var(--success); color: #0a0a0a; }
+  .result-btn.fail.active { background: #ff6b6b; color: #0a0a0a; }
+
+  .test-table-wrap { overflow-x: auto; margin-top: 12px; }
+  .test-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .test-table th, .test-table td { padding: 6px 8px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .test-table th { color: var(--text-muted); font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  .metric-select { width: 100%; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 10px; font-family: var(--body); margin-bottom: 10px; }
 </style>
 </head>
 <body>
@@ -531,6 +574,7 @@
 
   <div class="tabs">
     <button class="tab active" data-tab="today">Today</button>
+    <button class="tab" data-tab="study">Study</button>
     <button class="tab" data-tab="stretches">Stretches</button>
     <button class="tab" data-tab="history">History</button>
   </div>
@@ -617,6 +661,135 @@
     </section>
   </div>
 
+  <!-- STUDY VIEW (Windmill Dunk Study — data collection) -->
+  <div id="view-study" class="hidden section">
+    <h2 class="section-title study-header">Windmill Dunk Study</h2>
+    <p class="study-sub">Primary objective: a clean windmill dunk by Dec 31, 2026 — controlled takeoff, ball transferred in a continuous circular arc, dunked with the rotating hand without touching rim/backboard first, balanced landing.</p>
+
+    <div class="analytics-card">
+      <h3 style="font-family: var(--display); letter-spacing: 0.05em; margin-bottom: 4px;">Phase Tracker</h3>
+      <div class="phase-list" id="phaseList"></div>
+      <div class="countdown-row" id="countdownRow"></div>
+    </div>
+
+    <div class="form-card" style="margin-top:16px;">
+      <h3 style="font-family: var(--display); letter-spacing: 0.05em; margin-bottom: 12px;">Log Pain / RPE</h3>
+      <div class="form-row">
+        <div class="field" style="flex:1"><label>Date</label><input type="date" id="painDate"></div>
+        <div class="field" style="flex:1.4">
+          <label>Session Type</label>
+          <select id="painSessionType">
+            <option>Arms + Shoulders</option>
+            <option>Chest + Pull</option>
+            <option>Leg Day A</option>
+            <option>Leg Day B</option>
+            <option>Basketball</option>
+            <option>Mobility</option>
+            <option>Re-Test</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="bf-slider-row">
+        <div class="bf-label">Knee Pain <strong id="kneePainValue">0</strong>/10</div>
+        <input type="range" min="0" max="10" value="0" id="kneePainSlider" class="bf-slider">
+      </div>
+      <div class="bf-slider-row">
+        <div class="bf-label">Back Pain <strong id="backPainValue">0</strong>/10</div>
+        <input type="range" min="0" max="10" value="0" id="backPainSlider" class="bf-slider">
+      </div>
+      <div class="bf-slider-row">
+        <div class="bf-label">RPE <strong id="rpeValue">0</strong>/10</div>
+        <input type="range" min="0" max="10" value="0" id="rpeSlider" class="bf-slider">
+      </div>
+      <div class="field" style="margin-top:6px;"><label>Notes</label><input type="text" id="painNotes" placeholder="Optional"></div>
+      <div class="pain-hint-banner" id="painHintBanner"></div>
+      <button class="btn btn-accent" id="logPainBtn" style="margin-top:12px;">Log Session</button>
+    </div>
+
+    <div class="analytics-card">
+      <h3 style="font-family: var(--display); letter-spacing: 0.05em; margin-bottom: 4px;">Adverse Event Log</h3>
+      <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">Sessions logged at knee or back pain 3+, per protocol thresholds.</p>
+      <div id="adverseLog"></div>
+    </div>
+
+    <div class="form-card" style="margin-top:16px;">
+      <h3 style="font-family: var(--display); letter-spacing: 0.05em; margin-bottom: 4px;">Log Re-Test / Outcome Measures</h3>
+      <p style="font-size:11px; color:var(--text-faint); margin-bottom:12px;">Baseline (Aug 20, 2026): squat 100–125 lbs (knee-dependent) · bench 110 lbs · calf raise 230 lbs · pull-ups ~12 · bodyweight 84kg · body fat ~19–20% · explosiveness pending baseline test session.</p>
+      <div class="form-row">
+        <div class="field"><label>Date</label><input type="date" id="testDate"></div>
+        <div class="field">
+          <div class="field-label-row"><label>Lift Unit</label>
+            <div class="unit-toggle" id="testUnitToggle">
+              <button type="button" class="unit-btn active" data-unit="kg">KG</button>
+              <button type="button" class="unit-btn" data-unit="lb">LB</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Standing Vert (cm)</label><input type="number" id="testStandingVert" step="0.5"></div>
+        <div class="field"><label>Running Vert (cm)</label><input type="number" id="testRunningVert" step="0.5"></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Broad Jump (cm)</label><input type="number" id="testBroadJump" step="0.5"></div>
+        <div class="field"><label>10m Sprint (s)</label><input type="number" id="testSprint10" step="0.01"></div>
+        <div class="field"><label>20m Sprint (s)</label><input type="number" id="testSprint20" step="0.01"></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Squat Top Set</label><input type="number" id="testSquat" step="0.5"></div>
+        <div class="field"><label>Bench Top Set</label><input type="number" id="testBench" step="0.5"></div>
+        <div class="field"><label>Calf Raise Max</label><input type="number" id="testCalf" step="0.5"></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Max Pull-ups</label><input type="number" id="testPullups"></div>
+        <div class="field"><label>Bodyweight (kg)</label><input type="number" id="testBodyweight" step="0.1"></div>
+        <div class="field"><label>Body Fat %</label><input type="number" id="testBodyFat" step="0.1"></div>
+      </div>
+      <div class="field"><label>Notes</label><input type="text" id="testNotes" placeholder="Optional"></div>
+      <button class="btn" id="logTestBtn" style="margin-top:12px;">Save Test Results</button>
+    </div>
+
+    <div class="analytics-card">
+      <h3 style="font-family: var(--display); letter-spacing: 0.05em; margin-bottom: 10px;">Outcome Trend</h3>
+      <select id="testMetricSelect" class="metric-select">
+        <option value="standingVertical">Standing Vertical Jump (cm)</option>
+        <option value="runningVertical">Running Vertical Jump (cm)</option>
+        <option value="broadJump">Broad Jump (cm)</option>
+        <option value="sprint10m">10m Sprint (s)</option>
+        <option value="sprint20m">20m Sprint (s)</option>
+        <option value="squat">Squat Top Set (kg)</option>
+        <option value="bench">Bench Top Set (kg)</option>
+        <option value="calfRaise">Calf Raise Max (kg)</option>
+        <option value="pullups">Max Pull-ups</option>
+        <option value="bodyweight">Bodyweight (kg)</option>
+        <option value="bodyFat">Body Fat %</option>
+      </select>
+      <canvas id="testChart" style="max-height:220px;"></canvas>
+      <div class="test-table-wrap">
+        <table class="test-table" id="testTable"></table>
+      </div>
+    </div>
+
+    <div class="form-card" style="margin-top:16px;">
+      <h3 style="font-family: var(--display); letter-spacing: 0.05em; margin-bottom: 12px;">Windmill Attempts</h3>
+      <div class="form-row">
+        <div class="field" style="flex:1"><label>Date</label><input type="date" id="windmillDate"></div>
+        <div class="field" style="flex:1">
+          <label>Result</label>
+          <div class="result-toggle" id="windmillResultToggle">
+            <button type="button" class="result-btn pass" data-result="pass">Pass</button>
+            <button type="button" class="result-btn fail active" data-result="fail">Fail</button>
+          </div>
+        </div>
+      </div>
+      <div class="field"><label>Notes</label><input type="text" id="windmillNotes" placeholder="What broke down, or what clicked"></div>
+      <button class="btn btn-accent" id="logWindmillBtn" style="margin-top:12px;">Log Attempt</button>
+      <div id="windmillSummary" style="margin-top:14px;"></div>
+      <div id="windmillList" style="margin-top:8px;"></div>
+    </div>
+  </div>
+
   <!-- STRETCHES VIEW -->
   <div id="view-stretches" class="hidden section">
     <div id="stretchesContent"></div>
@@ -691,6 +864,45 @@
   </div>
 </div>
 
+<!-- END WORKOUT SHEET -->
+<div class="edit-overlay" id="endWorkoutOverlay"></div>
+<div class="edit-sheet" id="endWorkoutSheet">
+  <div class="edit-sheet-handle"></div>
+  <h3>End Session</h3>
+  <div class="edit-sheet-meta">Log pain &amp; RPE before saving — feeds the study's adverse event log</div>
+  <div class="field" style="margin-bottom:10px;">
+    <label>Session Type</label>
+    <select id="endSessionType">
+      <option>Arms + Shoulders</option>
+      <option>Chest + Pull</option>
+      <option>Leg Day A</option>
+      <option>Leg Day B</option>
+      <option>Basketball</option>
+      <option>Mobility</option>
+      <option>Re-Test</option>
+      <option>Other</option>
+    </select>
+  </div>
+  <div class="bf-slider-row">
+    <div class="bf-label">Knee Pain <strong id="endKneePainValue">0</strong>/10</div>
+    <input type="range" min="0" max="10" value="0" id="endKneePainSlider" class="bf-slider">
+  </div>
+  <div class="bf-slider-row">
+    <div class="bf-label">Back Pain <strong id="endBackPainValue">0</strong>/10</div>
+    <input type="range" min="0" max="10" value="0" id="endBackPainSlider" class="bf-slider">
+  </div>
+  <div class="bf-slider-row">
+    <div class="bf-label">RPE <strong id="endRpeValue">0</strong>/10</div>
+    <input type="range" min="0" max="10" value="0" id="endRpeSlider" class="bf-slider">
+  </div>
+  <div class="field"><label>Notes</label><input type="text" id="endNotes" placeholder="Optional"></div>
+  <div class="pain-hint-banner" id="endPainHintBanner"></div>
+  <div class="edit-actions">
+    <button class="btn btn-ghost" id="endCancelBtn">Cancel</button>
+    <button class="btn btn-accent" id="endConfirmBtn">Save Workout</button>
+  </div>
+</div>
+
 <div class="toast" id="toast">Saved</div>
 
 <script>
@@ -699,10 +911,16 @@ const STORAGE_KEYS = {
   current: 'gymlog_current',
   history: 'gymlog_history',
   profile: 'gymlog_profile',
-  unitPrefs: 'gymlog_unit_prefs'   // remembers last unit per exercise name
+  unitPrefs: 'gymlog_unit_prefs',   // remembers last unit per exercise name
+  painLog: 'gymlog_pain_log',
+  testResults: 'gymlog_test_results',
+  windmillAttempts: 'gymlog_windmill_attempts'
 };
-const BACKUP_VERSION = 1;
-let state = { exercises: [], timerStart: null, timerElapsed: 0, timerRunning: false, history: [] };
+const BACKUP_VERSION = 2;
+let state = {
+  exercises: [], timerStart: null, timerElapsed: 0, timerRunning: false, history: [],
+  painLog: [], testResults: [], windmillAttempts: []
+};
 let profile = { height: 180, weight: 80, sex: 'male', age: 30, bodyFat: 18 };
 let chartInstance = null;
 let timerInterval = null;
@@ -749,6 +967,54 @@ function displayWeight(kg, unit) {
   if (kg == null || isNaN(kg)) return '';
   const val = unit === 'lb' ? kgToLb(kg) : kg;
   return round1(val);
+}
+
+/* ============== WINDMILL DUNK STUDY — PROTOCOL CONSTANTS ==============
+   Mirrors the N-of-1 protocol doc: phase dates/focus, baseline stats, and
+   the pain-monitoring action thresholds. Used to drive the Study tab
+   (phase tracker, re-test countdown, adverse event classification). */
+const STUDY_BASELINE = '2026-08-20';
+const STUDY_GOAL = '2026-12-31';
+const STUDY_PHASES = [
+  { name: 'Foundation', start: '2026-08-20', end: '2026-09-16', focus: 'Tendon tolerance, landing mechanics, base strength, mobility' },
+  { name: 'Strength & Power', start: '2026-09-17', end: '2026-10-14', focus: 'Relative strength, RFD, back-safe hinge mechanics' },
+  { name: 'Reactive Power', start: '2026-10-15', end: '2026-11-04', focus: 'Plyometric progression, SSC efficiency, approach-jump intro' },
+  { name: 'Maximal Jump Development', start: '2026-11-05', end: '2026-11-25', focus: 'Approach vertical, takeoff mechanics' },
+  { name: 'Dunk Specificity', start: '2026-11-26', end: '2026-12-16', focus: 'Rim work, ball-control-in-air, windmill mechanics rehearsal' },
+  { name: 'Peak', start: '2026-12-17', end: '2026-12-31', focus: 'Volume taper, performance attempts' }
+];
+
+function daysBetween(a, b) {
+  return Math.round((new Date(b) - new Date(a)) / 86400000);
+}
+
+function getCurrentPhase() {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  for (const p of STUDY_PHASES) {
+    if (today >= new Date(p.start) && today <= new Date(p.end)) return p;
+  }
+  return today < new Date(STUDY_PHASES[0].start) ? STUDY_PHASES[0] : STUDY_PHASES[STUDY_PHASES.length - 1];
+}
+
+// Formal re-test every 2 weeks from baseline, through the study's end.
+function getUpcomingRetestDates() {
+  const dates = [];
+  let d = new Date(STUDY_BASELINE);
+  const goal = new Date(STUDY_GOAL);
+  d.setDate(d.getDate() + 14);
+  while (d <= goal) {
+    dates.push(new Date(d));
+    d.setDate(d.getDate() + 14);
+  }
+  return dates;
+}
+
+// Pain/RPE action thresholds — matches the protocol's adverse-event table exactly.
+function getPainAction(level) {
+  if (level >= 7) return { tier: 3, label: 'Stop lower-body training — seek physio/sports-med evaluation before resuming' };
+  if (level >= 5) return { tier: 2, label: 'Skip plyo/jump work; strength only in pain-free range; re-test in 48h' };
+  if (level >= 3) return { tier: 1, label: 'Proceed, but reduce jump volume 20-30% this session; log it' };
+  return { tier: 0, label: 'Proceed as planned' };
 }
 
 /* ============== STRETCH LIBRARY (with inline SVG illustrations) ==============
@@ -1476,6 +1742,9 @@ function updateAvatarProportions() {
 function saveState() {
   localStorage.setItem(STORAGE_KEYS.current, JSON.stringify(state));
   localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(state.history));
+  localStorage.setItem(STORAGE_KEYS.painLog, JSON.stringify(state.painLog));
+  localStorage.setItem(STORAGE_KEYS.testResults, JSON.stringify(state.testResults));
+  localStorage.setItem(STORAGE_KEYS.windmillAttempts, JSON.stringify(state.windmillAttempts));
 }
 
 /* Migration: stamp `displayUnit: 'kg'` onto any older log entries that
@@ -1511,6 +1780,13 @@ function loadState() {
         b.classList.toggle('active', b.dataset.sex === profile.sex);
       });
   }
+  const pain = localStorage.getItem(STORAGE_KEYS.painLog);
+  if (pain) state.painLog = JSON.parse(pain);
+  const tests = localStorage.getItem(STORAGE_KEYS.testResults);
+  if (tests) state.testResults = JSON.parse(tests);
+  const wm = localStorage.getItem(STORAGE_KEYS.windmillAttempts);
+  if (wm) state.windmillAttempts = JSON.parse(wm);
+
   loadUnitPrefs();
   migrateLegacyUnits();
 }
@@ -1532,7 +1808,10 @@ function exportData() {
       current: currentRaw,
       history: historyRaw,
       profile: profileRaw,
-      unitPrefs: unitPrefsRaw
+      unitPrefs: unitPrefsRaw,
+      painLog: localStorage.getItem(STORAGE_KEYS.painLog),
+      testResults: localStorage.getItem(STORAGE_KEYS.testResults),
+      windmillAttempts: localStorage.getItem(STORAGE_KEYS.windmillAttempts)
     }
   };
 
@@ -1579,8 +1858,11 @@ function importData(file) {
     else localStorage.removeItem(STORAGE_KEYS.history);
     if (payload.data.profile) localStorage.setItem(STORAGE_KEYS.profile, payload.data.profile);
     else localStorage.removeItem(STORAGE_KEYS.profile);
-    // unitPrefs is optional in older backups — only overwrite if present
+    // unitPrefs / study data are optional in older backups — only overwrite if present
     if (payload.data.unitPrefs) localStorage.setItem(STORAGE_KEYS.unitPrefs, payload.data.unitPrefs);
+    if (payload.data.painLog) localStorage.setItem(STORAGE_KEYS.painLog, payload.data.painLog);
+    if (payload.data.testResults) localStorage.setItem(STORAGE_KEYS.testResults, payload.data.testResults);
+    if (payload.data.windmillAttempts) localStorage.setItem(STORAGE_KEYS.windmillAttempts, payload.data.windmillAttempts);
 
     localStorage.setItem('gymlog_last_import', new Date().toISOString());
     alert('Restore complete. App will reload.');
@@ -1811,28 +2093,78 @@ function addExercise() {
   renderAll();
 }
 
-function endWorkout() {
+/* Ending a workout now opens a bottom sheet to capture session type,
+   knee/back pain, and RPE — this is what feeds the Study tab's adverse
+   event log and keeps every session (not just leg days) logged. */
+function guessSessionType() {
+  const parts = new Set(state.exercises.map(e => e.bodyPart));
+  if (parts.has('Legs')) return 'Leg Day A';
+  if (parts.has('Chest') || parts.has('Back')) return 'Chest + Pull';
+  if (parts.has('Arms') || parts.has('Shoulders')) return 'Arms + Shoulders';
+  return 'Other';
+}
+
+function openEndWorkoutSheet() {
   if (state.exercises.length === 0) return;
-  if (!confirm('Save workout to history?')) return;
+  document.getElementById('endSessionType').value = guessSessionType();
+  ['endKneePainSlider', 'endBackPainSlider', 'endRpeSlider'].forEach(id => document.getElementById(id).value = 0);
+  ['endKneePainValue', 'endBackPainValue', 'endRpeValue'].forEach(id => document.getElementById(id).textContent = '0');
+  document.getElementById('endNotes').value = '';
+  updateEndPainHintBanner();
+  document.getElementById('endWorkoutOverlay').classList.add('show');
+  document.getElementById('endWorkoutSheet').classList.add('show');
+}
+
+function closeEndWorkoutSheet() {
+  document.getElementById('endWorkoutOverlay').classList.remove('show');
+  document.getElementById('endWorkoutSheet').classList.remove('show');
+}
+
+function updateEndPainHintBanner() {
+  const knee = parseInt(document.getElementById('endKneePainSlider').value) || 0;
+  const back = parseInt(document.getElementById('endBackPainSlider').value) || 0;
+  const action = getPainAction(Math.max(knee, back));
+  const banner = document.getElementById('endPainHintBanner');
+  banner.className = `pain-hint-banner show tier-${action.tier}`;
+  banner.textContent = `Pain ${Math.max(knee, back)}/10 — ${action.label}`;
+}
+
+function confirmEndWorkout() {
+  const sessionType = document.getElementById('endSessionType').value;
+  const knee = parseInt(document.getElementById('endKneePainSlider').value) || 0;
+  const back = parseInt(document.getElementById('endBackPainSlider').value) || 0;
+  const rpe = parseInt(document.getElementById('endRpeSlider').value) || 0;
+  const notes = document.getElementById('endNotes').value.trim();
 
   const finalElapsed = state.timerElapsed + (state.timerRunning ? Date.now() - state.timerStart : 0);
+  const isoDate = new Date().toISOString();
 
   const session = {
     id: Date.now(),
-    date: new Date().toISOString(),
+    date: isoDate,
     duration: finalElapsed,
-    exercises: [...state.exercises]
+    exercises: [...state.exercises],
+    sessionType, kneePain: knee, backPain: back, rpe, notes
   };
 
   state.history.unshift(session);
+  state.painLog.unshift({
+    id: session.id, date: isoDate.slice(0, 10), sessionType,
+    kneePain: knee, backPain: back, rpe, notes, source: 'workout'
+  });
+
   state.exercises = [];
   state.timerRunning = false;
   state.timerElapsed = 0;
   state.timerStart = null;
   if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
   document.getElementById('timerDisplay').textContent = '00:00:00';
+
   saveState();
+  closeEndWorkoutSheet();
   renderAll();
+  if (!document.getElementById('view-study').classList.contains('hidden')) renderStudyTab();
+  toast('Workout saved');
 }
 
 /* ============== TIMER ============== */
@@ -1996,6 +2328,7 @@ function renderHistory() {
         <div class="history-date">${new Date(s.date).toLocaleDateString().toUpperCase()}</div>
         <div style="color: var(--text-muted); font-size: 12px;">${Math.round(s.duration/60000)}m</div>
       </div>
+      ${s.sessionType ? `<div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">${s.sessionType}${s.kneePain!=null?` · Knee ${s.kneePain}/10`:''}${s.backPain!=null?` · Back ${s.backPain}/10`:''}${s.rpe!=null?` · RPE ${s.rpe}/10`:''}</div>` : ''}
       ${s.exercises.map(e => {
         const liveRank = getRank(e.weight, e.name, e.reps, e.bodyPart);
         const unit = e.displayUnit || 'kg';
@@ -2032,6 +2365,210 @@ function renderBody() {
   updateAvatarProportions();
 }
 
+/* ============== STUDY TAB: PHASE TRACKER ============== */
+function renderPhaseTracker() {
+  const list = document.getElementById('phaseList');
+  const current = getCurrentPhase();
+  list.innerHTML = STUDY_PHASES.map(p => `
+    <div class="phase-item ${p.name === current.name ? 'current' : ''}">
+      <div>
+        <div class="phase-name">${p.name}</div>
+        <div class="phase-dates">${p.focus}</div>
+      </div>
+      <div class="phase-dates">${new Date(p.start).toLocaleDateString(undefined,{month:'short',day:'numeric'})} – ${new Date(p.end).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</div>
+    </div>
+  `).join('');
+
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const daysToGoal = daysBetween(today, STUDY_GOAL);
+  const daysSinceStart = daysBetween(STUDY_BASELINE, today);
+  const retests = getUpcomingRetestDates();
+  const nextRetest = retests.find(d => d >= today);
+  const daysToRetest = nextRetest ? daysBetween(today, nextRetest) : null;
+
+  document.getElementById('countdownRow').innerHTML = `
+    <div class="countdown-stat"><div class="countdown-num">${daysToGoal}</div><div class="countdown-label">Days to Dec 31</div></div>
+    <div class="countdown-stat"><div class="countdown-num">${daysSinceStart}</div><div class="countdown-label">Days in study</div></div>
+    <div class="countdown-stat"><div class="countdown-num">${daysToRetest != null ? daysToRetest : '—'}</div><div class="countdown-label">${nextRetest ? 'Days to re-test' : 'All re-tests done'}</div></div>
+  `;
+}
+
+/* ============== STUDY TAB: PAIN / RPE LOG ============== */
+function updatePainHintBanner() {
+  const knee = parseInt(document.getElementById('kneePainSlider').value) || 0;
+  const back = parseInt(document.getElementById('backPainSlider').value) || 0;
+  const action = getPainAction(Math.max(knee, back));
+  const banner = document.getElementById('painHintBanner');
+  banner.className = `pain-hint-banner show tier-${action.tier}`;
+  banner.textContent = `Pain ${Math.max(knee, back)}/10 — ${action.label}`;
+}
+
+function logPainEntry() {
+  const date = document.getElementById('painDate').value || new Date().toISOString().slice(0, 10);
+  const sessionType = document.getElementById('painSessionType').value;
+  const knee = parseInt(document.getElementById('kneePainSlider').value) || 0;
+  const back = parseInt(document.getElementById('backPainSlider').value) || 0;
+  const rpe = parseInt(document.getElementById('rpeSlider').value) || 0;
+  const notes = document.getElementById('painNotes').value.trim();
+
+  state.painLog.unshift({ id: Date.now(), date, sessionType, kneePain: knee, backPain: back, rpe, notes, source: 'quick' });
+  saveState();
+  toast('Session logged');
+
+  ['kneePainSlider', 'backPainSlider', 'rpeSlider'].forEach(id => document.getElementById(id).value = 0);
+  ['kneePainValue', 'backPainValue', 'rpeValue'].forEach(id => document.getElementById(id).textContent = '0');
+  document.getElementById('painNotes').value = '';
+  updatePainHintBanner();
+  renderAdverseLog();
+}
+
+function renderAdverseLog() {
+  const container = document.getElementById('adverseLog');
+  const events = state.painLog
+    .filter(e => Math.max(e.kneePain || 0, e.backPain || 0) >= 3)
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+  if (events.length === 0) {
+    container.innerHTML = '<div class="adverse-empty">No adverse events logged yet.</div>';
+    return;
+  }
+  container.innerHTML = events.map(e => {
+    const action = getPainAction(Math.max(e.kneePain || 0, e.backPain || 0));
+    return `
+      <div class="history-item adverse-row">
+        <div class="history-header">
+          <div class="history-date" style="font-size:15px;">${new Date(e.date).toLocaleDateString()}</div>
+          <div style="color: var(--text-muted); font-size: 11px;">${e.sessionType || ''}</div>
+        </div>
+        <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">Knee ${e.kneePain || 0}/10 · Back ${e.backPain || 0}/10 · RPE ${e.rpe || 0}/10</div>
+        <div style="font-size:12px; color: var(--accent);">${action.label}</div>
+        ${e.notes ? `<div style="font-size:12px; color:var(--text-muted); margin-top:4px;">${e.notes}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+/* ============== STUDY TAB: OUTCOME MEASURES / RE-TEST ============== */
+let currentTestUnit = 'kg';
+let testChartInstance = null;
+const TEST_METRIC_LABELS = {
+  standingVertical: 'Standing Vertical Jump (cm)', runningVertical: 'Running Vertical Jump (cm)',
+  broadJump: 'Broad Jump (cm)', sprint10m: '10m Sprint (s)', sprint20m: '20m Sprint (s)',
+  squat: 'Squat Top Set (kg)', bench: 'Bench Top Set (kg)', calfRaise: 'Calf Raise Max (kg)',
+  pullups: 'Max Pull-ups', bodyweight: 'Bodyweight (kg)', bodyFat: 'Body Fat %'
+};
+
+function logTestEntry() {
+  const date = document.getElementById('testDate').value || new Date().toISOString().slice(0, 10);
+  const num = v => (v === '' || v == null) ? null : parseFloat(v);
+  const toKg = v => (v === '' || v == null) ? null : (currentTestUnit === 'lb' ? lbToKg(parseFloat(v)) : parseFloat(v));
+
+  const entry = {
+    id: Date.now(),
+    date,
+    standingVertical: num(document.getElementById('testStandingVert').value),
+    runningVertical: num(document.getElementById('testRunningVert').value),
+    broadJump: num(document.getElementById('testBroadJump').value),
+    sprint10m: num(document.getElementById('testSprint10').value),
+    sprint20m: num(document.getElementById('testSprint20').value),
+    squat: toKg(document.getElementById('testSquat').value),
+    bench: toKg(document.getElementById('testBench').value),
+    calfRaise: toKg(document.getElementById('testCalf').value),
+    pullups: num(document.getElementById('testPullups').value),
+    bodyweight: num(document.getElementById('testBodyweight').value),
+    bodyFat: num(document.getElementById('testBodyFat').value),
+    notes: document.getElementById('testNotes').value.trim()
+  };
+
+  state.testResults.unshift(entry);
+
+  // Sync bodyweight/body fat into the profile so the Today tab avatar reflects it
+  if (entry.bodyweight != null || entry.bodyFat != null) {
+    profile = { ...profile, weight: entry.bodyweight ?? profile.weight, bodyFat: entry.bodyFat ?? profile.bodyFat };
+    localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(profile));
+    document.getElementById('userWeight').value = profile.weight;
+    document.getElementById('userBodyFat').value = profile.bodyFat;
+    document.getElementById('bfValue').textContent = `${profile.bodyFat}%`;
+    updateAvatarProportions();
+  }
+
+  saveState();
+  toast('Test results saved');
+  ['testStandingVert', 'testRunningVert', 'testBroadJump', 'testSprint10', 'testSprint20',
+   'testSquat', 'testBench', 'testCalf', 'testPullups', 'testBodyweight', 'testBodyFat', 'testNotes']
+    .forEach(id => document.getElementById(id).value = '');
+  renderTestChart();
+  renderTestTable();
+}
+
+function renderTestChart() {
+  const metric = document.getElementById('testMetricSelect').value;
+  const sorted = [...state.testResults].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const labels = sorted.map(e => new Date(e.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+  const data = sorted.map(e => e[metric]);
+  const ctx = document.getElementById('testChart').getContext('2d');
+  if (testChartInstance) testChartInstance.destroy();
+  testChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets: [{ label: TEST_METRIC_LABELS[metric], data, borderColor: '#ee5622', backgroundColor: 'rgba(238,86,34,0.15)', tension: 0.3, spanGaps: true }] },
+    options: {
+      scales: { x: { grid: { color: '#262626' }, ticks: { color: '#9b8fa8' } }, y: { grid: { color: '#262626' }, ticks: { color: '#9b8fa8' } } },
+      plugins: { legend: { display: false } }
+    }
+  });
+}
+
+function renderTestTable() {
+  const table = document.getElementById('testTable');
+  const sorted = [...state.testResults].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const cols = ['date', 'standingVertical', 'runningVertical', 'broadJump', 'sprint10m', 'sprint20m', 'squat', 'bench', 'calfRaise', 'pullups', 'bodyweight', 'bodyFat'];
+  const headers = ['Date', 'Stand Vert', 'Run Vert', 'Broad', '10m', '20m', 'Squat', 'Bench', 'Calf', 'Pull-ups', 'BW', 'BF%'];
+  table.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>` +
+    sorted.map(e => `<tr>${cols.map(c => {
+      if (c === 'date') return `<td>${new Date(e.date).toLocaleDateString()}</td>`;
+      const v = e[c];
+      return `<td>${v == null ? '—' : v}</td>`;
+    }).join('')}</tr>`).join('');
+}
+
+/* ============== STUDY TAB: WINDMILL ATTEMPTS ============== */
+let windmillResult = 'fail';
+
+function logWindmillAttempt() {
+  const date = document.getElementById('windmillDate').value || new Date().toISOString().slice(0, 10);
+  const notes = document.getElementById('windmillNotes').value.trim();
+  state.windmillAttempts.unshift({ id: Date.now(), date, result: windmillResult, notes });
+  saveState();
+  toast(windmillResult === 'pass' ? '🏀 WINDMILL LANDED 🏀' : 'Logged');
+  document.getElementById('windmillNotes').value = '';
+  renderWindmillLog();
+}
+
+function renderWindmillLog() {
+  const attempts = state.windmillAttempts;
+  const passes = attempts.filter(a => a.result === 'pass').length;
+  const summary = document.getElementById('windmillSummary');
+  summary.innerHTML = attempts.length === 0
+    ? '<div class="adverse-empty">No attempts logged yet.</div>'
+    : `<div class="bmi-readout">${attempts.length} attempt(s) logged · <strong>${passes} clean pass${passes === 1 ? '' : 'es'}</strong></div>`;
+
+  const list = document.getElementById('windmillList');
+  list.innerHTML = [...attempts].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 15).map(a => `
+    <div class="history-exercise-row" style="font-size:13px; display:flex; justify-content:space-between; padding:6px 0;">
+      <span>${new Date(a.date).toLocaleDateString()}${a.notes ? ' · ' + a.notes : ''}</span>
+      <span class="${a.result === 'pass' ? 'rank-c' : 'rank-a'}" style="font-weight:700; text-transform:uppercase; font-size:11px;">${a.result}</span>
+    </div>
+  `).join('');
+}
+
+function renderStudyTab() {
+  renderPhaseTracker();
+  renderAdverseLog();
+  renderTestChart();
+  renderTestTable();
+  renderWindmillLog();
+  updatePainHintBanner();
+}
+
 /* ============== INIT ============== */
 function renderAll() { renderTodayList(); renderBody(); renderTimerUI(); }
 function toast(m) {
@@ -2047,10 +2584,12 @@ document.querySelectorAll('.tab').forEach(btn => {
     btn.classList.add('active');
     const target = btn.dataset.tab;
     document.getElementById('view-today').classList.toggle('hidden', target !== 'today');
+    document.getElementById('view-study').classList.toggle('hidden', target !== 'study');
     document.getElementById('view-history').classList.toggle('hidden', target !== 'history');
     document.getElementById('view-stretches').classList.toggle('hidden', target !== 'stretches');
     if (target === 'history') renderHistory();
     if (target === 'stretches') renderStretches();
+    if (target === 'study') renderStudyTab();
   };
 });
 
@@ -2077,8 +2616,46 @@ document.getElementById('addExercise').onclick = addExercise;
 document.getElementById('timerStart').onclick = startTimer;
 document.getElementById('timerPause').onclick = pauseTimer;
 document.getElementById('timerResume').onclick = resumeTimer;
-document.getElementById('timerEnd').onclick = endWorkout;
+document.getElementById('timerEnd').onclick = openEndWorkoutSheet;
 document.getElementById('todayDate').textContent = new Date().toDateString().toUpperCase();
+
+// End-workout sheet wiring
+document.getElementById('endCancelBtn').onclick = closeEndWorkoutSheet;
+document.getElementById('endConfirmBtn').onclick = confirmEndWorkout;
+document.getElementById('endWorkoutOverlay').onclick = closeEndWorkoutSheet;
+['endKneePainSlider', 'endBackPainSlider', 'endRpeSlider'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    document.getElementById(id.replace('Slider', 'Value')).textContent = document.getElementById(id).value;
+    updateEndPainHintBanner();
+  });
+});
+
+// Study tab wiring
+document.getElementById('logPainBtn').onclick = logPainEntry;
+document.getElementById('logTestBtn').onclick = logTestEntry;
+document.getElementById('logWindmillBtn').onclick = logWindmillAttempt;
+document.getElementById('testMetricSelect').addEventListener('change', renderTestChart);
+['kneePainSlider', 'backPainSlider', 'rpeSlider'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    document.getElementById(id.replace('Slider', 'Value')).textContent = document.getElementById(id).value;
+    updatePainHintBanner();
+  });
+});
+document.querySelectorAll('#testUnitToggle .unit-btn').forEach(btn => {
+  btn.onclick = () => {
+    currentTestUnit = btn.dataset.unit;
+    document.querySelectorAll('#testUnitToggle .unit-btn').forEach(b => b.classList.toggle('active', b === btn));
+  };
+});
+document.querySelectorAll('#windmillResultToggle .result-btn').forEach(btn => {
+  btn.onclick = () => {
+    windmillResult = btn.dataset.result;
+    document.querySelectorAll('#windmillResultToggle .result-btn').forEach(b => b.classList.toggle('active', b === btn));
+  };
+});
+// Default the Study tab's date pickers to today
+const todayISO = new Date().toISOString().slice(0, 10);
+['painDate', 'testDate', 'windmillDate'].forEach(id => { document.getElementById(id).value = todayISO; });
 
 // Unit toggle wiring — Log form
 document.querySelectorAll('#exUnitToggle .unit-btn').forEach(btn => {
